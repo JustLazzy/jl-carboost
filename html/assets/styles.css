@@ -19,13 +19,13 @@
   -ms-flex-direction: column;
   flex-direction: column;
   padding-top: 10px;
-  padding-left: 0;
+  padding-left: 10px;
   margin-bottom: 0;
 }
 
 .main li {
   position: relative;
-  display: block;
+  display: flex;
   padding: 10px 20px;
   list-style: none;
 }
