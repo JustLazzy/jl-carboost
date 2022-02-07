@@ -15,6 +15,18 @@ server_script {
 }
 client_script 'client/main.lua'
 
-ui_page 'html/ui.html'
+ui_page 'html/index.html'
 
 lua54 'yes'
+
+
+files {
+	'html/index.html',
+	'html/style.css',
+	'html/js/*.js',
+	'html/assets/*.png',
+	'html/assets/shop/*.png',
+	'html/assets/*.svg',
+	'html/assets/audio/*.mp3',
+	'html/assets/audio/*.wav',
+}

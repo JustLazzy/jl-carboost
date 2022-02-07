@@ -1,0 +1,49 @@
+#boosting-app {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 70%;
+  height: 70%;
+  display: flex;
+  flex-direction: column;
+  background-color: rgb(11, 13, 27);
+  border-radius: 5px;
+  border-width: 1px;
+  box-shadow: 10px 10px 15px rgba(0, 0, 0, 0.06);
+  border: 2px solid rgba(255, 255, 255, 0.507);
+  transition: 0.5s;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+#boosting-app > header > nav {
+  font-family: "Open Sans", sans-serif;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: row;
+  padding: 15px;
+  border-width: 1px;
+  flex-direction: row;
+  width: 100%;
+  height: 60px;
+  background-color: rgb(5, 6, 17);
+}
+
+#boosting-app > header > nav ul {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  flex-direction: row;
+}
+
+#boosting-app > header :active {
+  cursor: move;
+  user-select: none;
+}

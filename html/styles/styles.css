@@ -1,0 +1,197 @@
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans&display=swap");
+
+* {
+  /* make it in middle */
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  /* overflow-x: scroll;
+  /* white-space: nowrap; */
+  -ms-user-select: none;
+  user-select: none;
+  overflow-y: hidden;
+  overflow-x: hidden;
+  color: white;
+}
+
+div.laptop {
+  width: 95%;
+  height: 95%;
+  top: -50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  position: absolute;
+  visibility: hidden;
+  background: url(../assets/BG.png);
+  border: 10px solid rgb(11, 13, 27);
+  border-bottom: 20px solid rgb(11, 13, 27);
+  border-radius: 5px;
+  background-size: cover;
+  background-position: center;
+  opacity: 1;
+  transition: 1s;
+}
+
+div .winmanager {
+  width: 100%;
+  height: 45px;
+  position: absolute;
+  bottom: 0;
+  background: linear-gradient(
+    to right,
+    rgba(21, 24, 43, 0.8),
+    rgba(30, 38, 77, 0.8),
+    rgba(10, 12, 41, 0.8)
+  );
+  backdrop-filter: blur(10px);
+  border-top: 1px solid rgba(80, 80, 80, 0.3);
+  display: flex;
+  bottom: 0;
+  align-items: center;
+  z-index: 10;
+}
+
+div.icon {
+  height: 50px;
+  width: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 5px;
+}
+
+/* div.icon :hover {
+  cursor: pointer;
+} */
+
+div.start {
+  /* background: linear-gradient(
+    135deg,
+    rgba(20, 23, 58, 0.5),
+    rgba(18, 25, 53, 0.75)
+  ); */
+  border-radius: 3px;
+  /* border-top: 1px solid rgb(24, 14, 66);
+  border-bottom: 1px inset rgb(13, 6, 41); */
+}
+
+img.start {
+  height: 40px;
+}
+
+img {
+  height: 30px;
+  -webkit-user-drag: none;
+}
+
+div.winmanager > .left-icons {
+  padding: 10px;
+  position: fixed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+}
+
+div.winmanager > .right-icons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  padding: 15px;
+  right: 0;
+}
+
+div.winmanager > .right-icons > i {
+  padding: 10px;
+}
+
+div.winmanager > .right-icons > div {
+  margin: 0 15px;
+}
+
+i.show-desktop {
+  margin-right: 15px;
+}
+
+i:hover {
+  cursor: pointer;
+}
+
+i.fas {
+  font-size: 15px;
+  padding: 0 4px;
+  color: rgb(248, 248, 248);
+}
+
+div.date-time {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  font-size: 12px;
+  font-family: "Segoe UI", sans-serif;
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+div.desktopicons {
+  padding: 20px 20px;
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+}
+
+div.desktopicons > div {
+  padding: 10px 20px;
+  display: inline-block;
+  text-align: center;
+  /* make every item centered */
+  justify-content: center;
+  left: 0;
+  list-style: none;
+  transition: 1s;
+}
+
+div.desktopicons > div > img {
+  border-radius: 2px;
+  transition: 0.5s;
+}
+
+div.desktopicons > div > img:hover {
+  cursor: pointer;
+  opacity: 80%;
+}
+
+p {
+  font-family: "Segoe UI", sans-serif;
+  text-transform: capitalize;
+  font-size: 17px;
+  font-weight: bold;
+}
+
+.desktopicons img {
+  height: 60px;
+  width: 60px;
+}
+
+/* Bennys */
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1b1a46;
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.25);
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 5px;
+  background-color: #0c0c2b;
+}
+
+.apps img {
+  width: auto;
+  height: auto;
+}

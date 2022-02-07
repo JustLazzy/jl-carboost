@@ -14,6 +14,10 @@ AddEventHandler('onResourceStop', function(resource)
    end
 end)
 
+-- Event
+RegisterNetEvent('jl-carboost:server:sendTask', function (source, data)
+end)
+
 QBCore.Commands.Add('carboost', 'Start carboost', {{
    name = 'tier',
    help = 'Tier'
@@ -53,4 +57,10 @@ QBCore.Functions.CreateCallback('jl-carboost:server:spawnCar', function (source,
       }
       cb(data)
    end
+end)
+
+
+QBCore.Functions.CreateUseableItem('laptop' , function(source, item)
+   TriggerClientEvent('jl-carboost:client:openLaptop', source)
+   print(item)
 end)

@@ -1,41 +1,194 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
-    />
-    <link rel="stylesheet" href="assets/styles.css" />
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>JL Carboost</title>
+    <title>jl carboost</title>
+    <script
+      src="https://code.jquery.com/jquery-3.4.1.min.js"
+      integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+      crossorigin="anonymous"
+    ></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+      integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link rel="stylesheet" href="./styles/styles.css" />
+    <link rel="stylesheet" href="./styles/bennys.css" />
+    <link rel="stylesheet" href="./styles/boosting.css" />
   </head>
-  <body>
-    <header></header>
-    <div id="laptop">
-      <div class="main">
-        <ul id="app-list">
-          <li>
-            <img src="./img/boost.png" alt="Carboost" />
-            <a href="#">TEST</a>
-          </li>
-          <li>
-            <img src="./img/bennys.png" alt="Bennys" />
-            <a href="#">TEST</a>
-          </li>
-        </ul>
-      </div>
-      <div class="footer">
-        <div class="left">
-          <ul>
-            <li>
-              <a href="#"><img src="./img/logo.png" alt="logo" /></a>
-            </li>
-          </ul>
+
+  <body oncopy="return false" oncut="return false" onpaste="return false">
+    <div class="laptop">
+      <div class="desktop">
+        <!-- make 2 icon -->
+        <div class="notification"></div>
+        <div class="apps">
+          <div id="bennys-app">
+            <header>
+              <nav>
+                <h1>Bennys Motorshop</h1>
+                <ul>
+                  <i
+                    id="close-bennys"
+                    class="fas fa-times-circle"
+                    style="font-size: 15px; color: rgb(192, 11, 11)"
+                  ></i>
+                </ul>
+              </nav>
+            </header>
+            <div class="container">
+              <div class="navigation">
+                <nav>
+                  <button style="background-color: #1db15b">Checkout</button>
+                  <button style="background-color: #b11d1d">Basket</button>
+                </nav>
+              </div>
+              <div class="grid">
+                <article>
+                  <img src="./assets/shop/brake_parts_a.png" alt="brakes" />
+                  <div class="text">
+                    <h3>Brake Grade S</h3>
+                    <p>Price: 300k</p>
+                    <button style="background: #1db15b">Add to basket</button>
+                  </div>
+                </article>
+                <article>
+                  <img src="./assets/shop/brake_parts_a.png" alt="brakes" />
+                  <div class="text">
+                    <h3>Brake Grade S</h3>
+                    <p>Price: 300k</p>
+                    <button style="background: #1db15b">Add to basket</button>
+                  </div>
+                </article>
+                <article>
+                  <img src="./assets/shop/brake_parts_a.png" alt="brakes" />
+                  <div class="text">
+                    <h3>Brake Grade S</h3>
+                    <p>Price: 300k</p>
+                    <button style="background: #1db15b">Add to basket</button>
+                  </div>
+                </article>
+                <article>
+                  <img src="./assets/shop/brake_parts_a.png" alt="brakes" />
+                  <div class="text">
+                    <h3>Brake Grade S</h3>
+                    <p>Price: 300k</p>
+                    <button style="background: #1db15b">Add to basket</button>
+                  </div>
+                </article>
+                <article>
+                  <img src="./assets/shop/brake_parts_a.png" alt="brakes" />
+                  <div class="text">
+                    <h3>Brake Grade S</h3>
+                    <p>Price: 300k</p>
+                    <button style="background: #1db15b">Add to basket</button>
+                  </div>
+                </article>
+                <article>
+                  <img src="./assets/shop/brake_parts_a.png" alt="brakes" />
+                  <div class="text">
+                    <h3>Brake Grade S</h3>
+                    <p>Price: 300k</p>
+                    <button style="background: #1db15b">Add to basket</button>
+                  </div>
+                </article>
+                <article>
+                  <img src="./assets/shop/brake_parts_a.png" alt="brakes" />
+                  <div class="text">
+                    <h3>Brake Grade S</h3>
+                    <p>Price: 300k</p>
+                    <button style="background: #1db15b">Add to basket</button>
+                  </div>
+                </article>
+                <article>
+                  <img src="./assets/shop/brake_parts_a.png" alt="brakes" />
+                  <div class="text">
+                    <h3>Brake Grade S</h3>
+                    <p>Price: 300k</p>
+                    <button style="background: #1db15b">Add to basket</button>
+                  </div>
+                </article>
+                <article>
+                  <img src="./assets/shop/brake_parts_a.png" alt="brakes" />
+                  <div class="text">
+                    <h3>Brake Grade S</h3>
+                    <p>Price: 300k</p>
+                    <button style="background: #1db15b">Add to basket</button>
+                  </div>
+                </article>
+                <article>
+                  <img src="./assets/shop/brake_parts_a.png" alt="brakes" />
+                  <div class="text">
+                    <h3>Brake Grade S</h3>
+                    <p>Price: 300k</p>
+                    <button style="background: #1db15b">Add to basket</button>
+                  </div>
+                </article>
+              </div>
+            </div>
+
+            <!-- </header> -->
+          </div>
+          <div id="boosting-app">
+            <header>
+              <nav>
+                <h1>Boost</h1>
+                <ul>
+                  <i
+                    id="close-boosting"
+                    class="fas fa-times-circle"
+                    style="font-size: 30px; color: rgb(192, 11, 11)"
+                  ></i>
+                </ul>
+              </nav>
+            </header>
+          </div>
         </div>
-        <div class="right"></div>
+        <div class="desktopicons">
+          <div>
+            <img
+              id="bennys"
+              class="icon"
+              src="./assets/bennys.png"
+              alt="bennys"
+            />
+            <p>bennys</p>
+          </div>
+          <div>
+            <img
+              id="boosting"
+              class="icon"
+              src="./assets/boost.png"
+              alt="boosting"
+            />
+            <p>boosting</p>
+          </div>
+        </div>
+      </div>
+      <div class="winmanager">
+        <div class="left-icons">
+          <div class="icon start">
+            <img class="start" src="./assets/logo.png" alt="" />
+          </div>
+        </div>
+        <div class="right-icons">
+          <i class="fas fa-duotone fa-gear"></i>
+          <i class="fas fa-wifi"></i>
+          <i class="fas fa-volume-up"></i>
+          <i class="fas fa-battery-half"></i>
+          <div class="date-time">
+            <span id="time"></span>
+            <span id="date"></span>
+          </div>
+        </div>
       </div>
     </div>
+    <!-- import javascript -->
+    <script src="./js/app.js"></script>
   </body>
 </html>
