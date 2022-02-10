@@ -1,0 +1,11 @@
+{
+  "devmode": true,
+  "bennyssell": {
+    "card": {
+      "name": "Card",
+      "image": "brake_parts_a.png",
+      "price": 10000
+    },
+    "repeat": 50
+  }
+}

@@ -62,5 +62,4 @@ end)
 
 QBCore.Functions.CreateUseableItem('laptop' , function(source, item)
    TriggerClientEvent('jl-carboost:client:openLaptop', source)
-   print(item)
 end)

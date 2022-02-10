@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto&display=swap");
 #bennys-app {
   margin: 0;
   padding: 0;
@@ -22,13 +23,15 @@
 }
 
 #bennys-app .grid {
+  visibility: hidden;
+  opacity: 0;
   position: relative;
-  margin: 5px;
+  /* margin: 10px; */
   margin-top: 5vh;
   display: grid;
-  grid-template-columns: repeat(4, 13vw);
-  grid-gap: 20px;
-  grid-column-gap: 15px;
+  grid-template-columns: repeat(5, 11vw);
+  grid-gap: 10px;
+  grid-column-gap: 10px;
   align-items: center;
   justify-content: center;
 }
@@ -54,6 +57,7 @@
 }
 
 #bennys-app .text h3 {
+  font-family: "Roboto", sans-serif;
   text-transform: uppercase;
 }
 
@@ -145,4 +149,14 @@
 #bennys-app > header :active {
   cursor: move;
   user-select: none;
+}
+
+#bennys-app .loading {
+  /* make it larger and centered */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: x-large;
+  transition: 1s;
 }

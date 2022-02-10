@@ -17,12 +17,9 @@ client_script 'client/main.lua'
 
 ui_page 'html/index.html'
 
-lua54 'yes'
-
-
 files {
 	'html/index.html',
-	'html/style.css',
+	'html/styles/*.css',
 	'html/js/*.js',
 	'html/assets/*.png',
 	'html/assets/shop/*.png',
@@ -30,3 +27,4 @@ files {
 	'html/assets/audio/*.mp3',
 	'html/assets/audio/*.wav',
 }
+lua54 'yes'

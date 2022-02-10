@@ -3,15 +3,6 @@ local isPoliceCalled = false
 local isCarSpawned
 local display = false
 
-
-
-RegisterCommand('carnui', function (source)
-    SetDisplay(not display)
-end)
-
-RegisterCommand('loadstore', function (source)
-   TriggerEvent('jl-carboost:client:loadStore')
-end)
 -- function
 function SetDisplay(bool)
     display = bool
@@ -38,12 +29,20 @@ RegisterNUICallback('exit', function (data)
     SetDisplay(false)
 end)
 
-RegisterNetEvent('jl-carboost:client:loadStore', function ()
-    SendNUIMessage({
-        type="loadStore",
-        store = Config.BennysSell
-    })
+RegisterNUICallback('loadstore', function (data, cb)
+    local storeitem = Config.BennysSell
+    if storeitem then
+        cb({
+            storeitem = storeitem
+        })
+    else
+        cb({
+            error = 'No store item'
+        })
+    end
 end)
+
+
 -- Event
 RegisterNetEvent('jl-carboost:client:spawnCar', function()
     QBCore.Functions.TriggerCallback('jl-carboost:server:spawnCar', function(result)
@@ -85,9 +84,4 @@ CreateThread(function ()
         DisableControlAction(0, 322, display)
         DisableControlAction(0, 106, display)
     end
-end)
-
-CreateThread(function ()
-    Wait(100)
-    TriggerEvent('jl-carboost:client:loadStore')
 end)

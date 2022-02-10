@@ -22,13 +22,13 @@
     <link rel="stylesheet" href="./styles/boosting.css" />
   </head>
 
-  <body oncopy="return false" oncut="return false" onpaste="return false">
+  <body oncopy="false" oncut="false" onpaste="false">
     <div class="laptop">
       <div class="desktop">
         <!-- make 2 icon -->
         <div class="notification"></div>
         <div class="apps">
-          <div id="bennys-app">
+          <div id="bennys-app" onload="registerItem()">
             <header>
               <nav>
                 <h1>Bennys Motorshop</h1>
@@ -42,94 +42,14 @@
               </nav>
             </header>
             <div class="container">
-              <div class="navigation">
-                <nav>
-                  <button style="background-color: #1db15b">Checkout</button>
-                  <button style="background-color: #b11d1d">Basket</button>
-                </nav>
+              <div class="loading">
+                <!-- make a loading with fontawesome -->
+                <i
+                  class="fas fa-solid fa-spinner fa-spin"
+                  style="font-size: x-large"
+                ></i>
               </div>
-              <div class="grid">
-                <article>
-                  <img src="./assets/shop/brake_parts_a.png" alt="brakes" />
-                  <div class="text">
-                    <h3>Brake Grade S</h3>
-                    <p>Price: 300k</p>
-                    <button style="background: #1db15b">Add to basket</button>
-                  </div>
-                </article>
-                <article>
-                  <img src="./assets/shop/brake_parts_a.png" alt="brakes" />
-                  <div class="text">
-                    <h3>Brake Grade S</h3>
-                    <p>Price: 300k</p>
-                    <button style="background: #1db15b">Add to basket</button>
-                  </div>
-                </article>
-                <article>
-                  <img src="./assets/shop/brake_parts_a.png" alt="brakes" />
-                  <div class="text">
-                    <h3>Brake Grade S</h3>
-                    <p>Price: 300k</p>
-                    <button style="background: #1db15b">Add to basket</button>
-                  </div>
-                </article>
-                <article>
-                  <img src="./assets/shop/brake_parts_a.png" alt="brakes" />
-                  <div class="text">
-                    <h3>Brake Grade S</h3>
-                    <p>Price: 300k</p>
-                    <button style="background: #1db15b">Add to basket</button>
-                  </div>
-                </article>
-                <article>
-                  <img src="./assets/shop/brake_parts_a.png" alt="brakes" />
-                  <div class="text">
-                    <h3>Brake Grade S</h3>
-                    <p>Price: 300k</p>
-                    <button style="background: #1db15b">Add to basket</button>
-                  </div>
-                </article>
-                <article>
-                  <img src="./assets/shop/brake_parts_a.png" alt="brakes" />
-                  <div class="text">
-                    <h3>Brake Grade S</h3>
-                    <p>Price: 300k</p>
-                    <button style="background: #1db15b">Add to basket</button>
-                  </div>
-                </article>
-                <article>
-                  <img src="./assets/shop/brake_parts_a.png" alt="brakes" />
-                  <div class="text">
-                    <h3>Brake Grade S</h3>
-                    <p>Price: 300k</p>
-                    <button style="background: #1db15b">Add to basket</button>
-                  </div>
-                </article>
-                <article>
-                  <img src="./assets/shop/brake_parts_a.png" alt="brakes" />
-                  <div class="text">
-                    <h3>Brake Grade S</h3>
-                    <p>Price: 300k</p>
-                    <button style="background: #1db15b">Add to basket</button>
-                  </div>
-                </article>
-                <article>
-                  <img src="./assets/shop/brake_parts_a.png" alt="brakes" />
-                  <div class="text">
-                    <h3>Brake Grade S</h3>
-                    <p>Price: 300k</p>
-                    <button style="background: #1db15b">Add to basket</button>
-                  </div>
-                </article>
-                <article>
-                  <img src="./assets/shop/brake_parts_a.png" alt="brakes" />
-                  <div class="text">
-                    <h3>Brake Grade S</h3>
-                    <p>Price: 300k</p>
-                    <button style="background: #1db15b">Add to basket</button>
-                  </div>
-                </article>
-              </div>
+              <div class="grid"></div>
             </div>
 
             <!-- </header> -->

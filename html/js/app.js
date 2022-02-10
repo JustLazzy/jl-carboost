@@ -1,10 +1,12 @@
 var audio = new Audio("assets/audio/notification.wav");
+const item = [];
 index = 0;
-$(function () {
+
+$(document).ready(() => {
   if (index >= 2) {
     index = 0;
   }
-  let settings = document.querySelector("#settings");
+
   let bennys = document.querySelector("#bennys-app");
   bennysheader = bennys.querySelector("header");
   let boosting = document.querySelector("#boosting-app");
@@ -24,14 +26,12 @@ $(function () {
   }
 
   function display(bool) {
-    bool = true;
+    // bool = true;
     if (bool) {
       $(".laptop").css("visibility", "visible");
-      // $(".laptop").css("opacity", "1");
       $(".laptop").css("top", "50%");
       return;
     } else {
-      // $(".laptop").css("opacity", "0");
       $(".laptop").css("top", "-50%");
       $(".laptop").css("visibility", "hidden");
       return;
@@ -39,7 +39,6 @@ $(function () {
   }
 
   function createIcon(name) {
-    // return console.log(name);
     const div = document.createElement("div");
     div.id = name;
     div.className = "icon start";
@@ -75,6 +74,11 @@ $(function () {
     }
   }
 
+  function refreshStore() {
+    const test = document.getElementsByClassName("grid");
+    console.log("this test", test);
+  }
+
   bennysheader.addEventListener("mousedown", () => {
     bennysheader.classList.add("active");
     bennysheader.addEventListener("mousemove", onDrag);
@@ -100,35 +104,79 @@ $(function () {
         return;
       }
     }
-    if (event.data.type === "loadStore") {
-      // laad all the store data from config
-      const storedata = event.data.store;
-      for (let index = 0; index < storedata.length; index++) {
-        const element = storedata[index];
-        if (element.name.length < 2 || !element.price || element.image < 2)
-          return;
-        // create article / card for store
-        // const article = document.createElement("article");
-        // article.id = element.name.toLowerCase().replace(/ +/g, "");
-        // article.innerHTML = `<img src="./assets/shop/${element.image}" alt="${element.name}" />
-        // <div class="text">
-        //   <h3>${element.name}</h3>
-        //   <p>Price: ${element.price}</p>
-        //   <button>Buy</button>
-        //   <button style="background: #1db15b">Add to basket</button>
-        // </div>
-        // `;
-        // $(".grid").append(article);
-        // console.log(element.image);
-        // console.log(JSON.stringify(element.name));
-      }
-    }
   });
+  function registerItem() {
+    console.log("register item");
+  }
+
+  function loadBennysApp() {
+    $(".grid").empty();
+    fetch("https://jl-carboost/loadstore", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        storeitem: item,
+      }),
+    }).then((resp) =>
+      resp.json().then((resp) => {
+        $(".loading").css("opacity", "1");
+        storedata = resp.storeitem;
+        if (storedata) {
+          storedata.forEach((data) => {
+            item.splice(0, item.length);
+            if (data.name.length < 2 || !data.price || !data.image) return;
+            const article = document.createElement("article");
+            article.tagName = data.name.toLowerCase().replace(/ +/g, "");
+            article.innerHTML = `<img src="./assets/shop/${data.image}" alt="${data.name}" />
+              <div class="text">
+                <h3>${data.name}</h3>
+                <p>Stock: <b>${data.stock}</b></p>
+                <p>Price: <b style="color: #e97d01;">${data.price}</b></p>
+                <button style="background: #1db15b" class="basket-button"  >Add to basket</button>
+              </div>
+              `;
+            $(".grid").append(article);
+            item.push(article.tagName);
+          });
+          setTimeout(() => {
+            $(".loading").css("opacity", "0");
+            $(".grid").css("visibility", "visible");
+            $(".grid").css("opacity", "100%");
+          }, 1000);
+        } else {
+          const error = document.createElement("div");
+          error.innerHTML = `<h1>Error</h1>`;
+          $(".grid").append(error);
+        }
+      })
+    );
+  }
+
+  function addBasket() {
+    console.log("test");
+  }
+
+  $("button").on("click", function (e) {
+    console.log(e);
+  });
+
+  function closeBennys() {
+    setTimeout(() => {
+      $(".loading").css("opacity", "1");
+      $(".loading").css("visibility", "visible");
+      $(".grid").css("visibility", "hidden");
+      $(".grid").css("opacity", "0");
+    }, 500);
+    removeIcon("bennys");
+  }
   window.addEventListener("click", function (event) {
     if (event.target.id != "splash") {
       if (event.target.id == "bennys") {
         toggleDisplayApp(true, "#bennys-app");
         createIcon(event.target.id);
+        loadBennysApp();
       } else if (event.target.id == "boosting") {
         toggleDisplayApp(true, "#boosting-app");
         createIcon("boost");
@@ -136,7 +184,7 @@ $(function () {
         toggleDisplayApp(true, "#settings");
       } else if (event.target.id == "close-bennys") {
         toggleDisplayApp(false, "#bennys-app");
-        removeIcon("bennys");
+        closeBennys();
       } else if (event.target.id == "close-boosting") {
         toggleDisplayApp(false, "#boosting-app");
         removeIcon("boost");
@@ -144,11 +192,6 @@ $(function () {
       }
     }
   });
-
-  document.onclick = function (event) {
-    // audio.play();
-    console.info(index);
-  };
 
   document.onkeydown = function (data) {
     if (event.repeat) {
@@ -158,7 +201,7 @@ $(function () {
       case 27:
         if (bennys.style.visibility == "visible") {
           toggleDisplayApp(false, "#bennys-app");
-          removeIcon("bennys");
+          closeBennys();
         } else if (boosting.style.visibility == "visible") {
           toggleDisplayApp(false, "#boosting-app");
           removeIcon("boost");
@@ -181,7 +224,7 @@ $(function () {
   };
 });
 
-// Refresh date
+// Refresh time
 setInterval(refreshTime, 1000);
 
 function timePMAM(date) {

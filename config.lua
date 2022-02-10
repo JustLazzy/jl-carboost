@@ -8,6 +8,14 @@ Config.Tier = {
     --[[
         Don't touch the tier name, just configure the location and car
     --]]
+    ['D'] = {
+        location = {
+
+        },
+        car = {
+            
+        }
+    },
     ['C'] = {
         location = {
             vector4(-333.41, -1268.04, 31.3, 84.32),
@@ -77,87 +85,67 @@ Config.Tier = {
     }
 }
 
-Config.SellLocation = {
-
-}
-
 Config.BennysSell = {
     [1] = {
         name = 'Brake Grade S',
         image = 'brake_parts_s.png',
         price = 1000,
-        
+        stock = 50
     },
     [2] = {
         name = 'Brake Grade A',
         image = 'brake_parts_a.png',
-        price = 1000
+        price = 1000,
+        stock = 50
         
     },
     [3] = {
         name = 'Brake Grade B',
         image = 'brake_parts_b.png',
         price = 1000,
-        
+        stock = 50
     },
     [4] = {
         name = 'Brake Grade C',
         image = 'brake_parts_c.png',
         price = 1000,
+        stock = 50,
     },
     [5] = {
         name = 'Brake Grade D',
         image = 'brake_parts_d.png',
         price = 1000,
+        stock = 50,
     },
     [6] = {
         name = 'Engine Grade S',
         image = 'engine_parts_s.png',
         price = 502000,
+        stock = 50,
     },
     [7] = {
         name = 'Engine Grade A',
         image = 'engine_parts_a.png',
         price = 130000,
+        stock = 50,
     },
     [8] = {
         name = 'Engine Grade B',
         image = 'engine_parts_b.png',
         price = 120000,
+        stock = 50,
     },
     [9] = {
         name = 'Engine Grade C',
         image = 'engine_parts_c.png',
         price = 100000,
+        stock = 50,
     },
     [10] = {
         name = 'Engine Grade D',
         image = 'engine_parts_d.png',
         price = 100000,
+        stock = 50,
     },
-    -- [11] = {
-    --     name = '',
-    --     image = '',
-    --     price = 0,
-    -- },
-    -- [12] = {
-    --     name = '',
-    --     image = '',
-    --     price = 0,
-    -- },
-    -- [13] = {
-    --     name = '',
-    --     image = '',
-    --     price = 0,
-    -- },
-    -- [14] = {
-    --     name = '',
-    --     image = '',
-    --     price = 0,
-    -- },
-    -- [15] = {
-    --     name = '',
-    --     image = '',
-    --     price = 0,
-    -- }
+
 }
