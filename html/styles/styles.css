@@ -32,6 +32,10 @@ div.laptop {
   transition: 1s;
 }
 
+div.laptop.active {
+  visibility: visible;
+}
+
 div .winmanager {
   width: 100%;
   height: 45px;

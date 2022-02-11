@@ -28,7 +28,7 @@
         <!-- make 2 icon -->
         <div class="notification"></div>
         <div class="apps">
-          <div id="bennys-app" onload="registerItem()">
+          <div id="bennys-app">
             <header>
               <nav>
                 <h1>Bennys Motorshop</h1>
@@ -42,30 +42,39 @@
               </nav>
             </header>
             <div class="container">
-              <div class="loading">
-                <!-- make a loading with fontawesome -->
-                <i
-                  class="fas fa-solid fa-spinner fa-spin"
-                  style="font-size: x-large"
-                ></i>
-              </div>
               <div class="navigation">
-                <button style="background: rgb(26, 141, 41)">
+                <button
+                  class="home-button"
+                  style="background: rgb(26, 141, 41)"
+                >
                   <i class="fa-solid fa-house-chimney"></i>
                 </button>
-                <button style="background: rgb(190, 45, 45)">
+                <button
+                  class="cart-button"
+                  style="background: rgb(190, 45, 45)"
+                >
                   <i class="fa-solid fa-cart-shopping"></i>
                 </button>
               </div>
               <div class="cart">
                 <div class="cart-content">
                   <div class="cart-box">
-                    <img src="./assets/shop/brake_parts_a.png" alt="" />
-                    <div class="product-title">Some Title</div>
-                    <div class="product-price">$25</div>
+                    <div class="remove-cart-item">
+                      <i class="fas fa-trash-alt"></i>
+                    </div>
+                    <div class="cart-image">
+                      <img src="./assets/shop/brake_parts_a.png" alt="" />
+                    </div>
+                    <div class="cart-box-text">
+                      <div class="product-title">Engine</div>
+                      <div class="product-price">$25</div>
+                    </div>
                     <input
                       type="number"
-                      style="color: black"
+                      min="1"
+                      max="50"
+                      name="quantity"
+                      maxlength="2"
                       value="1"
                       class="cart-quantity"
                     />
@@ -73,14 +82,22 @@
                 </div>
                 <div class="cart-content">
                   <div class="cart-box">
-                    <img src="./assets/shop/brake_parts_a.png" alt="" />
-                    <div class="product-title">Some Title</div>
-                    <div class="product-price">$25</div>
+                    <div class="remove-cart-item">
+                      <i class="fas fa-trash-alt"></i>
+                    </div>
+                    <div class="cart-image">
+                      <img src="./assets/shop/brake_parts_a.png" alt="" />
+                    </div>
+                    <div class="cart-box-text">
+                      <div class="product-title">Engine</div>
+                      <div class="product-price">$35</div>
+                    </div>
                     <input
                       type="number"
-                      style="color: black"
                       min="1"
                       max="50"
+                      name="quantity"
+                      maxlength="2"
                       value="1"
                       class="cart-quantity"
                     />
@@ -90,9 +107,9 @@
                   <div class="total-title">Total</div>
                   <div class="total-price">$0</div>
                 </div>
-                <button>Test</button>
+                <button class="buy-button">Checkout</button>
               </div>
-              <div class="grid" onload="loadBennysApp()">
+              <div class="grid">
                 <!-- ini cardnya -->
               </div>
             </div>

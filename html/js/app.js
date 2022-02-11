@@ -1,6 +1,12 @@
-var audio = new Audio("assets/audio/notification.wav");
 const item = [];
+let typing;
 index = 0;
+const storeloaded = false;
+let cartButton = document.querySelector(".cart-button");
+let cart = document.querySelector(".cart");
+let homeButton = document.querySelector(".home-button");
+let store = document.querySelector(".grid");
+let laptop = document.querySelector(".laptop");
 
 $(document).ready(() => {
   if (index >= 2) {
@@ -28,16 +34,18 @@ $(document).ready(() => {
   function display(bool) {
     bool = true;
     if (bool) {
-      $(".laptop").css("visibility", "visible");
       $(".laptop").css("top", "50%");
+      laptop.classList.add("active");
       return;
     } else {
       $(".laptop").css("top", "-50%");
-      $(".laptop").css("visibility", "hidden");
+      laptop.classList.remove("active");
       return;
     }
   }
-
+  display(false);
+  loadBennysApp();
+  uglyFunct();
   function createIcon(name) {
     const div = document.createElement("div");
     div.id = name;
@@ -55,20 +63,31 @@ $(document).ready(() => {
   }
 
   function toggleDisplayApp(bool, id) {
+    let app = document.querySelector(id);
+    console.log(app);
     if (bool && id != null) {
+      if (app.id === "bennys-app") {
+        if (cart.classList.contains("active")) {
+          store.classList.remove("active");
+        } else {
+          store.classList.add("active");
+        }
+      }
+      app.classList.add("active");
       $(id).css("z-index", index++);
-      $(id).css("visibility", "visible");
-      $(id).css("opacity", "100%");
+      // $(id).css("visibility", "visible");
+      // $(id).css("opacity", "100%");
 
       setTimeout(() => {
         $(id).css("transition", "0s");
       }, 500);
       return;
     } else if (!bool && id != null) {
+      app.classList.remove("active");
       $(id).css("z-index", "0");
       $(id).css("transition", "0.5s");
-      $(id).css("visibility", "hidden");
-      $(id).css("opacity", "0");
+      // $(id).css("visibility", "hidden");
+      // $(id).css("opacity", "0");
       index - 1;
       return;
     }
@@ -78,6 +97,10 @@ $(document).ready(() => {
     const test = document.getElementsByClassName("grid");
     console.log("this test", test);
   }
+
+  $("input").keypress(function (e) {
+    typing = true;
+  });
 
   bennysheader.addEventListener("mousedown", () => {
     bennysheader.classList.add("active");
@@ -93,7 +116,7 @@ $(document).ready(() => {
     boostingheader.classList.remove("active");
     boostingheader.removeEventListener("mousemove", onDrag);
   });
-  display(false);
+
   window.addEventListener("message", function (event) {
     if (event.data.type === "openlaptop") {
       if (event.data.status == true) {
@@ -111,17 +134,22 @@ $(document).ready(() => {
   //   console.log(JSON.stringify(e));
   // });
 
-  $(".basket-button").click(function () {
-    console.log("click");
-  });
+  homeButton.onclick = () => {
+    store.classList.add("active");
+    cart.classList.remove("active");
+  };
+
+  cartButton.onclick = () => {
+    store.classList.remove("active");
+    cart.classList.add("active");
+  };
 
   function closeBennys() {
     setTimeout(() => {
-      $(".loading").css("opacity", "1");
-      $(".loading").css("visibility", "visible");
-      $(".grid").css("visibility", "hidden");
-      $(".grid").css("opacity", "0");
+      // $(".grid").css("visibility", "hidden");
+      // $(".grid").css("opacity", "0");
     }, 500);
+    store.classList.remove("active");
     removeIcon("bennys");
   }
   window.addEventListener("click", function (event) {
@@ -129,7 +157,7 @@ $(document).ready(() => {
       if (event.target.id == "bennys") {
         toggleDisplayApp(true, "#bennys-app");
         createIcon(event.target.id);
-        loadBennysApp();
+        // loadBennysApp();
       } else if (event.target.id == "boosting") {
         toggleDisplayApp(true, "#boosting-app");
         createIcon("boost");
@@ -150,8 +178,9 @@ $(document).ready(() => {
     if (event.repeat) {
       return;
     }
-    switch (event.keyCode) {
-      case 27:
+    console.log(event.key);
+    switch (event.key) {
+      case "Escape":
         if (bennys.style.visibility == "visible") {
           toggleDisplayApp(false, "#bennys-app");
           closeBennys();
@@ -162,24 +191,77 @@ $(document).ready(() => {
           $.post("https://jl-carboost/exit", JSON.stringify({}));
         }
         break;
-      case 8:
-        if (bennys.style.visibility == "visible") {
-          toggleDisplayApp(false, "#bennys-app");
-          return;
-        } else if (boosting.style.visibility == "visible") {
-          toggleDisplayApp(false, "#boosting-app");
-          return;
-        } else {
-          $.post("https://jl-carboost/exit", JSON.stringify({}));
-        }
+      case "Backspace":
+        $.post("https://jl-carboost/exit", JSON.stringify({}));
         break;
     }
   };
 });
 
-function addBasket(e) {
-  const tets = $(e).parent();
-  console.log(tets[0]);
+function uglyFunct() {
+  var removeCartButtons = document.getElementsByClassName("remove-cart-item");
+  // console.log(removeCartButtons);
+  for (var i = 0; i < removeCartButtons.length; i++) {
+    var button = removeCartButtons[i];
+    button.addEventListener("click", removeCartItem);
+  }
+  const quantityInputs = document.getElementsByClassName("cart-quantity");
+  for (var i = 0; i < quantityInputs.length; i++) {
+    let input = quantityInputs[i];
+    input.addEventListener("change", quantityChanged);
+  }
+  const addCart = document.getElementsByClassName("basket-button");
+  // console.log(addCart);
+  for (var i = 0; i < addCart.length; i++) {
+    let button = addCart[i];
+    button.addEventListener("click", addToCart);
+  }
+}
+
+// add to cart
+function addToCart(event) {
+  const button = event.target;
+  const product = button.parentElement;
+  const title = product.getElementsByClassName("title")[0].innerText;
+  console.log(title);
+}
+
+// quantity change
+function quantityChanged(event) {
+  const input = event.target;
+  if (isNaN(input.value) || input.value <= 0) {
+    input.value = 1;
+  }
+  updateTotalPrice();
+}
+// function to remove cart item
+function removeCartItem(event) {
+  const buttonClicked = event.target;
+  buttonClicked.parentElement.parentElement.parentElement.remove();
+  updateTotalPrice();
+}
+// function to update total price
+function updateTotalPrice() {
+  const cartContent = document.getElementsByClassName("cart-content")[0];
+  if (!cartContent) {
+    return (document.getElementsByClassName("total-price")[0].innerText = "$0");
+  }
+  const cartBox = cartContent.getElementsByClassName("cart-box");
+  if (cartBox.length == 0) {
+    return;
+  }
+  let total = 0;
+  for (var i = 0; i < cartBox.length; i++) {
+    const cartBoxes = cartBox[i];
+
+    const priceElement = cartBoxes.getElementsByClassName("product-price")[0];
+    const price = parseFloat(priceElement.innerText.replace("$", ""));
+    const quantityElement =
+      cartBoxes.getElementsByClassName("cart-quantity")[0];
+    const quantity = quantityElement.value;
+    total = total + price * quantity;
+    document.getElementsByClassName("total-price")[0].innerText = "$" + total;
+  }
 }
 
 // Refresh time
@@ -208,63 +290,47 @@ function refreshTime() {
 
 function addItem(e) {}
 
+function refreshBennys() {}
+
 function loadBennysApp() {
-  $(".grid").empty();
-  $(".loading").css("opacity", "0");
-  for (let index = 0; index <= 20; index++) {
-    console.log(index);
-    const article = document.createElement("article");
-    article.innerHTML = `<img src="./assets/shop/brake_parts_a.png" alt="test" />
+  fetch("https://jl-carboost/loadstore", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      storeitem: item,
+    }),
+  }).then((resp) =>
+    resp.json().then((resp) => {
+      $(".loading").css("opacity", "1");
+      storedata = resp.storeitem;
+      if (storedata) {
+        storedata.forEach((data) => {
+          item.splice(0, item.length);
+          if (data.name.length < 2 || !data.price || !data.image) return;
+          const article = document.createElement("article");
+          // article.onclick = data.name.toLowerCase().replace(/ +/g, "");
+          article.innerHTML = `<img src="./assets/shop/${data.image}" alt="${data.name}" />
             <div class="text">
-              <h3>CARD</h3>
-              <p>Stock: <b>50</b></p>
-              <p class="price">$1000</p>
+              <h3>${data.name}</h3>
+              <p>Stock: <b>${data.stock}</b></p>
+              <p class="price">$${data.price}</p>
               <button onclick="addBasket(this)" class="basket-button">Add to basket</button>
             </div>
             `;
-    $(".grid").append(article);
-    $(".grid").css("visibility", "visible");
-    $(".grid").css("opacity", "1");
-  }
-  // fetch("https://jl-carboost/loadstore", {
-  //   method: "POST",
-  //   headers: {
-  //     "Content-Type": "application/json",
-  //   },
-  //   body: JSON.stringify({
-  //     storeitem: item,
-  //   }),
-  // }).then((resp) =>
-  //   resp.json().then((resp) => {
-  //     $(".loading").css("opacity", "1");
-  //     storedata = resp.storeitem;
-  //     if (storedata) {
-  //       storedata.forEach((data) => {
-  //         item.splice(0, item.length);
-  //         if (data.name.length < 2 || !data.price || !data.image) return;
-  //         const article = document.createElement("article");
-  //         // article.onclick = data.name.toLowerCase().replace(/ +/g, "");
-  //         article.innerHTML = `<img src="./assets/shop/${data.image}" alt="${data.name}" />
-  //           <div class="text">
-  //             <h3>${data.name}</h3>
-  //             <p>Stock: <b>${data.stock}</b></p>
-  //             <p class="price">$${data.price}</p>
-  //             <button onclick="addBasket(this)" class="basket-button">Add to basket</button>
-  //           </div>
-  //           `;
-  //         $(".grid").append(article);
-  //         item.push(article.tagName);
-  //       });
-  //       setTimeout(() => {
-  //         $(".loading").css("opacity", "0");
-  //         $(".grid").css("visibility", "visible");
-  //         $(".grid").css("opacity", "100%");
-  //       }, 500);
-  //     } else {
-  //       const error = document.createElement("div");
-  //       error.innerHTML = `<h1>Error</h1>`;
-  //       $(".grid").append(error);
-  //     }
-  //   })
-  // );
+          $(".grid").append(article);
+          item.push(article.tagName);
+        });
+        setTimeout(() => {
+          $(".loading").css("opacity", "0");
+          store.classList.add("active");
+        }, 500);
+      } else {
+        const error = document.createElement("div");
+        error.innerHTML = `<h1>Error</h1>`;
+        $(".grid").append(error);
+      }
+    })
+  );
 }

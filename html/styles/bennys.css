@@ -22,10 +22,15 @@
   box-shadow: 10px 10px 15px rgba(0, 0, 0, 0.06);
 }
 
+#bennys-app.active {
+  visibility: visible;
+  opacity: 1;
+}
+
 #bennys-app .grid {
   visibility: hidden;
   opacity: 0;
-  position: relative;
+  position: absolute;
   /* margin: 10px; */
   /* margin-top: 5vh; */
   margin: 5px;
@@ -35,6 +40,12 @@
   grid-column-gap: 10px;
   align-items: center;
   justify-content: center;
+}
+
+#bennys-app .grid.active {
+  position: static;
+  visibility: visible;
+  opacity: 1;
 }
 
 #bennys-app .grid > article {
@@ -51,16 +62,24 @@
 
 /* cart */
 #bennys-app .cart {
+  position: absolute;
+  opacity: 0;
   display: flex;
+  visibility: hidden;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 2rem;
+}
+
+#bennys-app .cart.active {
+  position: relative;
+  opacity: 1;
+  visibility: visible;
 }
 
 #bennys-app .cart-content {
-  padding-top: 10px;
-  width: 70%;
+  /* padding: 10px; */
+  width: 80%;
   height: 100px;
   position: relative;
   padding: 10px;
@@ -70,11 +89,92 @@
 }
 
 #bennys-app .cart-box {
-  padding: 5px;
   display: flex;
   justify-content: center;
   justify-items: center;
   align-items: center;
+  text-align: center;
+}
+
+#bennys-app .cart-box > .cart-image {
+  display: flex;
+  flex: 1;
+}
+
+#bennys-app .cart-box .cart-box-text {
+  display: flex;
+  flex: 3;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  text-align: justify;
+}
+
+#bennys-app .cart-box-text div {
+  margin: 5px;
+}
+
+#bennys-app .product-title {
+  font-family: "Roboto", sans-serif;
+  text-transform: capitalize;
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: rgb(255, 255, 255);
+  margin: 0;
+  padding: 0;
+}
+
+#bennys-app .product-price {
+  font-family: "Roboto", sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  color: rgb(255, 255, 255);
+  margin: 0;
+  padding: 0;
+}
+
+#bennys-app .cart-box input {
+  width: 50px;
+  height: 30px;
+  border: none;
+  /* border-radius: 5px; */
+  /* background: rgb(190, 45, 45); */
+  background: var(--bg-color);
+  color: rgb(255, 255, 255);
+  /* font-weight: bolder; */
+  font-size: 20px;
+  text-align: center;
+  transition: 0.5s;
+}
+
+/* #bennys-app .cart-box textarea:focus,
+input :focus {
+  outline: none;
+  border: none;
+} */
+
+#bennys-app .cart-box i {
+  margin: 5px;
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  color: rgb(190, 45, 45);
+  font-size: 15px;
+}
+
+#bennys-app .buy-button {
+  margin: 10px;
+  text-transform: capitalize;
+  padding: 10px;
+  background: rgb(190, 45, 45);
+  text-align: center;
+  font-weight: bolder;
+  border: none;
+  border-radius: 5px;
+}
+
+#bennys-app .buy-button:hover {
+  cursor: pointer;
 }
 
 #bennys-app .cart-box img {
@@ -145,7 +245,7 @@
   justify-content: center;
   justify-items: center;
   align-items: center;
-  border-radius: 15px;
+  border-radius: 5px;
   border: none;
   padding: 5px 5px;
   margin: 10px;
@@ -153,6 +253,11 @@
   font-weight: 800;
   text-transform: uppercase;
   z-index: 10;
+}
+
+#bennys-app .navigation .home-button.active {
+  background-color: #1db15b;
+  color: #fff;
 }
 
 #bennys-app .navigation i,
