@@ -42,6 +42,10 @@ RegisterNUICallback('loadstore', function (data, cb)
     end
 end)
 
+RegisterNUICallback('buyitem', function (data, cb)
+    
+end)
+
 
 -- Event
 RegisterNetEvent('jl-carboost:client:spawnCar', function()

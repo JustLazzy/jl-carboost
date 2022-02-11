@@ -27,9 +27,10 @@
   opacity: 0;
   position: relative;
   /* margin: 10px; */
-  margin-top: 5vh;
+  /* margin-top: 5vh; */
+  margin: 5px;
   display: grid;
-  grid-template-columns: repeat(5, 11vw);
+  grid-template-columns: repeat(auto-fit, 11vw);
   grid-gap: 10px;
   grid-column-gap: 10px;
   align-items: center;
@@ -48,6 +49,38 @@
   transition: transform 0.1s;
 }
 
+/* cart */
+#bennys-app .cart {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+}
+
+#bennys-app .cart-content {
+  padding-top: 10px;
+  width: 70%;
+  height: 100px;
+  position: relative;
+  padding: 10px;
+  margin: 10px;
+  border-radius: 5px;
+  background: rgb(21, 26, 53);
+}
+
+#bennys-app .cart-box {
+  padding: 5px;
+  display: flex;
+  justify-content: center;
+  justify-items: center;
+  align-items: center;
+}
+
+#bennys-app .cart-box img {
+  width: 90px;
+}
+
 #bennys-app .grid > article > img {
   width: 50%;
 }
@@ -56,13 +89,23 @@
   padding: 0 15px 15px;
 }
 
+#bennys-app .grid > article .price {
+  /* position: fixed; */
+  padding-top: 5px;
+  font-family: "Roboto", sans-serif;
+  font-size: 15px;
+  font-weight: bolder;
+  color: #ffd09a;
+}
+
 #bennys-app .text h3 {
+  font-size: medium;
   font-family: "Roboto", sans-serif;
   text-transform: uppercase;
 }
 
 #bennys-app .text button {
-  background-color: #b11d1d;
+  background-color: #1db15b;
   border-radius: 5px;
   border: none;
   color: #fff;
@@ -76,34 +119,47 @@
 
 #bennys-app .text button:hover {
   cursor: pointer;
-  background-color: #e62b2b;
+  background-color: #10582e;
   color: #fff;
 }
 
-#bennys-app .navigation > nav {
-  background: rgb(21, 26, 53);
-  position: absolute;
+#bennys-app .navigation {
+  /* make it on top of each div */
+
+  /* background: rgb(21, 26, 53); */
+  /* position: fixed; */
+  margin: 2% 6%;
+  padding: 10px;
+  left: 0;
+  z-index: 999;
+  position: sticky;
   display: flex;
-  flex-direction: column;
-  top: 0;
-  width: 100%;
-  height: 5px;
+  flex-direction: row;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
   justify-items: end;
 }
 
 #bennys-app .navigation button {
-  /* position: absolute; */
-  /* background-color: #1db15b; */
-  border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  justify-items: center;
+  align-items: center;
+  border-radius: 15px;
   border: none;
-  color: #fff;
-  padding: 15px 15px;
+  padding: 5px 5px;
   margin: 10px;
-  width: 80%;
+  width: 10%;
   font-weight: 800;
   text-transform: uppercase;
+  z-index: 10;
+}
+
+#bennys-app .navigation i,
+p {
+  color: #fff;
+  margin: 5px;
+  padding: 0;
 }
 
 #bennys-app .navigation button:hover {
@@ -113,6 +169,10 @@
 #bennys-app .container {
   overflow-y: auto;
   overflow-x: hidden;
+}
+
+#bennys-app header {
+  z-index: 1000;
 }
 
 #bennys-app > header > nav {

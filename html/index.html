@@ -49,10 +49,53 @@
                   style="font-size: x-large"
                 ></i>
               </div>
-              <div class="grid"></div>
+              <div class="navigation">
+                <button style="background: rgb(26, 141, 41)">
+                  <i class="fa-solid fa-house-chimney"></i>
+                </button>
+                <button style="background: rgb(190, 45, 45)">
+                  <i class="fa-solid fa-cart-shopping"></i>
+                </button>
+              </div>
+              <div class="cart">
+                <div class="cart-content">
+                  <div class="cart-box">
+                    <img src="./assets/shop/brake_parts_a.png" alt="" />
+                    <div class="product-title">Some Title</div>
+                    <div class="product-price">$25</div>
+                    <input
+                      type="number"
+                      style="color: black"
+                      value="1"
+                      class="cart-quantity"
+                    />
+                  </div>
+                </div>
+                <div class="cart-content">
+                  <div class="cart-box">
+                    <img src="./assets/shop/brake_parts_a.png" alt="" />
+                    <div class="product-title">Some Title</div>
+                    <div class="product-price">$25</div>
+                    <input
+                      type="number"
+                      style="color: black"
+                      min="1"
+                      max="50"
+                      value="1"
+                      class="cart-quantity"
+                    />
+                  </div>
+                </div>
+                <div class="total">
+                  <div class="total-title">Total</div>
+                  <div class="total-price">$0</div>
+                </div>
+                <button>Test</button>
+              </div>
+              <div class="grid" onload="loadBennysApp()">
+                <!-- ini cardnya -->
+              </div>
             </div>
-
-            <!-- </header> -->
           </div>
           <div id="boosting-app">
             <header>

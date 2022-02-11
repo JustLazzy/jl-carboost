@@ -26,7 +26,7 @@ $(document).ready(() => {
   }
 
   function display(bool) {
-    // bool = true;
+    bool = true;
     if (bool) {
       $(".laptop").css("visibility", "visible");
       $(".laptop").css("top", "50%");
@@ -105,61 +105,14 @@ $(document).ready(() => {
       }
     }
   });
-  function registerItem() {
-    console.log("register item");
-  }
 
-  function loadBennysApp() {
-    $(".grid").empty();
-    fetch("https://jl-carboost/loadstore", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        storeitem: item,
-      }),
-    }).then((resp) =>
-      resp.json().then((resp) => {
-        $(".loading").css("opacity", "1");
-        storedata = resp.storeitem;
-        if (storedata) {
-          storedata.forEach((data) => {
-            item.splice(0, item.length);
-            if (data.name.length < 2 || !data.price || !data.image) return;
-            const article = document.createElement("article");
-            article.tagName = data.name.toLowerCase().replace(/ +/g, "");
-            article.innerHTML = `<img src="./assets/shop/${data.image}" alt="${data.name}" />
-              <div class="text">
-                <h3>${data.name}</h3>
-                <p>Stock: <b>${data.stock}</b></p>
-                <p>Price: <b style="color: #e97d01;">${data.price}</b></p>
-                <button style="background: #1db15b" class="basket-button"  >Add to basket</button>
-              </div>
-              `;
-            $(".grid").append(article);
-            item.push(article.tagName);
-          });
-          setTimeout(() => {
-            $(".loading").css("opacity", "0");
-            $(".grid").css("visibility", "visible");
-            $(".grid").css("opacity", "100%");
-          }, 1000);
-        } else {
-          const error = document.createElement("div");
-          error.innerHTML = `<h1>Error</h1>`;
-          $(".grid").append(error);
-        }
-      })
-    );
-  }
+  // $(document).click(function (e) {
+  //   e.preventDefault();
+  //   console.log(JSON.stringify(e));
+  // });
 
-  function addBasket() {
-    console.log("test");
-  }
-
-  $("button").on("click", function (e) {
-    console.log(e);
+  $(".basket-button").click(function () {
+    console.log("click");
   });
 
   function closeBennys() {
@@ -224,6 +177,11 @@ $(document).ready(() => {
   };
 });
 
+function addBasket(e) {
+  const tets = $(e).parent();
+  console.log(tets[0]);
+}
+
 // Refresh time
 setInterval(refreshTime, 1000);
 
@@ -246,4 +204,67 @@ function refreshTime() {
   var dateString = month + "/" + day + "/" + year;
   $("#time").html(timePMAM(date));
   $("#date").html(dateString);
+}
+
+function addItem(e) {}
+
+function loadBennysApp() {
+  $(".grid").empty();
+  $(".loading").css("opacity", "0");
+  for (let index = 0; index <= 20; index++) {
+    console.log(index);
+    const article = document.createElement("article");
+    article.innerHTML = `<img src="./assets/shop/brake_parts_a.png" alt="test" />
+            <div class="text">
+              <h3>CARD</h3>
+              <p>Stock: <b>50</b></p>
+              <p class="price">$1000</p>
+              <button onclick="addBasket(this)" class="basket-button">Add to basket</button>
+            </div>
+            `;
+    $(".grid").append(article);
+    $(".grid").css("visibility", "visible");
+    $(".grid").css("opacity", "1");
+  }
+  // fetch("https://jl-carboost/loadstore", {
+  //   method: "POST",
+  //   headers: {
+  //     "Content-Type": "application/json",
+  //   },
+  //   body: JSON.stringify({
+  //     storeitem: item,
+  //   }),
+  // }).then((resp) =>
+  //   resp.json().then((resp) => {
+  //     $(".loading").css("opacity", "1");
+  //     storedata = resp.storeitem;
+  //     if (storedata) {
+  //       storedata.forEach((data) => {
+  //         item.splice(0, item.length);
+  //         if (data.name.length < 2 || !data.price || !data.image) return;
+  //         const article = document.createElement("article");
+  //         // article.onclick = data.name.toLowerCase().replace(/ +/g, "");
+  //         article.innerHTML = `<img src="./assets/shop/${data.image}" alt="${data.name}" />
+  //           <div class="text">
+  //             <h3>${data.name}</h3>
+  //             <p>Stock: <b>${data.stock}</b></p>
+  //             <p class="price">$${data.price}</p>
+  //             <button onclick="addBasket(this)" class="basket-button">Add to basket</button>
+  //           </div>
+  //           `;
+  //         $(".grid").append(article);
+  //         item.push(article.tagName);
+  //       });
+  //       setTimeout(() => {
+  //         $(".loading").css("opacity", "0");
+  //         $(".grid").css("visibility", "visible");
+  //         $(".grid").css("opacity", "100%");
+  //       }, 500);
+  //     } else {
+  //       const error = document.createElement("div");
+  //       error.innerHTML = `<h1>Error</h1>`;
+  //       $(".grid").append(error);
+  //     }
+  //   })
+  // );
 }
