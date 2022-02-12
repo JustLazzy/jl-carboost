@@ -34,6 +34,7 @@ div.laptop {
 
 div.laptop.active {
   visibility: visible;
+  top: 50%;
 }
 
 div .winmanager {

@@ -4,6 +4,8 @@ Config.UseLindenAlert = true -- If u use linden_outlawalert
 
 Config.Minimum = 5 -- Minimum police
 
+Config.BennysItem = {}
+
 Config.Tier = {
     --[[
         Don't touch the tier name, just configure the location and car
@@ -88,12 +90,14 @@ Config.Tier = {
 Config.BennysSell = {
     [1] = {
         name = 'Brake Grade S',
+        item = 'brake4',
         image = 'brake_parts_s.png',
         price = 1000,
         stock = 50
     },
     [2] = {
         name = 'Brake Grade A',
+        item = 'brake0',
         image = 'brake_parts_a.png',
         price = 1000,
         stock = 50
@@ -101,48 +105,56 @@ Config.BennysSell = {
     },
     [3] = {
         name = 'Brake Grade B',
+        item = 'brake1',
         image = 'brake_parts_b.png',
         price = 1000,
         stock = 50
     },
     [4] = {
         name = 'Brake Grade C',
+        item = 'brake2',
         image = 'brake_parts_c.png',
         price = 1000,
         stock = 50,
     },
     [5] = {
         name = 'Brake Grade D',
+        item = 'brake3',
         image = 'brake_parts_d.png',
         price = 1000,
         stock = 50,
     },
     [6] = {
-        name = 'Engine Grade S',
+        name = 'Engine Upgrade S',
+        item = 'engine4',
         image = 'engine_parts_s.png',
         price = 502000,
         stock = 50,
     },
     [7] = {
-        name = 'Engine Grade A',
+        name = 'Stock Engine A',
+        item = 'engine0',
         image = 'engine_parts_a.png',
         price = 130000,
         stock = 50,
     },
     [8] = {
-        name = 'Engine Grade B',
+        name = 'Engine Upgrade B',
+        item = 'engine1',
         image = 'engine_parts_b.png',
         price = 120000,
         stock = 50,
     },
     [9] = {
-        name = 'Engine Grade C',
+        name = 'Engine Upgrade C',
+        item = 'engine2',
         image = 'engine_parts_c.png',
         price = 100000,
         stock = 50,
     },
     [10] = {
-        name = 'Engine Grade D',
+        name = 'Engine Upgrade D',
+        item = 'engine3',
         image = 'engine_parts_d.png',
         price = 100000,
         stock = 50,

@@ -77,9 +77,16 @@
   visibility: visible;
 }
 
+#bennys-app .cart-list {
+  display: flex;
+  justify-content: center;
+
+  flex-direction: column;
+}
+
 #bennys-app .cart-content {
   /* padding: 10px; */
-  width: 80%;
+  width: 800px;
   height: 100px;
   position: relative;
   padding: 10px;

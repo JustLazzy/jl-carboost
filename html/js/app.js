@@ -5,6 +5,7 @@ const storeloaded = false;
 let cartButton = document.querySelector(".cart-button");
 let cart = document.querySelector(".cart");
 let homeButton = document.querySelector(".home-button");
+let checkoutbutton = document.querySelector(".buy-button");
 let store = document.querySelector(".grid");
 let laptop = document.querySelector(".laptop");
 
@@ -12,7 +13,6 @@ $(document).ready(() => {
   if (index >= 2) {
     index = 0;
   }
-
   let bennys = document.querySelector("#bennys-app");
   bennysheader = bennys.querySelector("header");
   let boosting = document.querySelector("#boosting-app");
@@ -30,22 +30,22 @@ $(document).ready(() => {
       if (error) return;
     }
   }
+  loadBennysApp();
+
+  // make a wait function
 
   function display(bool) {
-    bool = true;
+    // bool = true;
     if (bool) {
-      $(".laptop").css("top", "50%");
       laptop.classList.add("active");
       return;
     } else {
-      $(".laptop").css("top", "-50%");
       laptop.classList.remove("active");
       return;
     }
   }
   display(false);
-  loadBennysApp();
-  uglyFunct();
+
   function createIcon(name) {
     const div = document.createElement("div");
     div.id = name;
@@ -64,7 +64,6 @@ $(document).ready(() => {
 
   function toggleDisplayApp(bool, id) {
     let app = document.querySelector(id);
-    console.log(app);
     if (bool && id != null) {
       if (app.id === "bennys-app") {
         if (cart.classList.contains("active")) {
@@ -126,6 +125,12 @@ $(document).ready(() => {
         display(false);
         return;
       }
+    } else if (event.data.type === "checkout") {
+      if (event.data.success == true) {
+        console.log("TRUE");
+      } else {
+        console.log("FALSE");
+      }
     }
   });
 
@@ -142,6 +147,11 @@ $(document).ready(() => {
   cartButton.onclick = () => {
     store.classList.remove("active");
     cart.classList.add("active");
+    updateTotalPrice();
+  };
+
+  checkoutbutton.onclick = () => {
+    checkout();
   };
 
   function closeBennys() {
@@ -178,10 +188,10 @@ $(document).ready(() => {
     if (event.repeat) {
       return;
     }
-    console.log(event.key);
+    // console.log(event.key);
     switch (event.key) {
       case "Escape":
-        if (bennys.style.visibility == "visible") {
+        if (bennys.classList.contains("active")) {
           toggleDisplayApp(false, "#bennys-app");
           closeBennys();
         } else if (boosting.style.visibility == "visible") {
@@ -200,7 +210,7 @@ $(document).ready(() => {
 
 function uglyFunct() {
   var removeCartButtons = document.getElementsByClassName("remove-cart-item");
-  // console.log(removeCartButtons);
+  // console.log("ini cart remove", removeCartButtons);
   for (var i = 0; i < removeCartButtons.length; i++) {
     var button = removeCartButtons[i];
     button.addEventListener("click", removeCartItem);
@@ -210,10 +220,12 @@ function uglyFunct() {
     let input = quantityInputs[i];
     input.addEventListener("change", quantityChanged);
   }
-  const addCart = document.getElementsByClassName("basket-button");
+  let addCart = document.getElementsByClassName("basket-button");
+  // console.log(addCart.length);
   // console.log(addCart);
   for (var i = 0; i < addCart.length; i++) {
     let button = addCart[i];
+    // console.log("ini button:", button);
     button.addEventListener("click", addToCart);
   }
 }
@@ -221,14 +233,62 @@ function uglyFunct() {
 // add to cart
 function addToCart(event) {
   const button = event.target;
-  const product = button.parentElement;
+  const product = button.parentElement.parentElement;
   const title = product.getElementsByClassName("title")[0].innerText;
-  console.log(title);
+  const price = product.getElementsByClassName("price")[0].innerText;
+  const image = product.getElementsByClassName("product-image")[0].src;
+  const productId = product.id;
+
+  addProductToCart(title, price, image, productId);
+}
+
+function addProductToCart(title, price, image, id) {
+  const cartShopBox = document.createElement("div");
+  cartShopBox.classList.add("cart-content");
+  const cartItems = document.getElementsByClassName("cart-list")[0];
+  const productTitle = cartItems.getElementsByClassName("product-title");
+  const content = `
+  <div class="cart-box" id="${id}">
+    <div class="remove-cart-item">
+      <i class="fas fa-trash-alt"></i>
+    </div>
+    <div class="cart-image">
+      <img src="${image}" alt="" />
+    </div>
+    <div class="cart-box-text">
+      <div class="product-title">${title}</div>
+      <div class="product-price">${price}</div>
+    </div>
+    <input
+      type="number"
+      min="1"
+      max="50"
+      name="quantity"
+      maxlength="2"
+      value="1"
+      class="cart-quantity"
+    />
+  </div>
+
+  `;
+  cartShopBox.innerHTML = content;
+  cartItems.append(cartShopBox);
+  cartShopBox
+    .getElementsByClassName("remove-cart-item")[0]
+    .addEventListener("click", removeCartItem);
+  cartShopBox
+    .getElementsByClassName("cart-quantity")[0]
+    .addEventListener("change", quantityChanged);
+
+  for (var i = 0; i < productTitle.length; i++) {
+    console.log(productTitle[i].innerText);
+  }
 }
 
 // quantity change
 function quantityChanged(event) {
   const input = event.target;
+  console.log("ini input", input.value);
   if (isNaN(input.value) || input.value <= 0) {
     input.value = 1;
   }
@@ -242,13 +302,13 @@ function removeCartItem(event) {
 }
 // function to update total price
 function updateTotalPrice() {
-  const cartContent = document.getElementsByClassName("cart-content")[0];
+  const cartContent = document.getElementsByClassName("cart-list")[0];
   if (!cartContent) {
     return (document.getElementsByClassName("total-price")[0].innerText = "$0");
   }
   const cartBox = cartContent.getElementsByClassName("cart-box");
   if (cartBox.length == 0) {
-    return;
+    return (document.getElementsByClassName("total-price")[0].innerText = "$0");
   }
   let total = 0;
   for (var i = 0; i < cartBox.length; i++) {
@@ -263,6 +323,31 @@ function updateTotalPrice() {
     document.getElementsByClassName("total-price")[0].innerText = "$" + total;
   }
 }
+
+function checkout() {
+  const list = [];
+  const total = parseFloat(
+    document.getElementsByClassName("total-price")[0].innerText.replace("$", "")
+  );
+  const itemList = document.getElementsByClassName("cart-list")[0];
+  const item = itemList.getElementsByClassName("cart-content");
+  if (item.length == 0) {
+    return console.log("NO ITEM");
+  }
+  for (let i = 0; i < item.length; i++) {
+    const itemcart = item[i];
+    const quantity = itemcart.getElementsByClassName("cart-quantity")[0].value;
+    const items = itemcart.getElementsByClassName("cart-box")[0].id;
+    list.push({
+      item: items,
+      quantity: quantity,
+    });
+  }
+  console.log(list, total);
+  $.post("https://jl-carboost/checkout", JSON.stringify({ list, total }));
+}
+
+function checkoutSuccess() {}
 
 // Refresh time
 setInterval(refreshTime, 1000);
@@ -292,6 +377,14 @@ function addItem(e) {}
 
 function refreshBennys() {}
 
+function wait(ms) {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      resolve();
+    }, ms);
+  });
+}
+
 function loadBennysApp() {
   fetch("https://jl-carboost/loadstore", {
     method: "POST",
@@ -303,28 +396,29 @@ function loadBennysApp() {
     }),
   }).then((resp) =>
     resp.json().then((resp) => {
-      $(".loading").css("opacity", "1");
+      // $(".loading").css("opacity", "1");
       storedata = resp.storeitem;
       if (storedata) {
         storedata.forEach((data) => {
           item.splice(0, item.length);
           if (data.name.length < 2 || !data.price || !data.image) return;
           const article = document.createElement("article");
-          // article.onclick = data.name.toLowerCase().replace(/ +/g, "");
-          article.innerHTML = `<img src="./assets/shop/${data.image}" alt="${data.name}" />
+          article.id = data.item;
+          article.innerHTML = `<img class="product-image" src="./assets/shop/${data.image}" alt="${data.name}" />
             <div class="text">
-              <h3>${data.name}</h3>
+              <h3 class="title">${data.name}</h3>
               <p>Stock: <b>${data.stock}</b></p>
               <p class="price">$${data.price}</p>
-              <button onclick="addBasket(this)" class="basket-button">Add to basket</button>
+              <button class="basket-button">Add to basket</button>
             </div>
             `;
-          $(".grid").append(article);
+          store.append(article);
           item.push(article.tagName);
         });
         setTimeout(() => {
           $(".loading").css("opacity", "0");
           store.classList.add("active");
+          uglyFunct();
         }, 500);
       } else {
         const error = document.createElement("div");

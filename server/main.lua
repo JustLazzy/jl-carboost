@@ -1,21 +1,43 @@
 local QBCore = exports['qb-core']:GetCoreObject()
 local tier = nil
 local isRunning = false
-AddEventHandler('onResourceStart', function(resource)
-   if resource == GetCurrentResourceName() then
-      Wait(100)
-      print('Start')
-   end
-end)
+local ItemConfig = {}
 
-AddEventHandler('onResourceStop', function(resource)
-   if resource == GetCurrentResourceName() then
-      print('Stop')
+CreateThread(function ()
+   local result = MySQL.Sync.fetchAll('SELECT * FROM `bennys_shop`', {})
+   if result[1] then
+      for k, v in pairs(result) do
+         Config.BennysItem[v.citizenid] = {
+            items = v.items
+         }
+      end
+      
    end
+   TriggerClientEvent('jl-carboost:client:setConfig', -1, Config.BennysItem)
+   print(json.encode(Config.BennysItem))
 end)
 
 -- Event
 RegisterNetEvent('jl-carboost:server:sendTask', function (source, data)
+end)
+
+RegisterNetEvent('jl-carboost:server:buyItem', function (data)
+   local src = source 
+   local pData = QBCore.Functions.GetPlayer(src)
+   local cartData = {}
+   pData.Functions.RemoveMoney('bank', data.price, 'bought-bennys-item')
+   for k, v in pairs(data.items) do
+      print(json.encode(v))
+      cartData[k] = {
+         item = v.item,
+         quantity = v.quantity,
+      }
+   end
+   print(json.encode(json.encode(pData.PlayerData.citizenid)))
+   MySQL.Async.insert('INSERT INTO bennys_shop (citizenid, items) VALUES(?,?)', {
+      pData.PlayerData.citizenid, json.encode(cartData)
+   })
+
 end)
 
 QBCore.Commands.Add('carboost', 'Start carboost', {{
@@ -29,6 +51,18 @@ QBCore.Commands.Add('carboost', 'Start carboost', {{
    else
       print('IS RUNNING or INVALID')
    end
+end)
+
+QBCore.Functions.CreateCallback('jl-carboost:server:canBuy', function(source, cb, data)
+   local src = source
+   local pData = QBCore.Functions.GetPlayer(src)
+   local bankAccount = pData.PlayerData.money["bank"]
+   if bankAccount >= data then
+      cb(true)
+   else
+      cb(false)
+   end
+   return cb
 end)
 
 QBCore.Functions.CreateCallback('jl-carboost:server:spawnCar', function (source, cb, coords)

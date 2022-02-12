@@ -13,7 +13,11 @@ server_script {
 	'@oxmysql/lib/MySQL.lua',
 	'server/main.lua'
 }
-client_script 'client/main.lua'
+client_script {
+	'@PolyZone/client.lua',
+	'@PolyZone/BoxZone.lua',
+	'client/main.lua',
+}
 
 ui_page 'html/index.html'
 
