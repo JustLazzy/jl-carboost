@@ -1,8 +1,22 @@
 local QBCore = exports['qb-core']:GetCoreObject()
+local PlayerData = QBCore.Functions.GetPlayerData()
 local isPoliceCalled = false
 local isCarSpawned
 local display = false
 local inZone = false
+
+
+RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
+    PlayerData = QBCore.Functions.GetPlayerData()
+end)
+
+RegisterNetEvent('QBCore:Client:OnJobUpdate', function(JobInfo)
+    PlayerData.job = JobInfo
+end)
+
+RegisterNetEvent('QBCore:Player:SetPlayerData', function(val)
+    PlayerData = val
+end)
 
 -- function
 function SetDisplay(bool)
@@ -14,42 +28,35 @@ function SetDisplay(bool)
     })
 end
 
-function CreateBlip(coords)
+function CreateBlip(coords, name, sprite)
 	local blip = AddBlipForCoord(coords)
-	SetBlipSprite(blip, 473)
+	SetBlipSprite(blip, sprite)
 	SetBlipScale(blip, 0.6)
 	SetBlipColour(blip, 4)
 	SetBlipDisplay(blip, 4)
-	SetBlipAsShortRange(blip, true)
+	SetBlipAsShortRange(blip, false)
 	BeginTextCommandSetBlipName("STRING")
-	AddTextComponentString("Pick Up")
+	AddTextComponentString(name)
 	EndTextCommandSetBlipName(blip)
 	return blip
 end
 
 RegisterCommand('testimage', function()
     for k, v in pairs(Config.BennysSell) do
-       print(QBCore.Shared.Items[v.item]["image"])
+       print(QBCore.Shared.Items[v.item]["label"])
     end
 end)
 
 RegisterCommand('testconfig', function()
-    print(json.encode(Config.BennysItem))
+    print(json.encode(Config.BennysItems))
 end)
 
 -- NUI
 RegisterNUICallback('openlaptop', function (data)
-    print(data.text)
-    SetDisplay(false)
-end)
-
-RegisterNUICallback('err', function (data)
-    print(data.error)
     SetDisplay(false)
 end)
 
 RegisterNUICallback('exit', function (data)
-    print('EXIT')
     SetDisplay(false)
 end)
 
@@ -67,15 +74,42 @@ RegisterNUICallback('loadstore', function (data, cb)
 end)
 
 RegisterNUICallback('checkout', function (data)
-    
     QBCore.Functions.TriggerCallback('jl-carboost:server:canBuy', function (result)
         if result then
-            print(result)
+            local firstTime = false
+            if not Config.BennysItems[1] then
+                firstTime = true
+            end
             local itemData = {
                 items = data.list,
                 price = data.total
             }
-            TriggerServerEvent('jl-carboost:server:buyItem', itemData)
+            for k, v in pairs(itemData.items) do
+                -- local itemquantity = v.quantity
+                -- local itemname = v.item
+                -- for k, v in pairs(Config.BennysItems) do
+                --     local itemname2 = v.item
+                --     if itemname2.name == itemname then
+                --         local quantityTotal = itemquantity + Config.BennysItems[k].item.quantity
+                --         Config.BennysItems[k].item.quantity = quantityTotal
+                --     else
+                --         local test = {
+                --             item = {
+                --                 itemname,
+                --                 itemquantity
+                --             }
+                --         }
+                --         table.insert(Config.BennysItems, test)
+                --     end
+                -- end
+                Config.BennysItems[#Config.BennysItems+1] = {
+                    item = {
+                        name = v.item,
+                        quantity = v.quantity
+                    }
+                }
+            end
+            TriggerServerEvent('jl-carboost:server:buyItem', itemData.price, Config.BennysItems, firstTime)
             SendNUIMessage({
                 type="checkout",
                 success = result
@@ -89,11 +123,69 @@ RegisterNUICallback('checkout', function (data)
     end, data.total)
 end)
 
-
 -- Event
+
+
 RegisterNetEvent('jl-carboost:client:setConfig', function (data)
-    Config.BennysItem = data
+    Config.BennysItems = data
 end)
+
+RegisterNetEvent('jl-carboost:client:takeAll', function ()
+    TriggerServerEvent('jl-carboost:server:takeAll', Config.BennysItems)
+    Config.BennysItems = {}
+end)
+
+RegisterNetEvent('jl-carboost:client:takeItem', function (data)
+    TriggerServerEvent('jl-carboost:server:takeItem', data.item, data.quantity)
+    for k, v in pairs(Config.BennysItems) do
+        if v.item.name == data.item then
+           table.remove(Config.BennysItems, k)
+        end
+    end
+    if Config.BennysItems[1] == nil then
+        Config.BennysItems = {}
+    end
+    TriggerServerEvent('jl-carboost:server:updateConfig', Config.BennysItems)
+end)
+
+RegisterNetEvent('jl-carboost:client:openMenu', function ()
+    if Config.BennysItems[1] then
+        local data = {
+            {
+                header = "| Post OP |",
+                isMenuHeader = true
+            },
+        }
+        for _, v in pairs(Config.BennysItems) do
+            local item = v.item
+            data[#data+1] = {
+                header = QBCore.Shared.Items[item.name]["label"],
+                id = item.name,
+                txt = "You have: "..item.quantity,
+                params = {
+                    event = "jl-carboost:client:takeItem",
+                    args = {
+                            item = item.name,
+                            quantity = item.quantity
+                    }
+                }
+            }
+        end
+        data[#data+1] = {
+            header = "Take all",
+            id = "take all",
+            txt = "Take all the items",
+            params = {
+                event = "jl-carboost:client:takeAll"
+            }
+
+        }
+        exports['qb-menu']:openMenu(data)
+    else
+        QBCore.Functions.Notify("You don't have anything in here...", "error")
+    end
+end)
+
 RegisterNetEvent('jl-carboost:client:spawnCar', function()
     QBCore.Functions.TriggerCallback('jl-carboost:server:spawnCar', function(result)
         if result then
@@ -118,6 +210,8 @@ RegisterNetEvent('jl-carboost:client:startBoosting', function ()
     
 end)
 
+
+
 RegisterNetEvent('jl-carboost:client:openLaptop', function ()
     SetDisplay(not display)
 end)
@@ -137,33 +231,30 @@ CreateThread(function ()
 end)
 
 CreateThread(function ()
-    local Zone = BoxZone:Create(vector3(1180.81, -3306.35, 6.03), 10, 10, {
-        name="jl-carboost",
-        heading=0,
-        debugPoly=true,
-        minZ=4.83,
-        maxZ=8.83
-      })
-      Zone:onPlayerInOut(function (isPointInside)
-          if isPointInside then
-            inZone = true
-          else
-            inZone = false
-          end
-      end)
-      Wait(500)
-      CreateBlip(vector3(1180.81, -3306.35, 6.03))
+    Wait(100)
+     if LocalPlayer.state['isLoggedIn'] then      
+        TriggerServerEvent('jl-carboost:server:getItem')
+        CreateBlip(vector3(1185.2, -3303.92, 6.92), "Post OP", 473)
+     end
 end)
 
-CreateThread(function ()
-    while true do
-        Wait(500)
-        if inZone then
-            for k, v in pairs(Config.BennysItem) do
-                print(k)
-            end
-        end
-    end
-end)
+-- exports
 
-
+exports['qb-target']:AddBoxZone("carboost:takeItem", vector3(1185.14, -3304.01, 7.1), 2, 2, {
+	name = "MissionRowDutyClipboard",
+    heading=0,
+    minZ=5.1,
+    maxZ=9.1,
+	-- debugPoly = true,
+    scale= {1.0, 1.0,1.0},
+}, {
+	options = {
+		{
+            type = "client",
+            event = "jl-carboost:client:openMenu",
+			icon = "fas fa-solid fa-box",
+			label = "Take item",
+		},
+	},
+	distance = 3.0
+})

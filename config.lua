@@ -4,7 +4,7 @@ Config.UseLindenAlert = true -- If u use linden_outlawalert
 
 Config.Minimum = 5 -- Minimum police
 
-Config.BennysItem = {}
+Config.BennysItems = {}
 
 Config.Tier = {
     --[[

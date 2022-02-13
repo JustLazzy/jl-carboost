@@ -17,7 +17,7 @@
 div.laptop {
   width: 95%;
   height: 95%;
-  top: -50%;
+  bottom: -150%;
   left: 50%;
   transform: translate(-50%, -50%);
   position: absolute;
@@ -34,7 +34,7 @@ div.laptop {
 
 div.laptop.active {
   visibility: visible;
-  top: 50%;
+  bottom: -45%;
 }
 
 div .winmanager {
@@ -194,6 +194,10 @@ p {
 ::-webkit-scrollbar-thumb {
   border-radius: 5px;
   background-color: #0c0c2b;
+}
+
+.apps {
+  z-index: 5;
 }
 
 .apps img {

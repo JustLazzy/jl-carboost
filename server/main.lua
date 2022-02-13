@@ -3,42 +3,70 @@ local tier = nil
 local isRunning = false
 local ItemConfig = {}
 
-CreateThread(function ()
-   local result = MySQL.Sync.fetchAll('SELECT * FROM `bennys_shop`', {})
-   if result[1] then
-      for k, v in pairs(result) do
-         Config.BennysItem[v.citizenid] = {
-            items = v.items
-         }
-      end
-      
-   end
-   TriggerClientEvent('jl-carboost:client:setConfig', -1, Config.BennysItem)
-   print(json.encode(Config.BennysItem))
-end)
-
 -- Event
 RegisterNetEvent('jl-carboost:server:sendTask', function (source, data)
 end)
 
-RegisterNetEvent('jl-carboost:server:buyItem', function (data)
+RegisterNetEvent('jl-carboost:server:takeItem', function (name, quantity)
+   local src = source
+   local Player = QBCore.Functions.GetPlayer(src)
+   Player.Functions.AddItem(name, quantity)
+   TriggerClientEvent('inventory:client:itemBox', src, QBCore.Shared.Items[tostring(name)], 'add')
+end)
+
+RegisterNetEvent('jl-carboost:server:getItem', function ()
+   local src = source
+   local pData = QBCore.Functions.GetPlayer(src)
+   local result = MySQL.Sync.fetchScalar('SELECT items FROM bennys_shop WHERE citizenid = @citizenid', {
+      ['@citizenid'] = pData.PlayerData.citizenid
+   })
+   if result then
+      TriggerClientEvent('jl-carboost:client:setConfig', src, json.decode(result))
+   end
+end)
+
+RegisterNetEvent('jl-carboost:server:setConfig', function ()
+   TriggerClientEvent('jl-carboost:client:setConfig', -1, Config.BennysItems)
+end)
+
+
+RegisterNetEvent('jl-carboost:server:buyItem', function (price, config, first)
    local src = source 
    local pData = QBCore.Functions.GetPlayer(src)
-   local cartData = {}
-   pData.Functions.RemoveMoney('bank', data.price, 'bought-bennys-item')
-   for k, v in pairs(data.items) do
-      print(json.encode(v))
-      cartData[k] = {
-         item = v.item,
-         quantity = v.quantity,
-      }
-   end
-   print(json.encode(json.encode(pData.PlayerData.citizenid)))
-   MySQL.Async.insert('INSERT INTO bennys_shop (citizenid, items) VALUES(?,?)', {
-      pData.PlayerData.citizenid, json.encode(cartData)
-   })
-
+   pData.Functions.RemoveMoney('bank', price, 'bought-bennys-item')
+   -- if first then
+      MySQL.Async.insert('INSERT INTO bennys_shop (citizenid, items) VALUES (@citizenid, @items) ON DUPLICATE KEY UPDATE items = @items', {
+         ['@citizenid'] = pData.PlayerData.citizenid,
+         ['@items'] = json.encode(config)
+      })
+   -- else
+      -- MySQL.Async.execute('UPDATE bennys_shop SET items = @items WHERE citizenid = @citizenid', {
+      --    ['@citizenid'] = pData.PlayerData.citizenid,
+      --    ['@items'] = json.encode(config)
+      -- })
+   -- end
 end)
+
+RegisterNetEvent('jl-carboost:server:updateConfig', function (data)
+   local src = source 
+   local pData = QBCore.Functions.GetPlayer(src)
+   MySQL.Async.execute('UPDATE bennys_shop SET items = @items WHERE citizenid = @citizenid', {
+      ['@citizenid'] = pData.PlayerData.citizenid,
+      ['@items'] = json.encode(data)
+   })
+end)
+
+RegisterNetEvent('jl-carboost:server:takeAll', function (data)
+   local src = source
+   local Player = QBCore.Functions.GetPlayer(src)
+   for k, v in pairs(data) do
+      local item = v.item
+      Player.Functions.AddItem(item.name, item.quantity)
+      TriggerClientEvent('inventory:client:itemBox', src, QBCore.Shared.Items[tostring(item.name)], 'add')
+   end
+end)
+
+-- Commands
 
 QBCore.Commands.Add('carboost', 'Start carboost', {{
    name = 'tier',
@@ -53,6 +81,8 @@ QBCore.Commands.Add('carboost', 'Start carboost', {{
    end
 end)
 
+-- Callback
+
 QBCore.Functions.CreateCallback('jl-carboost:server:canBuy', function(source, cb, data)
    local src = source
    local pData = QBCore.Functions.GetPlayer(src)
@@ -63,6 +93,9 @@ QBCore.Functions.CreateCallback('jl-carboost:server:canBuy', function(source, cb
       cb(false)
    end
    return cb
+end)
+
+QBCore.Functions.CreateCallback('jl-carboost:server:canTake', function (source, cb, data)
 end)
 
 QBCore.Functions.CreateCallback('jl-carboost:server:spawnCar', function (source, cb, coords)

@@ -210,7 +210,6 @@ $(document).ready(() => {
 
 function uglyFunct() {
   var removeCartButtons = document.getElementsByClassName("remove-cart-item");
-  // console.log("ini cart remove", removeCartButtons);
   for (var i = 0; i < removeCartButtons.length; i++) {
     var button = removeCartButtons[i];
     button.addEventListener("click", removeCartItem);
@@ -221,11 +220,8 @@ function uglyFunct() {
     input.addEventListener("change", quantityChanged);
   }
   let addCart = document.getElementsByClassName("basket-button");
-  // console.log(addCart.length);
-  // console.log(addCart);
   for (var i = 0; i < addCart.length; i++) {
     let button = addCart[i];
-    // console.log("ini button:", button);
     button.addEventListener("click", addToCart);
   }
 }
@@ -238,7 +234,14 @@ function addToCart(event) {
   const price = product.getElementsByClassName("price")[0].innerText;
   const image = product.getElementsByClassName("product-image")[0].src;
   const productId = product.id;
-
+  const cartItem = document.getElementsByClassName("cart-list")[0];
+  const cartcontent = cartItem.getElementsByClassName("cart-box");
+  for (var i = 0; i < cartcontent.length; i++) {
+    if (cartcontent[0].id === productId) {
+      return;
+    }
+  }
+  cartButton.classList.add("active");
   addProductToCart(title, price, image, productId);
 }
 
@@ -288,7 +291,6 @@ function addProductToCart(title, price, image, id) {
 // quantity change
 function quantityChanged(event) {
   const input = event.target;
-  console.log("ini input", input.value);
   if (isNaN(input.value) || input.value <= 0) {
     input.value = 1;
   }
@@ -308,6 +310,9 @@ function updateTotalPrice() {
   }
   const cartBox = cartContent.getElementsByClassName("cart-box");
   if (cartBox.length == 0) {
+    cartButton.classList.remove("active");
+    cart.classList.remove("active");
+    store.classList.add("active");
     return (document.getElementsByClassName("total-price")[0].innerText = "$0");
   }
   let total = 0;
@@ -331,9 +336,8 @@ function checkout() {
   );
   const itemList = document.getElementsByClassName("cart-list")[0];
   const item = itemList.getElementsByClassName("cart-content");
-  if (item.length == 0) {
-    return console.log("NO ITEM");
-  }
+  if (item.length == 0) return;
+
   for (let i = 0; i < item.length; i++) {
     const itemcart = item[i];
     const quantity = itemcart.getElementsByClassName("cart-quantity")[0].value;
@@ -343,7 +347,8 @@ function checkout() {
       quantity: quantity,
     });
   }
-  console.log(list, total);
+  itemList.innerHTML = "";
+  updateTotalPrice();
   $.post("https://jl-carboost/checkout", JSON.stringify({ list, total }));
 }
 
