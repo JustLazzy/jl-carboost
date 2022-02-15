@@ -20,6 +20,7 @@
   -webkit-box-shadow: 10px 10px 15px rgba(0, 0, 0, 0.06);
   -moz-box-shadow: 10px 10px 15px rgba(0, 0, 0, 0.06);
   box-shadow: 10px 10px 15px rgba(0, 0, 0, 0.06);
+  z-index: 20;
 }
 
 #bennys-app.active {
@@ -31,8 +32,6 @@
   visibility: hidden;
   opacity: 0;
   position: absolute;
-  /* margin: 10px; */
-  /* margin-top: 5vh; */
   margin: 5px;
   display: grid;
   grid-template-columns: repeat(auto-fit, 11vw);
@@ -219,6 +218,14 @@ input :focus {
   font-size: medium;
   font-family: "Roboto", sans-serif;
   text-transform: uppercase;
+}
+
+#bennys-app .cart .total {
+  text-align: center;
+  font-family: "Roboto", sans-serif;
+  font-size: 1rem;
+  font-weight: bold;
+  color: rgb(255, 255, 255);
 }
 
 #bennys-app .text button {

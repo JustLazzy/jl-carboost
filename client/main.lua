@@ -5,6 +5,8 @@ local isCarSpawned
 local display = false
 local inZone = false
 
+local laptopdict = "amb@code_human_in_bus_passenger_idles@female@tablet@base"
+local laptopanim = "base"
 
 RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
     PlayerData = QBCore.Functions.GetPlayerData()
@@ -40,6 +42,15 @@ function CreateBlip(coords, name, sprite)
 	EndTextCommandSetBlipName(blip)
 	return blip
 end
+
+RegisterCommand("testanim", function ()
+    RequestAnimDict(laptopdict)
+    while not HasAnimDictLoaded(laptopdict) do Wait(100) end
+
+    local ped = PlayerPedId()
+    
+    TaskPlayAnim(ped, laptopdict, laptopanim, 8.0, 8.0, -1, 0, 0, false, false, false)
+end)
 
 RegisterCommand('testimage', function()
     for k, v in pairs(Config.BennysSell) do

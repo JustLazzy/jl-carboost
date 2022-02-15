@@ -73,7 +73,7 @@ $(document).ready(() => {
         }
       }
       app.classList.add("active");
-      $(id).css("z-index", index++);
+      // $(id).css("z-index", index++);
       // $(id).css("visibility", "visible");
       // $(id).css("opacity", "100%");
 
@@ -83,11 +83,10 @@ $(document).ready(() => {
       return;
     } else if (!bool && id != null) {
       app.classList.remove("active");
-      $(id).css("z-index", "0");
+      // $(id).css("z-index", "0");
       $(id).css("transition", "0.5s");
       // $(id).css("visibility", "hidden");
       // $(id).css("opacity", "0");
-      index - 1;
       return;
     }
   }
@@ -127,17 +126,12 @@ $(document).ready(() => {
       }
     } else if (event.data.type === "checkout") {
       if (event.data.success == true) {
-        console.log("TRUE");
+        checkoutSuccess();
       } else {
-        console.log("FALSE");
+        Notification("You don't have enough money", "error");
       }
     }
   });
-
-  // $(document).click(function (e) {
-  //   e.preventDefault();
-  //   console.log(JSON.stringify(e));
-  // });
 
   homeButton.onclick = () => {
     store.classList.add("active");
@@ -188,7 +182,6 @@ $(document).ready(() => {
     if (event.repeat) {
       return;
     }
-    // console.log(event.key);
     switch (event.key) {
       case "Escape":
         if (bennys.classList.contains("active")) {
@@ -237,7 +230,7 @@ function addToCart(event) {
   const cartItem = document.getElementsByClassName("cart-list")[0];
   const cartcontent = cartItem.getElementsByClassName("cart-box");
   for (var i = 0; i < cartcontent.length; i++) {
-    if (cartcontent[0].id === productId) {
+    if (cartcontent[i].id === productId) {
       return;
     }
   }
@@ -283,9 +276,9 @@ function addProductToCart(title, price, image, id) {
     .getElementsByClassName("cart-quantity")[0]
     .addEventListener("change", quantityChanged);
 
-  for (var i = 0; i < productTitle.length; i++) {
-    console.log(productTitle[i].innerText);
-  }
+  // for (var i = 0; i < productTitle.length; i++) {
+  //   console.log(productTitle[i].innerText);
+  // }
 }
 
 // quantity change
@@ -337,7 +330,6 @@ function checkout() {
   const itemList = document.getElementsByClassName("cart-list")[0];
   const item = itemList.getElementsByClassName("cart-content");
   if (item.length == 0) return;
-
   for (let i = 0; i < item.length; i++) {
     const itemcart = item[i];
     const quantity = itemcart.getElementsByClassName("cart-quantity")[0].value;
@@ -347,12 +339,15 @@ function checkout() {
       quantity: quantity,
     });
   }
-  itemList.innerHTML = "";
-  updateTotalPrice();
   $.post("https://jl-carboost/checkout", JSON.stringify({ list, total }));
 }
 
-function checkoutSuccess() {}
+function checkoutSuccess() {
+  const itemList = document.getElementsByClassName("cart-list")[0];
+  itemList.innerHTML = "";
+  Notification("Your order is succesfully placed", "success");
+  updateTotalPrice();
+}
 
 // Refresh time
 setInterval(refreshTime, 1000);
@@ -388,6 +383,77 @@ function wait(ms) {
       resolve();
     }, ms);
   });
+}
+
+function randomMessage() {
+  const message = [
+    "Hey, how are you doing today?",
+    "I'm glad you're here!",
+    "I hope you're having a good day!",
+    "I hope you're having a great day!",
+    "I hope you're having a wonderful day!",
+    // random long fact
+    "I'm a software engineer, and I'm passionate about building things that make people's lives better.",
+  ];
+  const random = Math.floor(Math.random() * message.length);
+  Notification(message[random]);
+}
+
+function Notification(text, style, length) {
+  let icon;
+  if (style === "success") {
+    style = "success";
+    icon = "fas fa-circle-check";
+  } else if (style === "warning") {
+    style = "warning";
+    icon = "fas fa-exclamation-triangle";
+  } else if (style === "error") {
+    style = "error";
+    icon = "fas fa-times-circle";
+  } else if (style === "info") {
+    style = "info";
+    icon = "fas fa-bell";
+  } else {
+    style = "info";
+    icon = "fas fa-bell";
+  }
+  length = length || 3 * 1000; // <- 3 seconds
+  const notification = document.getElementsByClassName("notification")[0];
+  const notificationText = document.createElement("div");
+  const audio = new Audio("assets/audio/pop.wav");
+  const out = new Audio("assets/audio/out.wav");
+  notificationText.className = `alert ${style}`;
+  notificationText.innerHTML = `<span class="${icon}"></span>
+          <span class="message"
+            >${text}</span
+          >
+          <span class="close-btn">
+            <span class="fas fa-times"></span>
+          </span>`;
+  notificationText.classList.add("active");
+  audio.volume = 0.2;
+  out.volume = 0.2;
+  audio.play();
+
+  notification.append(notificationText);
+  notificationText
+    .getElementsByClassName("close-btn")[0]
+    .addEventListener("click", () => {
+      notificationText.classList.add("hide");
+      notificationText.classList.remove("active");
+      out.play();
+      setTimeout(() => {
+        notificationText.remove();
+        audio.remove();
+      }, 500);
+    });
+  setTimeout(async () => {
+    notificationText.classList.add("hide");
+    notificationText.classList.remove("active");
+    setTimeout(() => {
+      notificationText.remove();
+    }, length + 1000);
+  }, length);
 }
 
 function loadBennysApp() {
