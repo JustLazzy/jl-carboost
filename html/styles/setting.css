@@ -1,0 +1,136 @@
+#settings {
+  /* height: 0px; */
+  margin: 0;
+  width: 350px;
+  height: 500px;
+  padding: 0;
+  box-sizing: border-box;
+  /* visibility: hidden; */
+  opacity: 1;
+  position: absolute;
+  /* make the position on bottom right */
+  bottom: -80%;
+  right: -5%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(
+    to right,
+    rgba(21, 24, 43, 0.8),
+    rgba(30, 38, 77, 0.8),
+    rgba(10, 12, 41, 0.8)
+  );
+  backdrop-filter: blur(10px);
+  border-radius: 5px;
+  border-width: 1px;
+  box-shadow: 10px 10px 15px rgba(0, 0, 0, 0.06);
+  border: 2px solid rgba(255, 255, 255, 0.507);
+  transition: 0.5s;
+  overflow-y: auto;
+  overflow-x: hidden;
+  transition: 1s;
+  z-index: 90;
+}
+
+#settings.active {
+  visibility: visible;
+  bottom: -18%;
+}
+
+#settings > .container {
+  padding: 10px;
+  margin: 50px;
+  display: flex;
+  justify-content: center;
+  justify-items: center;
+  justify-self: center;
+  text-align: center;
+}
+
+#settings .setting-title {
+  position: fixed;
+  top: 0;
+  margin: 10px;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  justify-items: center;
+  align-items: center;
+}
+
+#settings .setting-title h2 {
+  text-transform: uppercase;
+  font-size: 18px;
+  font-weight: bold;
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+#settings .setting-body {
+  position: fixed;
+  margin: 10px;
+}
+
+#settings .setting-body h3 {
+  margin-top: 10px;
+  text-transform: capitalize;
+  font-size: 18px;
+  font-weight: bold;
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+#settings .setting-body > .bg-input input {
+  width: 300px;
+  height: 30px;
+  color: black;
+  border: none;
+  text-align: center;
+  margin-top: 10px;
+  font-size: medium;
+}
+
+#settings .setting-body .audio-slider input {
+  width: 300px;
+  height: 30px;
+  border: none;
+  /* margin-top: 10px; */
+  font-size: medium;
+}
+
+#settings .toggle-div {
+  display: flex;
+  justify-content: center;
+  justify-items: center;
+  align-items: center;
+  margin-top: 10px;
+}
+
+#settings .setting-body .bg-input input:focus {
+  outline: none;
+}
+
+#settings .setting-confirm {
+  /* text-align: center; */
+  display: flex;
+  justify-content: center;
+  justify-items: center;
+  position: absolute;
+  text-align: center;
+  bottom: 0;
+  margin: 10px;
+}
+
+#settings .setting-confirm button {
+  width: 120px;
+  height: 40px;
+  border: none;
+  border-radius: 5px;
+  background-color: rgba(28, 38, 90, 0.815);
+  color: rgb(255, 255, 255);
+  font-size: medium;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 5px;
+  transition: 0.5s;
+}

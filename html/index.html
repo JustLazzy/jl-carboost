@@ -20,15 +20,64 @@
     <link rel="stylesheet" href="./styles/styles.css" />
     <link rel="stylesheet" href="./styles/bennys.css" />
     <link rel="stylesheet" href="./styles/boosting.css" />
+    <link rel="stylesheet" href="./styles/setting.css" />
   </head>
 
   <body oncopy="false" oncut="false" onpaste="false">
     <div class="laptop">
       <div class="desktop">
-        <!-- <button onclick="randomMessage()">HALO</button> -->
+        <!-- <div class="testing">
+          <input type="url" name="bg" id="background" style="color: black" />
+          <button class="buttontest" onclick="wallpaper()" type="submit">
+            CLICK HERE
+          </button>
+        </div> -->
         <!-- make 2 icon -->
-        <div class="notification"></div>
+        <div class="notification">
+          <!-- notification goes here -->
+        </div>
         <div class="apps">
+          <div id="settings">
+            <div class="container">
+              <div class="setting-title">
+                <p style="font-size: large">Settings</p>
+              </div>
+              <div class="setting-body">
+                <div class="bg-input">
+                  <p>Wallpaper</p>
+                  <input id="background" type="url" inputmode="url" />
+                </div>
+                <div class="audio-settings">
+                  <p>Audio</p>
+                  <div class="audio-slider">
+                    <input
+                      id="volume-control"
+                      type="range"
+                      value="50"
+                      min="0"
+                      max="100"
+                    />
+                  </div>
+                </div>
+                <div class="toggle-text">
+                  <p>Desktop Text Color</p>
+                  <div class="toggle-div">
+                    <label for="toggle-text-color">
+                      <input
+                        type="checkbox"
+                        name="toggle-text-color"
+                        id="toggle-text-color"
+                      />
+                    </label>
+                    <p style="font-size: medium">Black/White</p>
+                  </div>
+                </div>
+              </div>
+              <div class="setting-confirm">
+                <button class="save-config">Save Config</button>
+              </div>
+            </div>
+          </div>
           <div id="bennys-app">
             <header>
               <nav>
@@ -107,9 +156,9 @@
           </div>
         </div>
         <div class="right-icons">
-          <i class="fas fa-duotone fa-gear"></i>
+          <i id="setting" class="fas fa-duotone fa-gear"></i>
           <i class="fas fa-wifi"></i>
-          <i class="fas fa-volume-up"></i>
+          <i id="volume" class="fas fa-volume-up"></i>
           <i class="fas fa-battery-half"></i>
           <div class="date-time">
             <span id="time"></span>

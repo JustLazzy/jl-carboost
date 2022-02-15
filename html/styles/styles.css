@@ -22,7 +22,8 @@ div.laptop {
   transform: translate(-50%, -50%);
   position: absolute;
   visibility: hidden;
-  background: url(../assets/BG.png);
+  background-image: url(../assets/BG.png);
+  background-color: rgb(41, 41, 41);
   border: 10px solid rgb(11, 13, 27);
   border-bottom: 20px solid rgb(11, 13, 27);
   border-radius: 5px;
@@ -44,7 +45,7 @@ div.laptop .notification {
   width: auto;
   height: auto;
   right: 0;
-  bottom: 50px;
+  top: 5px;
   z-index: 100;
   flex-direction: column;
   align-items: flex-end;
@@ -64,7 +65,7 @@ div.laptop .notification {
   min-width: 320px;
   border-radius: 5px;
   /* border-left: 7px solid#1b1a46; */
-  transition: 1s;
+  /* transition: 1s; */
 }
 
 .notification .alert.success {
@@ -182,7 +183,7 @@ div .winmanager {
   display: flex;
   bottom: 0;
   align-items: center;
-  z-index: 99;
+  z-index: 98;
 }
 
 div.icon {
@@ -273,6 +274,10 @@ div.desktopicons > div {
   left: 0;
   list-style: none;
   transition: 1s;
+}
+
+div.desktopicons.toggletext p {
+  color: black;
 }
 
 div.desktopicons > div > img {

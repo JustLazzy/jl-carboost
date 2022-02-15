@@ -8,6 +8,14 @@ let homeButton = document.querySelector(".home-button");
 let checkoutbutton = document.querySelector(".buy-button");
 let store = document.querySelector(".grid");
 let laptop = document.querySelector(".laptop");
+let volumebutton = document.querySelector("#volume");
+let testing = document.querySelector(".buttontest");
+let settingButton = document.querySelector("#setting");
+let volumecontrol = document.getElementById("volume-control");
+let saveConfig = document.querySelector(".save-config");
+
+let isMuted = false;
+let volumeValue = (50 / 200).toFixed(2);
 
 $(document).ready(() => {
   if (index >= 2) {
@@ -31,11 +39,7 @@ $(document).ready(() => {
     }
   }
   loadBennysApp();
-
-  // make a wait function
-
   function display(bool) {
-    // bool = true;
     if (bool) {
       laptop.classList.add("active");
       return;
@@ -148,6 +152,51 @@ $(document).ready(() => {
     checkout();
   };
 
+  saveConfig.onclick = () => {
+    // console.log("CLICKED");
+    saveConfigs();
+  };
+
+  volumecontrol.onchange = (e) => {
+    const input = e.target;
+    volumeValue = (input.value / 200).toFixed(2);
+
+    console.log(input.value);
+    if (input.value == 0) {
+      isMuted = true;
+
+      volumebutton.classList.remove("fa-volume-up");
+      volumebutton.classList.add("fa-volume-xmark");
+    } else if (input.value > 0) {
+      isMuted = false;
+      volumebutton.classList.add("fa-volume-up");
+      volumebutton.classList.remove("fa-volume-xmark");
+    }
+  };
+
+  volumebutton.onclick = () => {
+    if (volumebutton.classList.contains("fa-volume-up")) {
+      volumecontrol.value = 0;
+      isMuted = true;
+      volumebutton.classList.remove("fa-volume-up");
+      volumebutton.classList.add("fa-volume-xmark");
+    } else {
+      isMuted = false;
+      volumecontrol.value = 50;
+      volumebutton.classList.add("fa-volume-up");
+      volumebutton.classList.remove("fa-volume-xmark");
+    }
+  };
+
+  settingButton.onclick = () => {
+    const setting = document.querySelector("#settings");
+    if (setting.classList.contains("active")) {
+      setting.classList.remove("active");
+    } else {
+      setting.classList.add("active");
+    }
+  };
+
   function closeBennys() {
     setTimeout(() => {
       // $(".grid").css("visibility", "hidden");
@@ -194,9 +243,9 @@ $(document).ready(() => {
           $.post("https://jl-carboost/exit", JSON.stringify({}));
         }
         break;
-      case "Backspace":
-        $.post("https://jl-carboost/exit", JSON.stringify({}));
-        break;
+      // case "Backspace":
+      //   $.post("https://jl-carboost/exit", JSON.stringify({}));
+      //   break;
     }
   };
 });
@@ -237,7 +286,6 @@ function addToCart(event) {
   cartButton.classList.add("active");
   addProductToCart(title, price, image, productId);
 }
-
 function addProductToCart(title, price, image, id) {
   const cartShopBox = document.createElement("div");
   cartShopBox.classList.add("cart-content");
@@ -275,10 +323,21 @@ function addProductToCart(title, price, image, id) {
   cartShopBox
     .getElementsByClassName("cart-quantity")[0]
     .addEventListener("change", quantityChanged);
-
   // for (var i = 0; i < productTitle.length; i++) {
   //   console.log(productTitle[i].innerText);
   // }
+}
+
+function saveConfigs() {
+  Notification("Your settings have been saved", "success");
+  const toggleText = document.querySelector("#toggle-text-color");
+  const desktopicons = document.querySelector(".desktopicons");
+  if (toggleText.checked) {
+    desktopicons.classList.add("toggletext");
+  } else {
+    desktopicons.classList.remove("toggletext");
+  }
+  wallpaper();
 }
 
 // quantity change
@@ -431,29 +490,43 @@ function Notification(text, style, length) {
             <span class="fas fa-times"></span>
           </span>`;
   notificationText.classList.add("active");
-  audio.volume = 0.2;
+  audio.volume = volumeValue;
   out.volume = 0.2;
-  audio.play();
+  if (!isMuted) {
+    audio.play();
+  }
 
   notification.append(notificationText);
   notificationText
     .getElementsByClassName("close-btn")[0]
     .addEventListener("click", () => {
-      notificationText.classList.add("hide");
-      notificationText.classList.remove("active");
-      out.play();
-      setTimeout(() => {
-        notificationText.remove();
-        audio.remove();
-      }, 500);
+      notificationText.remove();
+      audio.remove();
     });
   setTimeout(async () => {
     notificationText.classList.add("hide");
     notificationText.classList.remove("active");
-    setTimeout(() => {
-      notificationText.remove();
-    }, length + 1000);
   }, length);
+  notificationText.onanimationend = (e) => {
+    if (e.animationName === "sliding_back") {
+      notificationText.remove();
+      audio.remove();
+    }
+  };
+}
+
+function wallpaper() {
+  let value = $("#background")[0].value;
+  if (
+    (value.startsWith("https://") && value.endsWith(".jpg")) ||
+    value.endsWith(".png")
+  ) {
+    $(".laptop").css("background-image", `url(${value})`);
+  } else if (!value) {
+    return;
+  } else {
+    return Notification("Please enter a valid URL", "error");
+  }
 }
 
 function loadBennysApp() {
