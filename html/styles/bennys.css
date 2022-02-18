@@ -248,10 +248,6 @@ input :focus {
 }
 
 #bennys-app .navigation {
-  /* make it on top of each div */
-
-  /* background: rgb(21, 26, 53); */
-  /* position: fixed; */
   margin: 2% 6%;
   padding: 10px;
   left: 0;

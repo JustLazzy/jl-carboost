@@ -12,12 +12,13 @@
     ></script>
     <link
       rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
-      integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA=="
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg=="
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     />
-    <link rel="stylesheet" href="./styles/styles.css" />
+
+    <link rel="stylesheet" type="text/css" href="./styles/styles.css" />
     <link rel="stylesheet" href="./styles/bennys.css" />
     <link rel="stylesheet" href="./styles/boosting.css" />
     <link rel="stylesheet" href="./styles/setting.css" />
@@ -26,13 +27,6 @@
   <body oncopy="false" oncut="false" onpaste="false">
     <div class="laptop">
       <div class="desktop">
-        <!-- <div class="testing">
-          <input type="url" name="bg" id="background" style="color: black" />
-          <button class="buttontest" onclick="wallpaper()" type="submit">
-            CLICK HERE
-          </button>
-        </div> -->
-        <!-- make 2 icon -->
         <div class="notification">
           <!-- notification goes here -->
         </div>
@@ -85,8 +79,8 @@
                 <ul>
                   <i
                     id="close-bennys"
-                    class="fas fa-times-circle"
-                    style="font-size: 15px; color: rgb(192, 11, 11)"
+                    class="fa-solid fa-circle-xmark"
+                    style="font-size: 20px; color: rgb(192, 11, 11)"
                   ></i>
                 </ul>
               </nav>
@@ -116,16 +110,68 @@
           <div id="boosting-app">
             <header>
               <nav>
-                <h1>Boost</h1>
+                <h1>Boosting</h1>
                 <ul>
                   <i
                     id="close-boosting"
-                    class="fas fa-times-circle"
-                    style="font-size: 30px; color: rgb(192, 11, 11)"
+                    class="fa-solid fa-circle-xmark"
+                    style="font-size: 20px; color: rgb(192, 11, 11)"
                   ></i>
                 </ul>
               </nav>
             </header>
+            <div class="navigation">
+              <button class="my-contract">My Contract</button>
+              <button class="buy-contract">Buy Contract</button>
+              <button class="join-queue">Join Queue</button>
+            </div>
+            <div class="container">
+              <div class="boost-proggress">
+                <p id="boost-class">D</p>
+                <div class="proggress-bar">
+                  <div class="prog"></div>
+                </div>
+                <p id="boost-class-next">C</p>
+              </div>
+              <div class="boost-contract">
+                <div class="boost-list">
+                  <div class="boostcart">
+                    <div class="boost-text">
+                      <p>Vehicle: Adder</p>
+                      <p>Contract Type: D</p>
+                    </div>
+                    <div class="boost-info">
+                      <p>Owner: The guy that use pepe framework</p>
+                      <p>Expire in: 5 hours</p>
+                    </div>
+                    <div class="boost-button">
+                      <button class="start-contract">Start Contract</button>
+                      <button class="transfer-contract">
+                        Transfer Contract
+                      </button>
+                      <button class="sell-contract">Sell Contract</button>
+                    </div>
+                  </div>
+                  <div class="boostcart">
+                    <div class="boost-text">
+                      <p>Vehicle: Adder</p>
+                      <p>Contract Type: D</p>
+                    </div>
+                    <div class="boost-info">
+                      <p>Owner: The guy who rename qbcore</p>
+                      <p>Expire in: 6 hours</p>
+                    </div>
+                    <div class="boost-button">
+                      <button class="start-contract">Start Contract</button>
+                      <button class="transfer-contract">
+                        Transfer Contract
+                      </button>
+                      <button class="sell-contract">Sell Contract</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
         <div class="desktopicons">
@@ -167,7 +213,8 @@
         </div>
       </div>
     </div>
-    <!-- import javascript -->
     <script src="./js/app.js"></script>
+    <script src="./js/bennys.js"></script>
+    <script src="./js/boost.js"></script>
   </body>
 </html>

@@ -12,28 +12,47 @@
   height: 70%;
   display: flex;
   flex-direction: column;
-  background-color: rgb(11, 13, 27);
+  background-color: rgb(15, 17, 31);
   border-radius: 5px;
-  border-width: 1px;
-  box-shadow: 10px 10px 15px rgba(0, 0, 0, 0.06);
-  border: 2px solid rgba(255, 255, 255, 0.507);
+
   transition: 0.5s;
-  overflow-y: auto;
-  overflow-x: hidden;
+  -webkit-box-shadow: 10px 10px 15px rgba(0, 0, 0, 0.06);
+  -moz-box-shadow: 10px 10px 15px rgba(0, 0, 0, 0.06);
+  box-shadow: 10px 10px 15px rgba(0, 0, 0, 0.06);
+  z-index: 20;
+}
+
+#boosting-app.active {
+  visibility: visible;
+  opacity: 1;
+}
+
+#boosting-app header {
+  z-index: 1000;
 }
 
 #boosting-app > header > nav {
   font-family: "Open Sans", sans-serif;
+  position: absolute;
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-direction: row;
-  padding: 15px;
+  padding: 10px;
   border-width: 1px;
   flex-direction: row;
   width: 100%;
-  height: 60px;
+  height: 40px;
   background-color: rgb(5, 6, 17);
+  z-index: 10;
+}
+
+#boosting-app > header > nav > h1 {
+  font-size: 15px;
+  font-weight: 600;
+  color: rgb(255, 255, 255);
+  margin: 0;
+  padding: 0;
 }
 
 #boosting-app > header > nav ul {
@@ -46,4 +65,180 @@
 #boosting-app > header :active {
   cursor: move;
   user-select: none;
+}
+
+#boosting-app > .container {
+  display: flex;
+  justify-content: center;
+  justify-items: center;
+  align-items: center;
+  top: 15%;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+#boosting-app > .navigation {
+  margin: 15px 0px;
+  padding: 0 100px;
+  display: flex;
+  position: relative;
+  top: 5%;
+  justify-content: flex-start;
+  justify-items: center;
+  align-items: center;
+  flex-direction: row;
+  width: 100%;
+  height: 30px;
+  z-index: 10;
+}
+
+#boosting-app > .navigation button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  justify-self: center;
+  font-family: "Open Sans", sans-serif;
+  font-weight: bold;
+  text-transform: capitalize;
+  margin: 10px;
+  padding: 5px;
+  color: rgb(255, 255, 255);
+  background-color: rgb(32, 41, 70);
+  width: 130px;
+  height: 100%;
+  border: none;
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+#boosting-app > .navigation button.my-contract {
+  /* background-color: rgb(6, 109, 12); */
+}
+
+#boosting-app > .navigation button.join-queue {
+  background-color: rgb(33, 156, 204);
+}
+
+#boosting-app > .navigation button.buy-contract {
+  background-color: rgb(6, 109, 12);
+}
+
+#boosting-app > .container .boost-proggress {
+  /* make it on top */
+  position: static;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  justify-items: center;
+  justify-self: center;
+  align-content: center;
+
+  width: 100%;
+  height: 100%;
+}
+
+#boosting-app > .container .boost-proggress > .proggress-bar {
+  margin: 10px;
+  position: static;
+  height: 5px;
+  width: 80%;
+  background-color: aliceblue;
+  border-radius: 5px;
+}
+
+#boosting-app .boost-proggress p {
+  font-family: "Open Sans", sans-serif;
+  height: auto;
+  /* font-size: 15px;
+  font-weight: 600;
+  color: rgb(255, 255, 255);
+  margin: 0;
+  padding: 0; */
+}
+
+#boosting-app > .container .boost-proggress > .proggress-bar > .prog {
+  transition: 0.5s;
+  background: rgb(255, 0, 0);
+  background: linear-gradient(
+    90deg,
+    rgba(255, 0, 0, 1) 0%,
+    rgba(251, 252, 15, 1) 43%,
+    rgba(1, 255, 0, 1) 100%
+  );
+  width: 0%;
+  height: 100%;
+}
+
+#boosting-app > .container .boost-contract {
+  top: 15vh;
+  position: fixed;
+}
+
+#boosting-app > .container .boost-contract > .boost-list {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+#boosting-app > .container .boost-contract > .boost-list .boostcart {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  text-align: justify;
+  justify-content: center;
+  align-items: center;
+  justify-self: center;
+  color: rgb(255, 255, 255);
+  margin: 10px;
+  padding: 5px 30px;
+  background-color: rgb(32, 41, 70);
+
+  width: 100vh;
+  height: 200px;
+  /* max-height: 200px;
+  min-height: 150px; */
+  border: none;
+  border-radius: 5px;
+}
+
+#boosting-app .boost-list .boost-button {
+  /* make it stick on bottom left */
+  display: flex;
+  justify-content: center;
+  justify-items: center;
+  justify-self: center;
+  align-items: center;
+  position: relative;
+  bottom: 0;
+}
+
+.boost-button button {
+  text-transform: capitalize;
+  font-family: "Open Sans", sans-serif;
+  font-size: 15px;
+  font-weight: bold;
+  padding: 0 5px;
+  text-align: center;
+  justify-self: center;
+  color: whitesmoke;
+  border: none;
+  border-radius: 4px;
+  width: 170px;
+  height: 30px;
+  margin: 0 10px;
+  cursor: pointer;
+}
+
+button.start-contract {
+  background-color: rgb(6, 109, 12);
+}
+
+button.transfer-contract {
+  background-color: rgb(10, 159, 245);
+}
+
+button.sell-contract {
+  background-color: rgb(194, 54, 54);
 }

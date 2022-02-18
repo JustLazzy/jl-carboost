@@ -10,6 +10,7 @@ local laptopanim = "base"
 
 RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
     PlayerData = QBCore.Functions.GetPlayerData()
+    TriggerServerEvent('jl-carboost:server:getItem')
 end)
 
 RegisterNetEvent('QBCore:Client:OnJobUpdate', function(JobInfo)
@@ -18,6 +19,11 @@ end)
 
 RegisterNetEvent('QBCore:Player:SetPlayerData', function(val)
     PlayerData = val
+end)
+
+RegisterNetEvent('QBCore:Client:OnPlayerUnload', function ()
+    PlayerData = {}
+    Config.BennysItems = {}
 end)
 
 -- function
@@ -36,7 +42,6 @@ function CreateBlip(coords, name, sprite)
 	SetBlipScale(blip, 0.6)
 	SetBlipColour(blip, 4)
 	SetBlipDisplay(blip, 4)
-	SetBlipAsShortRange(blip, false)
 	BeginTextCommandSetBlipName("STRING")
 	AddTextComponentString(name)
 	EndTextCommandSetBlipName(blip)
@@ -96,23 +101,6 @@ RegisterNUICallback('checkout', function (data)
                 price = data.total
             }
             for k, v in pairs(itemData.items) do
-                -- local itemquantity = v.quantity
-                -- local itemname = v.item
-                -- for k, v in pairs(Config.BennysItems) do
-                --     local itemname2 = v.item
-                --     if itemname2.name == itemname then
-                --         local quantityTotal = itemquantity + Config.BennysItems[k].item.quantity
-                --         Config.BennysItems[k].item.quantity = quantityTotal
-                --     else
-                --         local test = {
-                --             item = {
-                --                 itemname,
-                --                 itemquantity
-                --             }
-                --         }
-                --         table.insert(Config.BennysItems, test)
-                --     end
-                -- end
                 Config.BennysItems[#Config.BennysItems+1] = {
                     item = {
                         name = v.item,
@@ -135,7 +123,6 @@ RegisterNUICallback('checkout', function (data)
 end)
 
 -- Event
-
 
 RegisterNetEvent('jl-carboost:client:setConfig', function (data)
     Config.BennysItems = data
@@ -221,14 +208,11 @@ RegisterNetEvent('jl-carboost:client:startBoosting', function ()
     
 end)
 
-
-
 RegisterNetEvent('jl-carboost:client:openLaptop', function ()
     SetDisplay(not display)
 end)
 
 -- Threads
-
 CreateThread(function ()
     while display do
         Wait(0)
@@ -242,17 +226,16 @@ CreateThread(function ()
 end)
 
 CreateThread(function ()
-    Wait(100)
-     if LocalPlayer.state['isLoggedIn'] then      
+    if LocalPlayer.state['isLoggedIn'] then
         TriggerServerEvent('jl-carboost:server:getItem')
         CreateBlip(vector3(1185.2, -3303.92, 6.92), "Post OP", 473)
-     end
+    end
 end)
 
 -- exports
 
 exports['qb-target']:AddBoxZone("carboost:takeItem", vector3(1185.14, -3304.01, 7.1), 2, 2, {
-	name = "MissionRowDutyClipboard",
+	name = "BennysTakePoint",
     heading=0,
     minZ=5.1,
     maxZ=9.1,

@@ -34,17 +34,10 @@ RegisterNetEvent('jl-carboost:server:buyItem', function (price, config, first)
    local src = source 
    local pData = QBCore.Functions.GetPlayer(src)
    pData.Functions.RemoveMoney('bank', price, 'bought-bennys-item')
-   -- if first then
       MySQL.Async.insert('INSERT INTO bennys_shop (citizenid, items) VALUES (@citizenid, @items) ON DUPLICATE KEY UPDATE items = @items', {
          ['@citizenid'] = pData.PlayerData.citizenid,
          ['@items'] = json.encode(config)
       })
-   -- else
-      -- MySQL.Async.execute('UPDATE bennys_shop SET items = @items WHERE citizenid = @citizenid', {
-      --    ['@citizenid'] = pData.PlayerData.citizenid,
-      --    ['@items'] = json.encode(config)
-      -- })
-   -- end
 end)
 
 RegisterNetEvent('jl-carboost:server:updateConfig', function (data)
@@ -64,10 +57,13 @@ RegisterNetEvent('jl-carboost:server:takeAll', function (data)
       Player.Functions.AddItem(item.name, item.quantity)
       TriggerClientEvent('inventory:client:itemBox', src, QBCore.Shared.Items[tostring(item.name)], 'add')
    end
+   MySQL.Async.execute('UPDATE bennys_shop SET items = @items WHERE citizenid = @citizenid', {
+      ['@citizenid'] = Player.PlayerData.citizenid,
+      ['@items'] = json.encode({})
+   })
 end)
 
 -- Commands
-
 QBCore.Commands.Add('carboost', 'Start carboost', {{
    name = 'tier',
    help = 'Tier'
@@ -82,7 +78,6 @@ QBCore.Commands.Add('carboost', 'Start carboost', {{
 end)
 
 -- Callback
-
 QBCore.Functions.CreateCallback('jl-carboost:server:canBuy', function(source, cb, data)
    local src = source
    local pData = QBCore.Functions.GetPlayer(src)

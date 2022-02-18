@@ -1,12 +1,9 @@
 @import url("https://fonts.googleapis.com/css2?family=Open+Sans&display=swap");
 
 * {
-  /* make it in middle */
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  /* overflow-x: scroll;
-  /* white-space: nowrap; */
   -ms-user-select: none;
   user-select: none;
   overflow-y: hidden;
@@ -29,14 +26,44 @@ div.laptop {
   border-radius: 5px;
   background-size: cover;
   background-position: center;
-  opacity: 1;
+  opacity: 0;
   transition: 1s;
   z-index: -1;
 }
 
 div.laptop.active {
+  opacity: 1;
   visibility: visible;
   bottom: -45%;
+}
+
+@keyframes laptop_up {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 100%);
+  }
+  30% {
+    opacity: 50%;
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+}
+
+@keyframes laptop_down {
+  0% {
+    opacity: 1;
+    /* transform: translate(-50%, -50%); */
+  }
+  40% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+    /* transform: translate(-50%, 100%); */
+    display: none;
+  }
 }
 
 div.laptop .notification {
@@ -244,7 +271,7 @@ i:hover {
 
 i.fas {
   font-size: 15px;
-  padding: 0 4px;
+  padding: 0 5px;
   color: rgb(248, 248, 248);
 }
 
@@ -301,8 +328,6 @@ p {
   height: 60px;
   width: 60px;
 }
-
-/* Bennys */
 
 ::-webkit-scrollbar {
   width: 10px;

@@ -1,16 +1,14 @@
 #settings {
-  /* height: 0px; */
   margin: 0;
+  opacity: 0;
+  visibility: hidden;
   width: 350px;
   height: 500px;
   padding: 0;
   box-sizing: border-box;
-  /* visibility: hidden; */
-  opacity: 1;
   position: absolute;
-  /* make the position on bottom right */
-  bottom: -80%;
-  right: -5%;
+  bottom: -18%;
+  right: -120px;
   transform: translate(-50%, -50%);
   display: flex;
   flex-direction: column;
@@ -24,17 +22,16 @@
   border-radius: 5px;
   border-width: 1px;
   box-shadow: 10px 10px 15px rgba(0, 0, 0, 0.06);
-  border: 2px solid rgba(255, 255, 255, 0.507);
   transition: 0.5s;
   overflow-y: auto;
   overflow-x: hidden;
-  transition: 1s;
+  transition: 0.5s;
   z-index: 90;
 }
 
 #settings.active {
+  opacity: 1;
   visibility: visible;
-  bottom: -18%;
 }
 
 #settings > .container {

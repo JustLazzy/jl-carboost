@@ -16,7 +16,11 @@ Config.Tier = {
         },
         car = {
             
-        }
+        },
+        priceminimum = 10000,
+        pricemaximum = 10000,
+        callpolice = false,
+        
     },
     ['C'] = {
         location = {
@@ -28,7 +32,8 @@ Config.Tier = {
 
         },
         priceminimum = 30000,
-        pricemaximum = 60000
+        pricemaximum = 60000,
+        callpolice = false
     },
     ['B'] = {
         location = {
@@ -38,7 +43,8 @@ Config.Tier = {
             'issi2',
         },
         priceminimum = 30000,
-        pricemaximum = 60000
+        pricemaximum = 60000,
+        callpolice = true
     },
     ['A'] = {
         location = {
@@ -48,7 +54,8 @@ Config.Tier = {
              'italigto',
         },
         priceminimum = 30000,
-        pricemaximum = 60000
+        pricemaximum = 60000,
+        callpolice = true
     },
     ['A+'] = {
         location = {
@@ -58,7 +65,8 @@ Config.Tier = {
             'jester2',
         },
         priceminimum = 30000,
-        pricemaximum = 60000
+        pricemaximum = 60000,
+        callpolice = true
     },
     ['S'] = {
         location = {
@@ -68,7 +76,8 @@ Config.Tier = {
             'reaper'
         },
         priceminimum = 30000,
-        pricemaximum = 60000
+        pricemaximum = 60000,
+        callpolice = true
     },
     ['S+'] = {
         location = {
@@ -83,7 +92,8 @@ Config.Tier = {
             'zentorno',
         },
         priceminimum = 30000,
-        pricemaximum = 60000
+        pricemaximum = 60000,
+        callpolice = true
     }
 }
 
