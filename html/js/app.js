@@ -7,7 +7,6 @@ let laptop = document.querySelector(".laptop");
 let volumebutton = document.querySelector("#volume");
 let testing = document.querySelector(".buttontest");
 let settingButton = document.querySelector("#setting");
-
 let volumecontrol = document.getElementById("volume-control");
 let saveConfig = document.querySelector(".save-config");
 const setting = document.querySelector("#settings");
@@ -18,8 +17,7 @@ $(document).ready(() => {
   if (index >= 2) {
     index = 0;
   }
-  let boosting = document.querySelector("#boosting-app");
-  boostingheader = boosting.querySelector("header");
+
   function display(bool) {
     bool = true;
     if (bool) {
@@ -39,15 +37,6 @@ $(document).ready(() => {
 
   $("input").keypress(function (e) {
     typing = true;
-  });
-
-  boostingheader.addEventListener("mousedown", () => {
-    boostingheader.classList.add("active");
-    boostingheader.addEventListener("mousemove", onDrag);
-  });
-  document.addEventListener("mouseup", (e) => {
-    boostingheader.classList.remove("active");
-    boostingheader.removeEventListener("mousemove", onDrag);
   });
 
   window.addEventListener("message", function (event) {
@@ -192,14 +181,11 @@ function toggleDisplayApp(bool, id) {
 // Refresh time
 setInterval(refreshTime, 1000);
 function timePMAM(date) {
-  var hours = date.getHours();
-  var minutes = date.getMinutes();
-  var seconds = date.getSeconds();
-  var ampm = hours >= 12 ? "PM" : "AM";
-  hours = hours % 12;
-  minutes = minutes < 10 ? "0" + minutes : minutes;
-  var strTime = hours + ":" + minutes + " " + ampm;
-  return strTime;
+  return date.toLocaleString("en-US", {
+    hour12: true,
+    hour: "numeric",
+    minute: "numeric",
+  });
 }
 
 function refreshTime() {
