@@ -6,19 +6,28 @@ Config.Minimum = 5 -- Minimum police
 
 Config.BennysItems = {}
 
+Config.WaitTime = 5 -- Time to wait to get first contract, its in minute
+
+Config.MaxContract = 5 -- Max contract that you can handle
+
+Config.QueueList = {}
+
+Config.PlayerContract = {}
+
 Config.Tier = {
     --[[
         Don't touch the tier name, just configure the location and car
     --]]
     ['D'] = {
         location = {
-
+            vector4(-333.41, -1268.04, 31.3, 84.32),
+            vector4(1005.4, -1483.02, 31.15, 178.8)
         },
         car = {
-            
+            'rebla'
         },
-        priceminimum = 10000,
-        pricemaximum = 10000,
+        priceminimum = 5000,
+        pricemaximum = 7000,
         callpolice = false,
         
     },
@@ -170,4 +179,27 @@ Config.BennysSell = {
         stock = 50,
     },
 
+}
+
+Config.RandomName = {
+    'Alfred',
+    'Barry',
+    'Carl',
+    'Dennis',
+    'Edgar',
+    'Frederick',
+    'George',
+    'Herbert',
+    'Irving',
+    'John',
+    'Kevin',
+    'Larry',
+    'Michael',
+    'Norman',
+    'Oscar',
+    'Patricia',
+    'Quinn',
+    'Robert',
+    'Steven',
+    'Thomas',
 }

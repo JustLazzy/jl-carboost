@@ -10,6 +10,12 @@
       integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
       crossorigin="anonymous"
     ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"
+      integrity="sha512-qTXRIMyZIFb8iQcfjXWCO8+M5Tbc38Qi5WzdPOYZHIlZpzBHG3L3by84BBBOiRGiEb7KKtAOAs5qYdUiZiQNNQ=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
@@ -80,7 +86,7 @@
                   <i
                     id="close-bennys"
                     class="fa-solid fa-circle-xmark"
-                    style="font-size: 20px; color: rgb(192, 11, 11)"
+                    style="font-size: 20px; color: rgb(245, 105, 105)"
                   ></i>
                 </ul>
               </nav>
@@ -115,59 +121,43 @@
                   <i
                     id="close-boosting"
                     class="fa-solid fa-circle-xmark"
-                    style="font-size: 20px; color: rgb(192, 11, 11)"
+                    style="font-size: 20px; color: rgb(245, 105, 105)"
                   ></i>
                 </ul>
               </nav>
             </header>
-            <div class="navigation">
-              <button class="my-contract">My Contract</button>
-              <button class="buy-contract">Buy Contract</button>
-              <button class="join-queue">Join Queue</button>
-            </div>
             <div class="container">
-              <div class="boost-proggress">
-                <p id="boost-class">D</p>
-                <div class="proggress-bar">
-                  <div class="prog"></div>
-                </div>
-                <p id="boost-class-next">C</p>
+              <div class="navigation">
+                <button class="my-contract">My Contract</button>
+                <button class="buy-contract">Buy Contract</button>
+                <button class="join-queue">Join Queue</button>
               </div>
-              <div class="boost-contract">
-                <div class="boost-list">
-                  <div class="boostcart">
-                    <div class="boost-text">
-                      <p>Vehicle: Adder</p>
-                      <p>Contract Type: D</p>
-                    </div>
-                    <div class="boost-info">
-                      <p>Owner: The guy that use pepe framework</p>
-                      <p>Expire in: 5 hours</p>
-                    </div>
-                    <div class="boost-button">
-                      <button class="start-contract">Start Contract</button>
-                      <button class="transfer-contract">
-                        Transfer Contract
-                      </button>
-                      <button class="sell-contract">Sell Contract</button>
-                    </div>
+              <div class="boosting-list" id="boosting-contract">
+                <div class="boost-proggress">
+                  <p>D</p>
+                  <div class="progress-bar">
+                    <div id="boosting-progress" class="progress"></div>
                   </div>
-                  <div class="boostcart">
-                    <div class="boost-text">
-                      <p>Vehicle: Adder</p>
-                      <p>Contract Type: D</p>
-                    </div>
-                    <div class="boost-info">
-                      <p>Owner: The guy who rename qbcore</p>
-                      <p>Expire in: 6 hours</p>
-                    </div>
-                    <div class="boost-button">
-                      <button class="start-contract">Start Contract</button>
-                      <button class="transfer-contract">
-                        Transfer Contract
-                      </button>
-                      <button class="sell-contract">Sell Contract</button>
-                    </div>
+                  <p>C</p>
+                </div>
+                <h1 class="title" id="no-contract">
+                  You don't have any contract
+                </h1>
+                <!-- Boosting goes here -->
+              </div>
+              <div class="boosting-list hidden" id="boosting-shop">
+                <div class="boost-contract">
+                  <div class="boost-text">
+                    <p>Boost Type: A</p>
+                    <p>Owner: I know koil</p>
+                  </div>
+                  <div class="boost-info">
+                    <p>Vehicle Type: Lombargini</p>
+                    <p>Expires in: 69 Hours</p>
+                    <p>Price: 320k</p>
+                  </div>
+                  <div class="boost-button">
+                    <button class="start">Buy Contract</button>
                   </div>
                 </div>
               </div>

@@ -12,9 +12,8 @@
   height: 70%;
   display: flex;
   flex-direction: column;
-  background-color: rgb(15, 17, 31);
-  border-radius: 5px;
-
+  background-color: #1d2029;
+  border-radius: 2px;
   transition: 0.5s;
   -webkit-box-shadow: 10px 10px 15px rgba(0, 0, 0, 0.06);
   -moz-box-shadow: 10px 10px 15px rgba(0, 0, 0, 0.06);
@@ -32,18 +31,18 @@
 }
 
 #boosting-app > header > nav {
-  font-family: "Open Sans", sans-serif;
+  font-family: "Roboto", sans-serif;
   position: absolute;
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-direction: row;
-  padding: 10px;
+  padding: 10px 20px;
   border-width: 1px;
   flex-direction: row;
   width: 100%;
-  height: 40px;
-  background-color: rgb(5, 6, 17);
+  height: 35px;
+  background-color: rgb(23, 25, 39);
   z-index: 10;
 }
 
@@ -68,177 +67,207 @@
 }
 
 #boosting-app > .container {
-  display: flex;
-  justify-content: center;
-  justify-items: center;
-  align-items: center;
-  top: 15%;
-  position: fixed;
   width: 100%;
   height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
 }
 
-#boosting-app > .navigation {
-  margin: 15px 0px;
-  padding: 0 100px;
-  display: flex;
+#boosting-app .navigation {
+  padding: 0px 110px;
+  top: 10%;
   position: relative;
-  top: 5%;
-  justify-content: flex-start;
-  justify-items: center;
-  align-items: center;
-  flex-direction: row;
-  width: 100%;
-  height: 30px;
-  z-index: 10;
+  display: flex;
 }
 
-#boosting-app > .navigation button {
+#boosting-app .navigation button {
   display: flex;
   justify-content: center;
+  text-align: center;
   align-items: center;
   justify-self: center;
-  font-family: "Open Sans", sans-serif;
-  font-weight: bold;
+  font-family: "Roboto", sans-serif;
+  font-size: 15px;
+  font-weight: bolder;
   text-transform: capitalize;
   margin: 10px;
-  padding: 5px;
+  padding: 0px 5px;
   color: rgb(255, 255, 255);
-  background-color: rgb(32, 41, 70);
-  width: 130px;
-  height: 100%;
+  width: 150px;
+  height: 35px;
   border: none;
   border-radius: 2px;
   cursor: pointer;
 }
 
-#boosting-app > .navigation button.my-contract {
-  /* background-color: rgb(6, 109, 12); */
+#boosting-app .navigation button.my-contract {
+  background-color: #119917;
 }
 
-#boosting-app > .navigation button.join-queue {
-  background-color: rgb(33, 156, 204);
+#boosting-app .navigation button.join-queue {
+  background-color: #6995f5;
 }
 
-#boosting-app > .navigation button.buy-contract {
-  background-color: rgb(6, 109, 12);
+#boosting-app .navigation button.buy-contract {
+  background-color: #e95f58;
 }
 
-#boosting-app > .container .boost-proggress {
-  /* make it on top */
-  position: static;
+#boosting-app .boosting-list {
+  position: relative;
+  top: 100px;
   display: flex;
-  flex-direction: row;
-  justify-content: center;
+  flex-direction: column;
+  justify-content: first baseline;
   justify-items: center;
   justify-self: center;
-  align-content: center;
-
+  align-items: center;
+  text-align: center;
   width: 100%;
-  height: 100%;
+  height: auto;
 }
 
-#boosting-app > .container .boost-proggress > .proggress-bar {
-  margin: 10px;
-  position: static;
-  height: 5px;
-  width: 80%;
-  background-color: aliceblue;
-  border-radius: 5px;
+#boosting-app .boosting-list.hide {
+  display: none;
+}
+
+#boosting-app .boosting-list.hidden {
+  display: none;
+}
+
+#boosting-app .boosting-list .boost-contract {
+  display: grid;
+  justify-items: flex-start;
+  text-align: left;
+  align-items: flex-start;
+  width: 55vw;
+  height: 200px;
+  grid-template-columns: repeat(2, 1fr);
+  border-radius: 2px;
+  padding: 20px;
+  margin: 8px 0px;
+  background-color: rgb(45, 52, 68);
+}
+
+#boosting-app .boost-contract p {
+  font-weight: 600;
+  /* font family open sans */
+  color: rgb(255, 255, 255);
+  margin: 10px 0px;
+  padding: 0;
+}
+
+#boosting-app .boost-contract .boost-text b {
+  color: #f8bc3b;
 }
 
 #boosting-app .boost-proggress p {
-  font-family: "Open Sans", sans-serif;
-  height: auto;
-  /* font-size: 15px;
   font-weight: 600;
   color: rgb(255, 255, 255);
-  margin: 0;
-  padding: 0; */
+  padding: 0;
+  align-items: center;
+  align-content: center;
 }
 
-#boosting-app > .container .boost-proggress > .proggress-bar > .prog {
-  transition: 0.5s;
-  background: rgb(255, 0, 0);
-  background: linear-gradient(
-    90deg,
-    rgba(255, 0, 0, 1) 0%,
-    rgba(251, 252, 15, 1) 43%,
-    rgba(1, 255, 0, 1) 100%
-  );
+#boosting-app .boost-proggress {
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  align-content: center;
+  flex-direction: row;
+  width: 80%;
+  height: auto;
+}
+
+#boosting-app .progress-bar {
+  width: 100%;
+  height: 15px;
+  background-color: rgb(255, 255, 255);
+  border-radius: 5px;
+  border: none;
+  margin: 0px 15px;
+  padding: 0px;
+}
+
+#boosting-app .progress-bar p {
+  /* make it on center */
+  top: 0;
+  left: 50%;
+  position: absolute;
+  transform: translate(-50%, 20%);
+  color: rgb(0, 0, 0);
+  margin: 0px;
+  padding: 0px;
+  align-items: center;
+  align-content: center;
+}
+
+#boosting-app .progress-bar .progress {
   width: 0%;
   height: 100%;
+  background: linear-gradient(90deg, #d53369 0%, #daae51 100%);
+  border-radius: 2px;
+  margin: 0px;
+  padding: 0px;
+  transition: 0.5s ease;
 }
 
-#boosting-app > .container .boost-contract {
-  top: 15vh;
-  position: fixed;
-}
-
-#boosting-app > .container .boost-contract > .boost-list {
+#boosting-app .boost-contract .boost-button {
+  width: 100%;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-#boosting-app > .container .boost-contract > .boost-list .boostcart {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  text-align: justify;
-  justify-content: center;
-  align-items: center;
-  justify-self: center;
-  color: rgb(255, 255, 255);
-  margin: 10px;
-  padding: 5px 30px;
-  background-color: rgb(32, 41, 70);
-
-  width: 100vh;
-  height: 200px;
-  /* max-height: 200px;
-  min-height: 150px; */
-  border: none;
-  border-radius: 5px;
-}
-
-#boosting-app .boost-list .boost-button {
-  /* make it stick on bottom left */
-  display: flex;
-  justify-content: center;
-  justify-items: center;
-  justify-self: center;
-  align-items: center;
   position: relative;
-  bottom: 0;
+  padding: 0;
+  margin: 0;
+  bottom: -20px;
+  left: -15px;
+  justify-content: flex-start;
+  justify-items: center;
+  align-items: center;
+  align-content: center;
 }
 
-.boost-button button {
-  text-transform: capitalize;
-  font-family: "Open Sans", sans-serif;
-  font-size: 15px;
-  font-weight: bold;
-  padding: 0 5px;
+#boosting-app .boost-button button {
+  display: flex;
+  justify-content: center;
   text-align: center;
+  align-items: center;
   justify-self: center;
-  color: whitesmoke;
+  font-family: "Roboto", sans-serif;
+  font-size: 15px;
+  font-weight: bolder;
+  text-transform: capitalize;
+  margin: 10px;
+  padding: 0px 5px;
+
+  width: 150px;
+  height: 35px;
   border: none;
-  border-radius: 4px;
-  width: 170px;
-  height: 30px;
-  margin: 0 10px;
+  border-radius: 2px;
   cursor: pointer;
 }
 
-button.start-contract {
-  background-color: rgb(6, 109, 12);
+#boosting-app .boost-button button.start {
+  background-color: #119917;
+}
+#boosting-app .boost-button button.transfer {
+  background-color: #e95f58;
+}
+#boosting-app .boost-button button.sell {
+  background-color: #6995f5;
 }
 
-button.transfer-contract {
-  background-color: rgb(10, 159, 245);
+#boosting-app .container .title {
+  align-items: center;
+  align-content: center;
+  text-align: center;
+  font-family: "Roboto", sans-serif;
+  font-size: 30px;
+  font-weight: 600;
+  color: rgb(255, 255, 255);
+  margin: 0;
+  padding: 0;
 }
 
-button.sell-contract {
-  background-color: rgb(194, 54, 54);
+#boosting-app .container .title.hidden {
+  display: none;
 }

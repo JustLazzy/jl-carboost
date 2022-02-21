@@ -19,7 +19,7 @@ $(document).ready(() => {
   }
 
   function display(bool) {
-    bool = true;
+    // bool = true;
     if (bool) {
       laptop.classList.add("active");
       return;
@@ -48,12 +48,16 @@ $(document).ready(() => {
         display(false);
         return;
       }
-    } else if (event.data.type === "checkout") {
+    }
+    if (event.data.type === "checkout") {
       if (event.data.success == true) {
         return checkoutSuccess();
       } else {
         return Notification("You don't have enough money", "error");
       }
+    }
+    if (event.data.type === "addcontract") {
+      return setupNewContract(event.data.boost);
     }
   });
 
@@ -131,7 +135,7 @@ $(document).ready(() => {
         if (bennys.classList.contains("active")) {
           toggleDisplayApp(false, "#bennys-app");
           closeBennys();
-        } else if (boosting.style.visibility == "visible") {
+        } else if (boosting.classList.contains("active")) {
           toggleDisplayApp(false, "#boosting-app");
           removeIcon("boost");
         } else if (setting.classList.contains("active")) {
