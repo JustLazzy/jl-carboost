@@ -12,6 +12,7 @@ local boostingCar
 local laptopdict = "amb@code_human_in_bus_passenger_idles@female@tablet@base"
 local laptopanim = "base"
 local carInzone
+
 RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
     PlayerData = QBCore.Functions.GetPlayerData()
     TriggerServerEvent('jl-carboost:server:getItem')
@@ -170,7 +171,6 @@ RegisterNUICallback('checkout', function (data)
         end
     end, data.total)
 end)
-
 
 RegisterNUICallback('setupboostapp', function (data, cb)
     QBCore.Functions.TriggerCallback('jl-carboost:server:getboostdata', function (result)
@@ -356,7 +356,7 @@ RegisterNetEvent('jl-carboost:client:bringtoPlace', function ()
     end, function (isPointInside, point)
         inZone = isPointInside
         if inZone then
-            QBCore.Functions.Notify("Okay, leave the car there, I'll paid you later", "success")
+            QBCore.Functions.Notify("Okay, leave the car there, I'll pay you later", "success")
         end
     end)
 
@@ -415,22 +415,6 @@ CreateThread(function ()
     end
 end)
 
-
--- CreateThread(function ()
---     while inZone do
---         Wait(100)
---         if carSpawned ~= nil then
---             local player = GetEntityCoords(PlayerPedId())
---             local carCoords = GetEntityCoords(carSpawned)
---             local dist = #(player - carCoords)
---             print(dist)
---             if dist <= 30.0 then
---                 TriggerEvent('jl-carboost:client:finishBoosting')
---             end
---         end
---     end
--- end)
-
 CreateThread(function ()
     while true do
         Wait(100)
@@ -447,15 +431,11 @@ end)
 
 CreateThread(function ()
     if LocalPlayer.state['isLoggedIn'] then
+        TriggerServerEvent('jl-carboost:server:getItem')
         TriggerServerEvent('jl-carboost:server:getBoostData')
     end
     CreateBlip(vector3(1185.2, -3303.92, 6.92), "Post OP", 473)
 end)
-
-
-
-
-
 
 -- exports
 exports['qb-target']:AddBoxZone("carboost:takeItem", vector3(1185.14, -3304.01, 7.1), 2, 2, {
