@@ -498,22 +498,6 @@ RegisterNetEvent('jl-carboost:client:startBoosting', function ()
             end
         end)
     end)
-    -- CreateThread(function ()
-    --     while true do
-    --         Wait(100)
-    --         if inZone then
-    --             if carSpawned ~= nil then        
-    --                 local player = GetEntityCoords(PlayerPedId())
-    --                 local carcoords = GetEntityCoords(carSpawned)
-    --                 local dist = #(player - carcoords)
-    --                 if dist >= 30.0 then
-    --                     TriggerEvent('jl-carboost:client:finishBoosting')
-    --                     break
-    --                 end
-    --             end
-    --         end
-    --     end
-    -- end)
 end)
 
 RegisterNetEvent('jl-carboost:client:bringtoPlace', function ()
