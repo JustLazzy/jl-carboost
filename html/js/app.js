@@ -40,25 +40,47 @@ $(document).ready(() => {
   });
 
   window.addEventListener("message", function (event) {
-    if (event.data.type === "openlaptop") {
-      if (event.data.status == true) {
-        display(true);
-        return;
-      } else {
-        display(false);
-        return;
-      }
+    switch (event.data.type) {
+      case "openlaptop":
+        if (event.data.status == true) {
+          display(true);
+        } else {
+          display(false);
+        }
+        break;
+      case "checkout":
+        if (event.data.success == true) {
+          checkoutSuccess();
+        } else {
+          Notification("You don't have enough money", "error");
+        }
+        break;
+      case "addcontract":
+        setupNewContract(event.data.boost);
+        break;
+      case "setupboostingapp":
+        loadBoostData();
+        break;
     }
-    if (event.data.type === "checkout") {
-      if (event.data.success == true) {
-        return checkoutSuccess();
-      } else {
-        return Notification("You don't have enough money", "error");
-      }
-    }
-    if (event.data.type === "addcontract") {
-      return setupNewContract(event.data.boost);
-    }
+    // if (event.data.type === "openlaptop") {
+    //   if (event.data.status == true) {
+    //     display(true);
+    //     return;
+    //   } else {
+    //     display(false);
+    //     return;
+    //   }
+    // }
+    // if (event.data.type === "checkout") {
+    //   if (event.data.success == true) {
+    //     return checkoutSuccess();
+    //   } else {
+    //     return Notification("You don't have enough money", "error");
+    //   }
+    // }
+    // if (event.data.type === "addcontract") {
+    //   return setupNewContract(event.data.boost);
+    // }
   });
 
   saveConfig.onclick = () => {

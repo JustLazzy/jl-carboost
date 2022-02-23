@@ -41,11 +41,10 @@ function loadBennysApp() {
     body: JSON.stringify({}),
   }).then((resp) =>
     resp.json().then((resp) => {
-      storedata = resp.storeitem;
+      const storedata = resp.storeitem;
+      // console.log(JSON.stringify(storedata));
       if (storedata) {
         storedata.forEach((data) => {
-          item.splice(0, item.length);
-          if (data.name.length < 2 || !data.price || !data.image) return;
           const article = document.createElement("article");
           article.id = data.item;
           article.innerHTML = `<img class="product-image" src="./assets/shop/${data.image}" alt="${data.name}" />
@@ -59,11 +58,27 @@ function loadBennysApp() {
           store.append(article);
           item.push(article.tagName);
         });
-        setTimeout(() => {
-          $(".loading").css("opacity", "0");
-          store.classList.add("active");
-          uglyFunct();
-        }, 500);
+        // storedata.forEach((data) => {
+        //   item.splice(0, item.length);
+        //   if (data.name.length < 2 || !data.price || !data.image) return;
+        //   const article = document.createElement("article");
+        //   article.id = data.item;
+        //   article.innerHTML = `<img class="product-image" src="./assets/shop/${data.image}" alt="${data.name}" />
+        //       <div class="text">
+        //         <h3 class="title">${data.name}</h3>
+        //         <p>Stock: <b>${data.stock}</b></p>
+        //         <p class="price">$${data.price}</p>
+        //         <button class="basket-button">Add to basket</button>
+        //       </div>
+        //       `;
+        //   store.append(article);
+        //   item.push(article.tagName);
+        // });
+        // setTimeout(() => {
+        //   $(".loading").css("opacity", "0");
+        //   store.classList.add("active");
+        //   uglyFunct();
+        // }, 500);
       } else {
         const error = document.createElement("div");
         error.innerHTML = `<h1>Error</h1>`;

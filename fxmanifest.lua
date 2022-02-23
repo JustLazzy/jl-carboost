@@ -9,6 +9,7 @@ description 'Car Boost Script'
 version '0.0.1'
 
 shared_script 'config.lua'
+
 server_script {
 	'@oxmysql/lib/MySQL.lua',
 	'server/main.lua'
