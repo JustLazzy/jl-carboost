@@ -61,26 +61,10 @@ $(document).ready(() => {
       case "setupboostingapp":
         loadBoostData();
         break;
+      case "refreshContract":
+        refreshContract();
+        break;
     }
-    // if (event.data.type === "openlaptop") {
-    //   if (event.data.status == true) {
-    //     display(true);
-    //     return;
-    //   } else {
-    //     display(false);
-    //     return;
-    //   }
-    // }
-    // if (event.data.type === "checkout") {
-    //   if (event.data.success == true) {
-    //     return checkoutSuccess();
-    //   } else {
-    //     return Notification("You don't have enough money", "error");
-    //   }
-    // }
-    // if (event.data.type === "addcontract") {
-    //   return setupNewContract(event.data.boost);
-    // }
   });
 
   saveConfig.onclick = () => {

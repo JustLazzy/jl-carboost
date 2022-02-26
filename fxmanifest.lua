@@ -8,16 +8,18 @@ description 'Car Boost Script'
 
 version '0.0.1'
 
-shared_script 'config.lua'
+shared_script {
+	'config.lua',
+}
 
 server_script {
 	'@oxmysql/lib/MySQL.lua',
-	'server/main.lua'
+	'server/*.lua',
 }
 client_script {
 	'@PolyZone/client.lua',
 	'@PolyZone/BoxZone.lua',
-	'client/main.lua',
+	'client/*.lua',
 }
 
 ui_page 'html/index.html'
@@ -34,4 +36,5 @@ files {
 	'html/assets/audio/*.mp3',
 	'html/assets/audio/*.wav',
 }
+
 lua54 'yes'

@@ -103,6 +103,11 @@ function loadBoostData() {
       const data = resp.boostdata;
       const contract = data.contract;
       const title = document.querySelector("#no-contract");
+      let currentClass = document.querySelector("#currentclass");
+      let nextClass = getNextClass(data.class);
+      let nextClassElement = document.querySelector("#nextclass");
+      currentClass.textContent = data.class;
+      nextClassElement.textContent = nextClass;
       if (contract) {
         for (let i = 0; i < contract.length; i++) {
           if (!title.classList.contains("hidden"))
@@ -199,9 +204,6 @@ function toggleBoosting(event) {
         }
       });
     });
-    // Notification("Contract Started", "success");
-    // buttonClicked.innerText = "Stop Contract";
-    // startContract(parent.id);
   }
 }
 
@@ -211,4 +213,52 @@ function startContract(data) {
 
 function stopContract(data) {
   $.post("https://jl-carboost/stopcontract", JSON.stringify({ id: data }));
+}
+
+function refreshContract() {
+  let boostingList = document.querySelector("#boosting-contract");
+  boostingList.innerHTML = "";
+  fetch("https://jl-carboost/getcontract", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({}),
+  }).then((resp) => {
+    resp.json().then((resp) => {
+      console.log(JSON.stringify(resp));
+    });
+  });
+}
+
+function getNextClass(data) {
+  let nextClass;
+  switch (data) {
+    case "D":
+      nextClass = "C";
+      break;
+    case "C":
+      nextClass = "B";
+      break;
+    case "B":
+      nextClass = "A";
+      break;
+    case "A":
+      nextClass = "S";
+      break;
+    case "S":
+      nextClass = "S+";
+      break;
+    case "S+":
+      nextClass = "MAX";
+      break;
+  }
+  return nextClass;
+}
+
+function updateClasses() {
+  let currentClass = document.querySelector("#currentclass");
+  let nextClassElement = document.querySelector("#nextclass");
+  let nextClass = getNextClass(currentClass.textContent);
+  nextClassElement.textContent = nextClass;
 }

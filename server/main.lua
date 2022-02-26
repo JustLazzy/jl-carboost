@@ -2,6 +2,8 @@ local QBCore = exports['qb-core']:GetCoreObject()
 local tier = nil
 local isRunning = false
 local ItemConfig = {}
+local sleep = 1 * 1000
+local queueNumber = 0
 --[[
    Structure = {
       [citizenid] = {
@@ -19,11 +21,56 @@ local ItemConfig = {}
          xp = 0, -- xp
       }
    }
-   ]] 
+   ]]
+
+   -- Simple queue system
+CreateThread(function ()
+   while true do
+      Wait(sleep)
+      if queueNumber ~= 0 then
+         local num = 0
+         local player = 0
+         local inqueue = 0
+         Wait(Config.WaitTime * 1000)
+         for k, v in pairs(Config.QueueList) do
+            local Player = QBCore.Functions.GetPlayerByCitizenId(k)
+            if not v.getContract and Player and num <= Config.MaxQueueContract then
+               TriggerClientEvent('QBCore:Notify', Player.PlayerData.source, 'You just got a new contract', 'success')
+               TriggerEvent('jl-carboost:server:newContract', Player.PlayerData.source, k)
+               num = (num or 0) + 1
+               v.getContract = true
+            end
+            if v.getContract then
+               inqueue = inqueue + 1
+            end
+            player = player + 1
+         end
+         if player == inqueue then
+            -- inqueue = 0
+            -- queueNumber = 0
+         end
+      end
+   end
+end)
+
+-- function to get next boost class?, hit me up if you what the better way to do this
+local function GetNextClass(class)
+   if class == 'D' then
+      return 'C' 
+   elseif class == 'C' then
+      return 'B'
+   elseif class == 'B' then
+      return 'A'
+   elseif class == 'A' then
+      return 'S'
+   elseif class == 'S' then
+      return 'S+'
+   end
+end
 
 CreateThread(function ()
    while true do
-      Wait(100)
+      Wait(sleep)
       DeleteExpiredContract()
    end
 end)
@@ -57,8 +104,6 @@ RegisterNetEvent('jl-carboost:server:getBoostData', function()
          ['@xp'] = data.xp
       })
    end
-   -- print(json.encode(Config.QueueList))
-
 end)
 
 RegisterNetEvent('jl-carboost:server:saveBoostData', function (citizenid)
@@ -68,26 +113,32 @@ RegisterNetEvent('jl-carboost:server:saveBoostData', function (citizenid)
    })
 end)
 
-RegisterNetEvent('jl-carboost:server:newContract', function (citizenid)
+RegisterNetEvent('jl-carboost:server:newContract', function (source)
    local src = source
+   local Player = QBCore.Functions.GetPlayer(src)
+   local citizenid = Player.PlayerData.citizenid
    local config = Config.QueueList[citizenid]
    local tier = config.tier
-   local Player = QBCore.Functions.GetPlayer(src)
    local car = Config.Tier[tier].car[math.random(#Config.Tier[tier].car)]
    local owner = Config.RandomName[math.random(1, #Config.RandomName)]
    local contractData = {
       owner = owner,
       car = car,
-      tier = Player.PlayerData.metadata['carboosttier'],
+      tier = tier,
+      plate = RandomPlate(),
    }
    if #Config.QueueList[citizenid].contract <= Config.MaxContract then     
       MySQL.Async.insert('INSERT INTO boost_contract (owner, data, started, expire) VALUES (@owner, @data, NOW(),DATE_ADD(NOW(), INTERVAL ? HOUR))', {
          ['@owner'] = citizenid,
-         ['@data'] = json.encode(contractData)
-      })
-      Config.QueueList[citizenid].contract[#Config.QueueList[citizenid].contract+1] = contractData
+         ['@data'] = json.encode(contractData),
+         ['@expire'] = math.random(1, 6)
+      }, function (id)
+         contractData.id = id
+         Config.QueueList[citizenid].contract[#Config.QueueList[citizenid].contract+1] = contractData
+         print(json.encode(Config.QueueList[citizenid]))
+         TriggerClientEvent('jl-carboost:client:addContract', src, contractData)
+      end)
    end
-
 end)
 RegisterNetEvent('jl-carboost:server:sendTask', function (source, data)
 
@@ -98,18 +149,23 @@ RegisterNetEvent('jl-carboost:server:joinQueue', function (status, citizenid)
    local Player = QBCore.Functions.GetPlayer(src)
    if status then
       Config.QueueList[citizenid] = {
+         getContract = false,
          status = true,
-         tier = Player.PlayerData.metadata['carboosttier'],
+         tier = Player.PlayerData.metadata['carboostclass'],
          startContract = false,
+         contract = {}
       }
+      queueNumber = queueNumber + 1
    else
       Config.QueueList[citizenid] = {
          status =  false,
-         tier = Player.PlayerData.metadata['carboosttier'],
+         tier = Player.PlayerData.metadata['carboostclass'],
          startContract = false,
+         contract = {}
       }
+      queueNumber = queueNumber - 1
    end
-   print(json.encode(Config.QueueList))
+   -- print(json.encode(Config.QueueList))
 end)
 
 RegisterNetEvent('jl-carboost:server:takeItem', function (name, quantity)
@@ -140,7 +196,6 @@ RegisterNetEvent('jl-carboost:server:giveContract', function ()
    TriggerEvent('jl-carboost:server:newContract', src,pData.PlayerData.citizenid)
 end)
 
-
 RegisterNetEvent('jl-carboost:server:buyItem', function (price, config, first)
    local src = source 
    local pData = QBCore.Functions.GetPlayer(src)
@@ -151,14 +206,28 @@ RegisterNetEvent('jl-carboost:server:buyItem', function (price, config, first)
       })
 end)
 
-RegisterNetEvent('jl-carboost:server:log', function (string)
-   print(string)
+RegisterNetEvent('jl-carboost:server:log', function (string, type)
+   if type == "discord" then
+   else
+      print(string)
+   end
 end)
 
 RegisterNetEvent('jl-carboost:server:finishBoosting', function ()
    local src = source
    local pData = QBCore.Functions.GetPlayer(src)
+   local currentRep = pData.PlayerData.metadata['carboostrep']
+   local randomRep = math.random(Config.MinRep, Config.MaxRep)
+   local total = currentRep + randomRep
+   if total >= 100 then
+      total = total - 100
+      local class = GetNextClass(pData.PlayerData.metadata['carboostclass'])
+      pData.Functions.SetMetaData('carboostclass', class)
+   end
+   pData.Functions.SetMetaData("carboostrep", total)
    pData.Functions.AddMoney('bank', math.random(500, 2000), 'finished-boosting')
+   TriggerClientEvent('QBCore:Notify', src, 'You get more reputation: '..total, 'success')
+   TriggerClientEvent('jl-carboost:client:setBoostRep')
 end)
 
 RegisterNetEvent('jl-carboost:server:updateBennysConfig', function (data)
@@ -309,14 +378,14 @@ QBCore.Functions.CreateCallback('jl-carboost:server:spawnCar', function (source,
    end
    
    if DoesEntityExist(car) then
-      print(json.encode(data))
       SetVehicleDoorsLocked(car, 2) -- Lock the vehicle
       SetVehicleNumberPlateText(car, cardata.data.plate)
       local netId = NetworkGetNetworkIdFromEntity(car)
       data = {
          networkID = netId,
          spawnlocation = coords.car,
-         npc = coords.npc or nil
+         npc = coords.npc or nil,
+         carmodel = car,
       }
       cb(data)
    else
@@ -327,6 +396,7 @@ QBCore.Functions.CreateCallback('jl-carboost:server:spawnCar', function (source,
    end
 end)
 
+-- Delete Expired Contract
 function DeleteExpiredContract()
    MySQL.Async.execute('DELETE FROM boost_contract WHERE expire < NOW()',{}, function (result)
       if result > 0 then
@@ -334,7 +404,7 @@ function DeleteExpiredContract()
       end
    end)
 end
-
+-- Random Plate
 function RandomPlate()
 	local random = tostring(QBCore.Shared.RandomStr(2) .. QBCore.Shared.RandomInt(4)):upper()
    return random

@@ -10,13 +10,19 @@ Config.BennysItems = {}
 
 ----------------------------------------------------------
 
-Config.Alert = 'qb-dispatch' -- qb-dispatch / linden_outlawalert / notification, [qb-dispatch] is not yet working, so don't use :)
+Config.Alert = 'qb-dispatch' -- qb-dispatch / linden_outlawalert / notification, only use qb-dispatch when its on stable release
 
 Config.Minimum = 5 -- Minimum police
 
-Config.WaitTime = 5 -- Time to wait to get first contract, (in minute)
+Config.WaitTime = 1 -- Time to wait to get first contract, (in minutes)
 
 Config.MaxContract = 5 -- Max contract that you can handle
+
+Config.MaxQueueContract = 2 -- Max contract per session / per WaitTime
+
+Config.MinRep = 10
+
+Config.MaxRep = 40
 
 Config.Tier = {
     --[[
@@ -95,7 +101,15 @@ Config.Tier = {
     },
     ['B'] = {
         location = {
-            vector4(219.2, -2845.79, 6.01, 264.57)
+           [1] = {
+               car = vector4(-111.13, 1003.88, 235.77, 106.21),
+               npc = {
+                vector3(-113.14, 986.3, 235.75),
+                vector3(-105.28, 975.78, 235.76),
+                vector3(-99.48, 1017.46, 235.83),
+                vector3(-126.05, 1020.6, 235.79)
+               }
+            }
         },
         car = {
             'issi2',
@@ -106,7 +120,15 @@ Config.Tier = {
     },
     ['A'] = {
         location = {
-            vector4(263.14, -2847.59, 6.0, 33.77)
+            [1] = {
+                car = vector4(215.31, 758.66, 204.65, 38.15),
+                npc = {
+                    vector3(228.68, 765.78, 204.98),
+                    vector3(199.77, 776.69, 205.97),
+                    vector3(214.39, 784.04, 204.34)
+                },
+            }
+            
         },
         car = {
              'italigto',
@@ -140,7 +162,7 @@ Config.Tier = {
     ['S+'] = {
         location = {
             [1] = {
-                coords = vector4(-1610.89, -380.59, 43.28, 227.89),
+                car = vector4(-1610.89, -380.59, 43.28, 227.89),
                 npc = {
                     vector3(-1626.19, -391.83, 42.17),
                     vector3(-1614.89, -368.86, 43.41),
@@ -148,9 +170,6 @@ Config.Tier = {
                     vector3(-1600.25, -370.54, 44.36),
                 }
             },
-            [2] = {
-
-            }
         },
         car = {
             'zentorno',

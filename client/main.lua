@@ -1,23 +1,15 @@
 local QBCore = exports['qb-core']:GetCoreObject()
 local PlayerData = QBCore.Functions.GetPlayerData()
-local isPoliceCalled = false
-local isJoinQueue = false
-local isContractStarted = false
-local carSpawned
-local carID
+local isJoinQueue, isContractStarted = false, false
+local carSpawned, carID = nil, nil
 local display = false
-local zone
-local inZone = false
-local blipDisplay
-local boostingCar
+local zone, inZone, blipDisplay, dropBlip = nil, false, nil, nil
 local laptopdict = "amb@code_human_in_bus_passenger_idles@female@tablet@base"
 local laptopanim = "base"
-local carInzone
 
 RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
     PlayerData = QBCore.Functions.GetPlayerData()
     TriggerServerEvent('jl-carboost:server:getItem')
-    -- TriggerEvent('jl-carboost:client:setupBoostingApp')
 end)
 
 RegisterNetEvent('QBCore:Client:OnJobUpdate', function(JobInfo)
@@ -34,6 +26,17 @@ RegisterNetEvent('QBCore:Client:OnPlayerUnload', function ()
     Config.BennysItems = {}
 end)
 
+RegisterCommand('brum', function ()
+        local vehicleNet = NetworkGetNetworkIdFromEntity(GetVehiclePedIsIn(PlayerPedId(),false))
+        TriggerEvent('dispatch:carboost', vehicleNet)
+end)
+
+RegisterCommand('checkhacked', function ()
+    if carSpawned ~= nil then
+        print(json.encode(carSpawned))
+    end
+end)
+
 -- function
 function SetDisplay(bool)
     display = bool
@@ -44,24 +47,18 @@ function SetDisplay(bool)
     })
 end
 
-local function CreateBlip(coords, name, sprite)
+local function CreateBlip(coords, name, sprite, colour)
+    colour = colour or 4
 	local blip = AddBlipForCoord(coords)
 	SetBlipSprite(blip, sprite)
 	SetBlipScale(blip, 0.6)
-	SetBlipColour(blip, 4)
+	SetBlipColour(blip, colour)
 	SetBlipDisplay(blip, 4)
     SetBlipAsShortRange(blip, true)
 	BeginTextCommandSetBlipName("STRING")
 	AddTextComponentString(name)
 	EndTextCommandSetBlipName(blip)
 	return blip
-end
-
-local function getVehName(model)
-    local hash = GetHashKey(tostring(model))
-    local model = GetEntityModel(hash)
-    local car = GetDisplayNameFromVehicleModel(model)
-    return GetLabelText(model)
 end
 
 local function spawnAngryPed(coords)
@@ -80,18 +77,32 @@ local function spawnAngryPed(coords)
         end
         local ped = CreatePed(1, hash, x, y, z, 0.0, true, true)
         SetNetworkIdExistsOnAllMachines(NetworkGetNetworkIdFromEntity(ped), true)
-        SetPedAccuracy(ped, 60)
+        SetPedAccuracy(ped, 30)
         SetPedRelationshipGroupHash(ped, GetHashKey("AMBIENT_GANG_WEICHENG"))
         SetPedRelationshipGroupDefaultHash(ped, GetHashKey("AMBIENT_GANG_WEICHENG"))
         SetPedCombatAttributes(ped, 46, true)
         SetPedCombatAbility(ped, 1)
         SetPedCombatAttributes(ped, 0, true)
-        GiveWeaponToPed(ped, "WEAPON_COMBATPISTOL", -1, false, true)
+        GiveWeaponToPed(ped, "WEAPON_PISTOL", -1, false, true)
         SetPedDropsWeaponsWhenDead(ped, false)
-        TaskCombatHatedTargetsAroundPed(ped, 100.0, 0)
-        Wait(1)
-        TaskGotoEntityAiming(ped, PlayerPedId(), 10.0, 50.0)
-        TaskShootAtEntity(ped, PlayerPedId(), -1, -1)
+        SetPedCombatRange(ped, 1)
+        SetPedFleeAttributes(ped, 0, 0)
+        SetPedConfigFlag(ped, 58, true)
+        SetPedConfigFlag(ped, 75, true)
+        TaskGotoEntityAiming(ped, PlayerPedId(), 4.0, 50.0)
+        Wait(5000)
+        TaskShootAtEntity(ped, PlayerPedId(), -1)
+        SetPedTalk(ped)
+    end
+end
+
+local function BoostingAlert()
+    if Config.Alert == 'qb-dispatch' then
+        TriggerEvent('dispatch:carboost', carID)
+    elseif Config.Alert == 'linden_outlawalert' then
+
+    else
+        TriggerEvent('jl-carboost:client:notifyBoosting', carID)
     end
 end
 
@@ -101,16 +112,18 @@ end
 
 RegisterCommand('spawnped', function ()
     -- spawnAngryPed()
-    local coords = Config.Tier['D'].location[math.random(1, #Config.Tier['D'].location)]
-    print(json.encode(coords.npc))
-    spawnAngryPed(coords.npc)
+    local coord = GetEntityCoords(PlayerPedId())
+    local coords = {
+        vector3(209.95, -1642.52, 29.8),
+        vector3(225.97, -1655.23, 29.8),
+    }
+    spawnAngryPed(coords)
 end)
 
 RegisterCommand('metadata', function ()
     local carboost = PlayerData.metadata['carboostclass']
     -- carboost = 'C'
     local rep = PlayerData.metadata['carboostrep']
-    
     print(carboost, rep)
     -- TriggerServerEvent("QBCore:Server:SetMetaData", "carboostclass", 'C')
 end)
@@ -153,7 +166,6 @@ RegisterCommand('testimage', function()
             return TriggerServerEvent("jl-carboost:server:log", "Duplicate item found: " .. k)
         end
     end
-    print(json.encode(storeitem))
 end)
 
 RegisterCommand('testconfig', function()
@@ -241,7 +253,7 @@ end)
 RegisterNUICallback('stopcontract', function (data)
     if isContractStarted then
         isContractStarted = false
-        -- TriggerEvent('jl-carboost:client:removeCar')
+        TriggerEvent('jl-carboost:client:stopContract')
     end
 end)
 
@@ -285,7 +297,6 @@ RegisterNUICallback('setupboostapp', function (data, cb)
             for k, v in pairs(carboostdata.contract) do
                 carboostdata.contract[k].carname = GetLabelText(GetDisplayNameFromVehicleModel(v.car))
             end
-            print(json.encode(carboostdata))
             cb({
                 boostdata = carboostdata
             })
@@ -296,6 +307,19 @@ RegisterNUICallback('setupboostapp', function (data, cb)
         end
     end, PlayerData.citizenid)
 end)
+
+-- RegisterNUICallback('getcontract', function (data, cb)
+--     QBCore.Functions.TriggerCallback('jl-carboost:server:getContractData', function (result)
+--         print(json.encode(result))
+--         if result then
+--             print(json.encode(result))
+--         else
+--             cb({
+--                 error = 'No contract'
+--             })
+--         end
+--     end, PlayerData.citizenid)
+-- end)
 
 RegisterNUICallback('joinqueue', function (data)
     TriggerEvent('jl-carboost:client:joinQueue', data)
@@ -333,7 +357,6 @@ RegisterNetEvent('jl-carboost:client:newContract', function ()
 end)
 
 RegisterNetEvent('jl-carboost:client:addContract', function (data)
-    
     local vehName = GetLabelText(GetDisplayNameFromVehicleModel(data.car))
     data.carname = vehName
     -- local contractData = {
@@ -383,18 +406,16 @@ RegisterNetEvent('jl-carboost:client:openMenu', function ()
             -- print(#menu+1)
             print(json.encode(QBCore.Shared.Items[name]))
             menu[#menu+1] = {
-                header = name,
-                id = "AYO ID"
-                -- header = QBCore.Shared.Items[item.name]["label"],
-                -- id = item.name,
-                -- txt = "You have: "..item.quantity,
-                -- params = {
-                --     event = "jl-carboost:client:takeItem",
-                --     args = {
-                --             item = item.name,
-                --             quantity = item.quantity
-                --     }
-                -- }    
+                header = QBCore.Shared.Items[item.name]["label"],
+                id = item.name,
+                txt = "You have: "..item.quantity,
+                params = {
+                    event = "jl-carboost:client:takeItem",
+                    args = {
+                            item = item.name,
+                            quantity = item.quantity
+                    }
+                }    
             }
         end
         menu[#menu+1] = {
@@ -417,13 +438,13 @@ local function createRadiusBlips(x, y, z)
     SetBlipHighDetail(blip, true)
     SetBlipColour(blip, 44)
     SetBlipAsShortRange(blip, true)
+    SetBlipAlpha(blip, 50)
     blipDisplay = blip
 end
 
 RegisterNetEvent('jl-carboost:client:spawnCar', function(data)
     QBCore.Functions.TriggerCallback('jl-carboost:server:spawnCar', function(result)
         if result then
-            print('result', json.encode(result))
             local zone = GetNameOfZone(result.spawnlocation)
             local streetlabel = GetLabelText(zone)
             Wait(5000)
@@ -437,47 +458,33 @@ RegisterNetEvent('jl-carboost:client:spawnCar', function(data)
                     enabled = true,
                 }
              })
-             TriggerEvent('jl-carboost:client:startBoosting')
+             TriggerEvent('jl-carboost:client:startBoosting', result)
         else
             print('no result')
         end
     end, data)
 end)
 
--- CreateThread(function ()
---     while true do
---         Wait(100)
---         if carID ~= nil then
---             carSpawned = NetworkGetEntityFromNetworkId(carID)
---             if carSpawned ~= 0 or carSpawned ~= nil then
---                 local carcoords = GetEntityCoords(carSpawned)
---                 local playerCoords = GetEntityCoords(PlayerPedId())
---                 local dist = #(playerCoords - carcoords)
---                 if dist <= 5.0 then
---                     if blipDisplay ~= nil then
---                         RemoveBlip(blipDisplay)
---                         break
---                     end
---                 end
---             end 
---         end
---     end
--- end)
-
-RegisterNetEvent('jl-carboost:client:startBoosting', function ()
+RegisterNetEvent('jl-carboost:client:startBoosting', function (data)
+    local data = data
+    local modified = false
     CreateThread(function ()
         while true do
-            Wait(1)
+            Wait(5000)
             if carID ~= nil then
                 carSpawned = NetworkGetEntityFromNetworkId(carID)
                 if carSpawned ~= 0 or carSpawned ~= nil then
+                    if not modified then
+                        QBCore.Functions.SetVehicleProperties(carSpawned, props)
+                        modified = true
+                    end
                     local carcoords = GetEntityCoords(carSpawned)
                     local playerCoords = GetEntityCoords(PlayerPedId())
                     local dist = #(playerCoords - carcoords)
                     if dist <= 5.0 then
                         if blipDisplay ~= nil then
                             RemoveBlip(blipDisplay)
-                            TriggerEvent('jl-carboost:client:playerInVehicle')
+                            TriggerEvent('jl-carboost:client:playerInVehicle', data)
                             break
                         end
                     end
@@ -485,33 +492,39 @@ RegisterNetEvent('jl-carboost:client:startBoosting', function ()
             end
         end
     end)
+end)
 
-
-    RegisterNetEvent('jl-carboost:client:playerInVehicle', function ()
-        CreateThread(function ()
-            while true do
-                Wait(100)
-                if IsPedInVehicle(PlayerPedId(), carSpawned, false) then
-                    TriggerEvent('jl-carboost:client:bringtoPlace')
+RegisterNetEvent('jl-carboost:client:playerInVehicle', function (data)
+    local data = data
+    CreateThread(function ()
+        while true do
+            Wait(100)
+            if IsPedInVehicle(PlayerPedId(), carSpawned, false) then
+                if IsVehicleAlarmActivated(carSpawned) or IsVehicleEngineStarting(carSpawned) then       
+                    spawnAngryPed(data.npc)
+                    TriggerEvent('jl-carboost:client:bringtoPlace', data)
                     break
                 end
             end
-        end)
+        end
     end)
 end)
 
-RegisterNetEvent('jl-carboost:client:bringtoPlace', function ()
+RegisterNetEvent('jl-carboost:client:bringtoPlace', function (data)
+    data = data
     TriggerServerEvent('qb-phone:server:sendNewMail', {
         sender = "Unknown",
         subject = "Drop point",
         message = "Hey this is the drop point, you can drop your car here, I'm sending you the coord on gps",
     })
-    SetNewWaypoint(1564.08, -2164.13)
+
+    dropBlip = CreateBlip(vector3(1564.08, -2164.13, 77.58), "Drop Point", 225, 66)
+    SetNewWaypoint(dropBlip)
     Wait(100)
     zone = BoxZone:Create(vector3(1564.08, -2164.13, 77.58), 5, 7, {
         name="deliverypoint1",
         heading=260,
-        debugPoly=true,
+        -- debugPoly=true,
         minZ=74.98,
         maxZ=78.98
     })
@@ -523,18 +536,51 @@ RegisterNetEvent('jl-carboost:client:bringtoPlace', function ()
             QBCore.Functions.Notify("Okay, leave the car there, I'll pay you later", "success")
         end
     end)
+
+    CreateThread(function ()
+        while true do
+            Wait(1000)
+            if GetIsVehicleEngineRunning(carSpawned) then
+                BoostingAlert()
+                break
+            end
+        end
+    end)
 end)
 
-RegisterNetEvent('jl-carboost:client:finishBoosting', function ()
+RegisterNetEvent('jl-carboost:client:finishBoosting', function (data)
     DeleteEntity(carSpawned)
+    RemoveBlip(dropBlip)
     carSpawned = nil
     zone:destroy()
     zone = nil
+    inZone = false
     TriggerServerEvent('jl-carboost:server:finishBoosting')
+end)
+
+
+RegisterNetEvent('jl-carboost:client:failedBoosting', function ()
+    carSpawned = nil
+    carID = nil
+    RemoveBlip(dropBlip)
+    if zone then
+        zone:destroy()
+        zone = nil
+        inZone = false
+    end
+    QBCore.Functions.Notify("Something went wrong, contact your developer", "error")
+    TriggerEvent('jl-carboost:client:refreshContract')
 end)
 
 RegisterNetEvent('jl-carboost:client:openLaptop', function ()
     SetDisplay(not display)
+end)
+
+RegisterNetEvent('jl-carboost:client:refreshContract', function ()
+    QBCore.Functions.TriggerCallback('jl-carboost:server:getContractData')
+    SendNUIMessage({
+        type = "refreshContract",
+    })
 end)
 
 -- Threads
@@ -551,19 +597,40 @@ CreateThread(function ()
 end)
 
 CreateThread(function ()
-    while carInzone do
+    while true do
         Wait(100)
-        print("CAR INZONE")
+        if inZone then
+            if carSpawned ~= nil or carSpawned ~= 0 then
+                if not IsPedInVehicle(PlayerPedId(), carSpawned, false) then
+                    local playerCoords = GetEntityCoords(PlayerPedId())
+                    local carcoords = GetEntityCoords(carSpawned)
+                    local dist = #(playerCoords - carcoords)
+                    if dist >= 20.0 then
+                        TriggerEvent('jl-carboost:client:finishBoosting')
+                        break
+                    end
+                end
+            end
+        end
     end
 end)
 
-
 CreateThread(function ()
     if LocalPlayer.state['isLoggedIn'] then
-        -- TriggerServerEvent('jl-carboost:server:getItem')
-        -- TriggerEvent('jl-carboost:client:setupBoostingApp')
+        CreateBlip(vector3(1185.2, -3303.92, 6.92), "Post OP", 473)
     end
-    CreateBlip(vector3(1185.2, -3303.92, 6.92), "Post OP", 473)
+end)
+
+-- Prevent the boosting still running when the car is destroyed / disappeared for no reason
+CreateThread(function ()
+    while true do
+        Wait(1000)
+        if carSpawned ~= nil and not DoesEntityExist(carSpawned) then
+            if carSpawned ~= 0 then
+                TriggerEvent('jl-carboost:client:failedBoosting')
+            end
+        end
+    end
 end)
 
 -- exports
