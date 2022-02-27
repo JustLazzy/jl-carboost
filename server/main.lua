@@ -31,7 +31,7 @@ CreateThread(function ()
          local num = 0
          local player = 0
          local inqueue = 0
-         Wait(Config.WaitTime * 1000)
+         Wait(Config.WaitTime * 1000 * 60)
          for k, v in pairs(Config.QueueList) do
             local Player = QBCore.Functions.GetPlayerByCitizenId(k)
             if not v.getContract and Player and num <= Config.MaxQueueContract then
@@ -81,9 +81,10 @@ RegisterNetEvent('jl-carboost:server:getBoostData', function()
    local result = MySQL.Sync.fetchAll('SELECT * FROM boost_data WHERE citizenid = @citizenid', {
       ['@citizenid'] = Player.PlayerData.citizenid
    })
+   local data
    if result[1] then
       local res = result[1]
-      local data = {
+      data = {
          status = false,
          tier = tostring(res.tier),
          startContract = false,
@@ -91,7 +92,7 @@ RegisterNetEvent('jl-carboost:server:getBoostData', function()
          xp = res.xp,
       }
    else
-      local data = {
+      data = {
          status = false,
          tier = 'D',
          startContract = false,
@@ -213,7 +214,8 @@ RegisterNetEvent('jl-carboost:server:log', function (string, type)
    end
 end)
 
-RegisterNetEvent('jl-carboost:server:finishBoosting', function ()
+RegisterNetEvent('jl-carboost:server:finishBoosting', function (data)
+   local data = data
    local src = source
    local pData = QBCore.Functions.GetPlayer(src)
    local currentRep = pData.PlayerData.metadata['carboostrep']
@@ -228,6 +230,20 @@ RegisterNetEvent('jl-carboost:server:finishBoosting', function ()
    pData.Functions.AddMoney('bank', math.random(500, 2000), 'finished-boosting')
    TriggerClientEvent('QBCore:Notify', src, 'You get more reputation: '..total, 'success')
    TriggerClientEvent('jl-carboost:client:setBoostRep')
+   TriggerEvent('jl-carboost:server:deleteContract', src, data.id)
+end)
+
+RegisterNetEvent('jl-carboost:server:deleteContract', function (source, contractid)
+   local src = source
+   local playerData = QBCore.Functions.GetPlayer(src)
+   MySQL.Async.execute('DELETE FROM boost_contract WHERE citizenid = @citizenid AND id = @id',{
+      ['@citizenid'] = playerData.PlayerData.citizenid,
+      ['@id'] = contractid
+   }, function (result)
+      if result > 0 then
+         TriggerEvent('jl-carboost:server:log', 'Contract '..contractid..' deleted, CID:'..playerData.PlayerData.citizenid)
+      end
+   end)
 end)
 
 RegisterNetEvent('jl-carboost:server:updateBennysConfig', function (data)
@@ -332,7 +348,7 @@ QBCore.Functions.CreateCallback('jl-carboost:server:getboostdata', function (sou
       ['@owner'] = citizenid
    })
    if result[1] then
-      for k, v in pairs(result) do
+      for _, v in pairs(result) do
          if v.onsale == 1 then
             return
          end
@@ -369,6 +385,10 @@ QBCore.Functions.CreateCallback('jl-carboost:server:spawnCar', function (source,
    local cardata = data
    local boosttier = Config.Tier[cardata.data.tier]
    local coords = boosttier.location[math.random(1, #boosttier.location)]
+   local npcCoords
+   if boosttier.spawnnpc then
+      npcCoords = coords.npc
+   end
    local carhash = GetHashKey(data.data.car)
    local CreateAutomobile = GetHashKey('CREATE_AUTOMOBILE')
    local car = Citizen.InvokeNative(CreateAutomobile, carhash, coords.car, coords.car.h, true, false)
@@ -382,9 +402,10 @@ QBCore.Functions.CreateCallback('jl-carboost:server:spawnCar', function (source,
       SetVehicleNumberPlateText(car, cardata.data.plate)
       local netId = NetworkGetNetworkIdFromEntity(car)
       data = {
+         id = cardata.id,
          networkID = netId,
          spawnlocation = coords.car,
-         npc = coords.npc or nil,
+         npc = npcCoords,
          carmodel = car,
       }
       cb(data)
@@ -404,12 +425,18 @@ function DeleteExpiredContract()
       end
    end)
 end
+
 -- Random Plate
 function RandomPlate()
 	local random = tostring(QBCore.Shared.RandomStr(2) .. QBCore.Shared.RandomInt(4)):upper()
    return random
 end
+
 -- make the laptop usable
 QBCore.Functions.CreateUseableItem('laptop' , function(source, item)
    TriggerClientEvent('jl-carboost:client:openLaptop', source)
+end)
+
+QBCore.Functions.CreateUseableItem('hacking_device',  function (source, item)
+   TriggerClientEvent('jl-carboost:client:useHackingDevice', source)
 end)

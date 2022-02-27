@@ -24,6 +24,8 @@ Config.MinRep = 10
 
 Config.MaxRep = 40
 
+Config.Payment = 'qbit' -- qbit / bank
+
 Config.Tier = {
     --[[
         Don't touch the tier name, just configure the location and car
@@ -62,7 +64,6 @@ Config.Tier = {
         pricemaximum = 7000,
         callpolice = false,
         spawnnpc = false,
-        
     },
     ['C'] = {
         location = {
@@ -146,18 +147,35 @@ Config.Tier = {
         },
         priceminimum = 30000,
         pricemaximum = 60000,
-        callpolice = true
+        callpolice = true,
+        spawnnpc = true
     },
     ['S'] = {
         location = {
-            vector4(-1993.36, 294.09, 91.29, 340.95)
+            [1] = {
+                car = vector4(-1801.37, 457.55, 128.3, 85.66),
+                npc = {
+                    vector3(-1806.3, 439.24, 128.71),
+                    vector3(-1827.1, 449.58, 127.75),
+                    vector3(-1789.95, 443.4, 128.31)
+                }
+            },
+            [2] = {
+                car = vector4(-1948.29, 460.76, 101.83, 101.65),
+                npc = {
+                    vector3(-1943.03, 449.74, 102.93),
+                    vector3(-1972.41, 461.64, 102.22),
+                    vector3(-1942.9, 426.15, 101.65)
+                }
+            }
         },
         car = {
             'reaper'
         },
         priceminimum = 30000,
         pricemaximum = 60000,
-        callpolice = true
+        callpolice = true,
+        spawnnpc = true
     },
     ['S+'] = {
         location = {
@@ -178,6 +196,28 @@ Config.Tier = {
         pricemaximum = 60000,
         callpolice = true,
         spawnnpc = true,
+    }
+}
+
+Config.DropPoint = {
+    -- pz
+    [1] = {
+        coords = vector3(496.87, -2190.75, 5.92),
+        length = 11.6,
+        width = 5,
+        name = "droppoint",
+        heading = 331,
+        minZ=4.67,
+        maxZ=8.67
+    },
+    [2] = {
+        coords = vector3(1216.25, -2947.09, 5.87),
+        length = 12.05,
+        width = 10,
+        name = "droppoint2",
+        heading = 0,
+        minZ=4.87,
+        maxZ=8.47
     }
 }
 

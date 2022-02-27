@@ -102,13 +102,13 @@
   text-align: center;
 }
 
-#bennys-app .container .cart-button {
+#bennys-app .topnav button.cart-button {
   transition: 0.5s;
   opacity: 0;
   visibility: hidden;
 }
 
-#bennys-app .container .cart-button.active {
+#bennys-app .topnav button.cart-button.active {
   opacity: 1;
   visibility: visible;
 }
@@ -268,11 +268,44 @@ input :focus {
   display: flex;
   flex-direction: row;
   align-items: center;
+  justify-content: space-between;
+  justify-items: end;
+}
+
+#bennys-app .navigation .topnav {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
   justify-content: flex-end;
   justify-items: end;
 }
 
-#bennys-app .navigation button {
+#bennys-app .navigation .category {
+  display: flex;
+  justify-content: flex-start;
+}
+
+#bennys-app .navigation .category button {
+  font-weight: 800;
+  background-color: rgb(45, 52, 68);
+  border-radius: 2px;
+  border: none;
+  margin-right: 25px;
+  padding: 10px;
+  width: 150px;
+  text-transform: uppercase;
+  text-align: center;
+  align-content: center;
+  transition: 0.5s;
+}
+
+#bennys-app .navigation .category button:hover {
+  background-color: rgb(53, 63, 85);
+}
+
+#bennys-app .navigation .topnav button {
+  font-weight: 800;
+  font-size: 20px;
   display: flex;
   justify-content: center;
   justify-items: center;
@@ -281,10 +314,16 @@ input :focus {
   border: none;
   padding: 5px 5px;
   margin: 5px;
-  font-weight: 800;
   text-transform: uppercase;
   background: transparent;
   z-index: 10;
+  transition: 0.5s;
+}
+
+#bennys-app .navigation .topnav button:hover {
+  cursor: pointer;
+  background-color: rgb(45, 52, 68);
+  color: #fff;
 }
 
 #bennys-app .navigation .home-button.active {

@@ -55,6 +55,8 @@ function loadBennysApp() {
                 <button class="basket-button">Add to basket</button>
               </div>
               `;
+          let addCart = article.getElementsByClassName("basket-button");
+          addCart[0].addEventListener("click", addToCart);
           store.append(article);
           item.push(article.tagName);
         });
