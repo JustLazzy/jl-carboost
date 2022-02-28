@@ -1,13 +1,14 @@
 # JustLazzy Carboost
 
-## THIS SCRIPT IS NOT YET STABLE!, PLEASE REPORT IF YOU FIND BUG
+## THIS SCRIPT IS NOT YET STABLE! AND NOT YET READY, PLEASE REPORT IF YOU FIND BUG
 
 | Join my discord server [here](https://discord.gg/fqUjRyhW2z) |
 | ------------------------------------------------------------ |
 
 ## Dependencies
-
 ### boostinghack from Lionh34rt [here](https://github.com/Lionh34rt/boostinghack.git)
+### Polyzone
+### qb-target
 
 <BR>
 
