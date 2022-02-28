@@ -575,7 +575,7 @@ RegisterNetEvent("jl-carboost:client:bringtoPlace", function (data)
     })
 
     dropBlip = CreateBlip(polyZone.coords, "Drop Point", 225, 66)
-    SetNewWaypoint(dropBlip)
+    SetNewWaypoint(polyZone.coords)
     Wait(100)
     zone = BoxZone:Create(polyZone.coords, polyZone.length, polyZone.width, {
         name=polyZone.name,
