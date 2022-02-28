@@ -1,6 +1,5 @@
 local Translations = {
     error = {
-
     },
     success = {
         

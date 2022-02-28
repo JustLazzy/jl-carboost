@@ -24,7 +24,7 @@ Config.MinRep = 10
 
 Config.MaxRep = 40
 
-Config.Payment = 'qbit' -- qbit / bank
+Config.Payment = 'crypto' -- crypto / bank
 
 Config.Tier = {
     --[[

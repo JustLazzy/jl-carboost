@@ -215,6 +215,15 @@ function stopContract(data) {
   $.post("https://jl-carboost/stopcontract", JSON.stringify({ id: data }));
 }
 
+function removeContract(id) {
+  let contractList = document.getElementsByClassName("boost-contract");
+  let contractParent = document.getElementById(id);
+  if (contractParent) {
+    contractParent.remove();
+    Notification("You have done your contract", "success");
+  }
+}
+
 function refreshContract() {
   let boostingList = document.querySelector("#boosting-contract");
   boostingList.innerHTML = "";

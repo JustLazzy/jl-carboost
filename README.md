@@ -1,7 +1,13 @@
-# jl-carboost
+# JustLazzy Carboost
 
-| Join my discord server [here](https://discord.gg/fqUjRyhW2z) ! or buy me a [coffe](https://ko-fi.com/justlazzy) ! |
-| ----------------------------------------------------------------------------------------------------------------- |
+## THIS SCRIPT IS NOT YET STABLE!, PLEASE REPORT IF YOU FIND BUG
+
+| Join my discord server [here](https://discord.gg/fqUjRyhW2z) |
+| ------------------------------------------------------------ |
+
+## Dependencies
+
+### boostinghack from Lionh34rt [here](https://github.com/Lionh34rt/boostinghack.git)
 
 <BR>
 
@@ -18,7 +24,19 @@
     PlayerData.metadata['carboostclass'] = PlayerData.metadata['carboostclass'] or 'D'
     PlayerData.metadata['carboostrep'] = PlayerData.metadata['carboostrep'] or 0
 ```
-3. 
+
+3. Go to your qb-core/shared/items.lua, and add this
+
+```lua
+-- Hacking
+['hacking_device']			  = {['name'] = "hacking_device",					['label'] = "Hacking device",			['weight'] = 500,		['type'] = 'item', 		['image'] = 'hacking_device.png',			['unique'] = true,		['useable']	= true,		['shouldClose'] = true,	   ['combinable'] = nil,   ['description'] = "A multi purpose hacking device"},
+```
+
+Find laptop and change unique and usage to true,
+
+```lua
+['unique'] = true, 		['useable'] = true,
+```
 
 And you're done
 
@@ -38,3 +56,10 @@ Config.BennysSell = {
 ```
 
 **MAKE SURE YOUR ITEM IS EXIST ON THE SHARED ITEM**
+
+# Commands
+
+| Name         | Description                        | Permission |
+| ------------ | ---------------------------------- | ---------- |
+| settier      | Set Boosting Tier                  | Admin      |
+| giveContract | Give contract to a specific player | Admin      |

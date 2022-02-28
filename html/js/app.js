@@ -58,6 +58,9 @@ $(document).ready(() => {
       case "addcontract":
         setupNewContract(event.data.boost);
         break;
+      case "removeContract":
+        removeContract(event.data.id);
+        break;
       case "setupboostingapp":
         loadBoostData();
         break;

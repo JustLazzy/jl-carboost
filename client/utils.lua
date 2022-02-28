@@ -1,3 +1,4 @@
+-- This is the vehicle modification stuff
 windowtint = {  
 	'WINDOWTINT_PURE_BLACK',  
 	'WINDOWTINT_DARKSMOKE',  

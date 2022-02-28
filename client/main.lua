@@ -37,6 +37,10 @@ RegisterCommand('checkhacked', function ()
     end
 end)
 
+RegisterCommand('deletecontract', function ()
+    TriggerServerEvent('jl-carboost:server:deleteContract', 65)
+end)
+
 -- function
 function SetDisplay(bool)
     display = bool
@@ -115,7 +119,7 @@ local function StartHacking(vehicle)
     local trackerLeft = veh.state.trackerLeft
     if veh.state.tracker then
         if not veh.state.hacked then
-            local success = exports['howdy-hackminigame']:Begin(3, 5000)
+            local success = exports['boostinghack']:StartHack()
             if success then
                 local randomSeconds = math.random(30)
                 trackerLeft = trackerLeft - 1
@@ -522,7 +526,7 @@ RegisterNetEvent('jl-carboost:client:playerInVehicle', function (data)
         while true do
             Wait(100)
             if IsPedInVehicle(PlayerPedId(), carSpawned, false) then
-                if IsVehicleAlarmActivated(carSpawned) or IsVehicleEngineStarting(carSpawned) then       
+                if IsVehicleAlarmActivated(carSpawned) or IsVehicleEngineStarting(carSpawned) or GetIsVehicleEngineRunning(carSpawned) then       
                     spawnAngryPed(data.npc)
                     TriggerEvent('jl-carboost:client:trackersReady', data)
                     break
@@ -533,17 +537,21 @@ RegisterNetEvent('jl-carboost:client:playerInVehicle', function (data)
 end)
 
 RegisterNetEvent('jl-carboost:client:trackersReady', function (data)
-    local veh = Entity(carSpawned)
     CreateThread(function ()
         while true do
             Wait(1000)
             if GetIsVehicleEngineRunning(carSpawned) then
                 RegisterCar(carSpawned)
                 BoostingAlert()
+                TriggerEvent('jl-carboost:client:startTracker', data)
                 break
             end
         end
     end)
+end)
+
+RegisterNetEvent('jl-carboost:client:startTracker', function(data)
+    local veh = Entity(carSpawned)
     CreateThread(function ()
         while true do
             Wait(5000)
@@ -610,7 +618,18 @@ RegisterNetEvent('jl-carboost:client:finishBoosting', function (data)
     zone:destroy()
     zone = nil
     inZone = false
-    TriggerServerEvent('jl-carboost:server:finishBoosting')
+    TriggerServerEvent('jl-carboost:server:finishBoosting', data)
+    Wait(100)
+    TriggerEvent('jl-carboost:client:deleteContract', data)
+end)
+
+RegisterNetEvent('jl-carboost:client:deleteContract', function (data)
+    local id = data.id
+    SendNUIMessage({
+        type = "removeContract",
+        id = id
+    })
+    TriggerServerEvent('jl-carboost:server:deleteContract', id)
 end)
 
 
