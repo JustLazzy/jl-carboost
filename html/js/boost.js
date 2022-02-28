@@ -9,7 +9,7 @@ let contractPage = document.getElementById("boosting-contract");
 let shopPage = document.getElementById("boosting-shop");
 
 $(document).ready(function () {
-  loadBoostData();
+  // loadBoostData();
   boostingheader = boosting.querySelector("header");
   boostingheader.addEventListener("mousedown", () => {
     boostingheader.classList.add("active");

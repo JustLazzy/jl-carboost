@@ -10,6 +10,7 @@ local laptopanim = "base"
 RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
     PlayerData = QBCore.Functions.GetPlayerData()
     TriggerServerEvent('jl-carboost:server:getItem')
+    TriggerEvent('jl-carboost:client:setupBoostingApp')
 end)
 
 RegisterNetEvent('QBCore:Client:OnJobUpdate', function(JobInfo)
@@ -688,9 +689,7 @@ CreateThread(function ()
 end)
 
 CreateThread(function ()
-    if LocalPlayer.state['isLoggedIn'] then
-        CreateBlip(vector3(1185.2, -3303.92, 6.92), "Post OP", 473)
-    end
+    CreateBlip(vector3(1185.2, -3303.92, 6.92), "Post OP", 473)
 end)
 
 -- Prevent the boosting still running when the car is destroyed / disappeared for no reason

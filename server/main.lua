@@ -321,7 +321,7 @@ QBCore.Functions.CreateCallback('jl-carboost:server:canBuy', function(source, cb
 end)
 
 QBCore.Functions.CreateCallback('jl-carboost:server:canTake', function (source, cb, data)
-
+   
 end)
 
 QBCore.Functions.CreateCallback('jl-carboost:server:getboostdata', function (source, cb, citizenid)
