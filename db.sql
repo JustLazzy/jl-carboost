@@ -16,11 +16,3 @@ CREATE TABLE IF NOT EXISTS `boost_contract` (
   UNIQUE KEY `id` (`id`),
   KEY `owner` (`owner`)
 ) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb3;
-
-CREATE TABLE IF NOT EXISTS `boost_data` (
-  `citizenid` varchar(50) NOT NULL,
-  `tier` tinytext DEFAULT 'D',
-  `xp` int(100) DEFAULT 0,
-  PRIMARY KEY (`citizenid`),
-  KEY `citizenid` (`citizenid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
