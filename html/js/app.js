@@ -67,6 +67,9 @@ $(document).ready(() => {
       case "refreshContract":
         refreshContract();
         break;
+      case "updateProggress":
+        updateBoostProgress(event.data.boost);
+        break;
     }
   });
 

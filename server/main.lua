@@ -2,33 +2,11 @@ local QBCore = exports['qb-core']:GetCoreObject()
 local sleep = 1 * 1000
 local queueNumber = 0
 
-   -- Simple queue system
-CreateThread(function ()
-   while true do
-      Wait(sleep)
-      if queueNumber ~= 0 then
-         local num = 0
-         local player = 0
-         local inqueue = 0
-         Wait(Config.WaitTime * 1000 * 60)
-         for k, v in pairs(Config.QueueList) do
-            local Player = QBCore.Functions.GetPlayerByCitizenId(k)
-            if not v.getContract and v.status and Player and num <= Config.MaxQueueContract then
-               TriggerClientEvent('QBCore:Notify', Player.PlayerData.source, 'You just got a new contract', 'success')
-               TriggerEvent('jl-carboost:server:newContract', Player.PlayerData.source, k)
-               num = (num or 0) + 1
-               v.getContract = true
-            end
-            if v.getContract then
-               inqueue = inqueue + 1
-            end
-            player = player + 1
-         end
-         if queueNumber == inqueue then
-            inqueue = 0
-            queueNumber = 0
-         end
-      end
+
+AddEventHandler('onResourceStart', function (resource)
+   if resource == GetCurrentResourceName() then
+      Queue()
+      DeleteExpiredContract()
    end
 end)
 
@@ -46,14 +24,6 @@ local function GetNextClass(class)
       return 'S+'
    end
 end
-
-CreateThread(function ()
-   while true do
-      Wait(sleep)
-      DeleteExpiredContract()
-   end
-end)
-
 
 -- Event
 RegisterNetEvent('jl-carboost:server:saveBoostData', function (citizenid)
@@ -113,6 +83,9 @@ RegisterNetEvent('jl-carboost:server:joinQueue', function (status, citizenid)
          contract = {}
       }
       queueNumber = queueNumber - 1
+      if queueNumber < 0 then
+         queueNumber = 0
+      end
       TriggerEvent('jl-carboost:server:log', 'Player with CID: '..citizenid..' has left the queue, queue number: '..queueNumber)
    end
 end)
@@ -175,9 +148,11 @@ RegisterNetEvent('jl-carboost:server:log', function (string, type)
 end)
 
 RegisterNetEvent('jl-carboost:server:finishBoosting', function (data)
+   local isNextLevel = false
    local src = source
    local data = data
    local pData = QBCore.Functions.GetPlayer(src)
+   local amountMoney = math.random(20, 70)
    local currentRep = pData.PlayerData.metadata['carboostrep']
    local randomRep = math.random(Config.MinRep, Config.MaxRep)
    local total = currentRep + randomRep
@@ -185,10 +160,15 @@ RegisterNetEvent('jl-carboost:server:finishBoosting', function (data)
       total = total - 100
       local class = GetNextClass(pData.PlayerData.metadata['carboostclass'])
       pData.Functions.SetMetaData('carboostclass', class)
+      isNextLevel = true
+   end
+   if Config.Payment == 'crypto' then
+      TriggerClientEvent('QBCore:Notify', src, 'You just got '..amountMoney..' crypto', 'success')
    end
    pData.Functions.SetMetaData("carboostrep", total)
-   pData.Functions.AddMoney(Config.Payment, math.random(500, 2000), 'finished-boosting')
-   TriggerClientEvent('QBCore:Notify', src, 'You get more reputation: '..total, 'success')
+   pData.Functions.AddMoney(Config.Payment, amountMoney, 'finished-boosting')
+   TriggerClientEvent('jl-carboost:client:updateProggress', src, isNextLevel)
+   TriggerClientEvent('QBCore:Notify', src, 'You get more reputation: '..randomRep, 'success')
 end)
 
 RegisterNetEvent('jl-carboost:server:deleteContract', function (contractid)
@@ -404,13 +384,47 @@ QBCore.Functions.CreateCallback('jl-carboost:server:spawnCar', function (source,
    end
 end)
 
--- Delete Expired Contract
+
+-- Simple Queue System
+function Queue()
+   if queueNumber ~= 0 then
+      local num = 0
+      local player = 0
+      local inqueue = 0
+      Wait(Config.WaitTime * 1000 * 60)
+      for k, v in pairs(Config.QueueList) do
+         local Player = QBCore.Functions.GetPlayerByCitizenId(k)
+         if not v.getContract and v.status and Player and num <= Config.MaxQueueContract then
+            TriggerClientEvent('QBCore:Notify', Player.PlayerData.source, 'You just got a new contract', 'success')
+            TriggerEvent('jl-carboost:server:newContract', Player.PlayerData.source, k)
+            num = (num or 0) + 1
+            v.getContract = true
+         end
+         if v.getContract then
+            inqueue = inqueue + 1
+         end
+         player = player + 1
+      end
+      if queueNumber == inqueue then
+         inqueue = 0
+         queueNumber = 0
+      end
+   end
+   SetTimeout(sleep, function ()
+      Queue()
+   end)
+end
+
+-- Delete expired contracts
 function DeleteExpiredContract()
    MySQL.Async.execute('DELETE FROM boost_contract WHERE expire < NOW()',{}, function (result)
       if result > 0 then
          print(json.encode(result))
          print('Contracts deleted')
       end
+   end)
+   SetTimeout(sleep,function ()
+      DeleteExpiredContract()
    end)
 end
 

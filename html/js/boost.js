@@ -76,6 +76,9 @@ function toggleQueue() {
 
 function boostProgress(currentVal, toVal) {
   // console.log(currentVal, toVal);
+  if (currentVal == "current") {
+    currentVal = boostpercent.style.width.replace("%", "");
+  }
   if (toVal === 0) {
     return (boostpercent.style.width = 0 + "%");
   } else {
@@ -87,6 +90,17 @@ function boostProgress(currentVal, toVal) {
       }
     }, 100);
   }
+}
+
+function updateBoostProgress(data) {
+  let currentClass = document.querySelector("#currentclass");
+  if (data.isNextLevel === true) {
+    boostProgress(0, data.rep);
+  } else {
+    boostProgress("current", data.rep);
+  }
+  currentClass.textContent = data.boostclass;
+  updateClasses();
 }
 
 function loadBoostData() {
@@ -216,11 +230,16 @@ function stopContract(data) {
 }
 
 function removeContract(id) {
-  let contractList = document.getElementsByClassName("boost-contract");
-  let contractParent = document.getElementById(id);
-  if (contractParent) {
-    contractParent.remove();
+  let contractParent = document.getElementById("boosting-contract");
+  let contractCart = document.getElementById(id);
+  if (contractCart) {
+    contractCart.remove();
     Notification("You have done your contract", "success");
+    let contractList = contractParent.getElementsByClassName("boost-contract");
+    if (contractList.length === 0) {
+      let title = document.querySelector("#no-contract");
+      title.classList.remove("hidden");
+    }
   }
 }
 

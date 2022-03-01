@@ -27,21 +27,6 @@ RegisterNetEvent('QBCore:Client:OnPlayerUnload', function ()
     Config.BennysItems = {}
 end)
 
-RegisterCommand('brum', function ()
-        local vehicleNet = NetworkGetNetworkIdFromEntity(GetVehiclePedIsIn(PlayerPedId(),false))
-        TriggerEvent('dispatch:carboost', vehicleNet)
-end)
-
-RegisterCommand('checkhacked', function ()
-    if carSpawned ~= nil then
-        print(json.encode(Entity(carSpawned).state.hacked))
-    end
-end)
-
-RegisterCommand('deletecontract', function ()
-    TriggerServerEvent('jl-carboost:server:deleteContract', 65)
-end)
-
 -- function
 function SetDisplay(bool)
     display = bool
@@ -138,7 +123,7 @@ local function StartHacking(vehicle)
                     veh.state.hacked = false
                 end)
             else
-                print("you suck")
+                QBCore.Functions.Notify("You failed to disable the tracker", "error")
             end
         else
             print("ALREADY HACKED")
@@ -165,68 +150,6 @@ local function BoostingAlert()
         TriggerEvent('jl-carboost:client:notifyBoosting', carID)
     end
 end
-
-RegisterCommand('spawnped', function ()
-    -- spawnAngryPed()
-    local coord = GetEntityCoords(PlayerPedId())
-    local coords = {
-        vector3(209.95, -1642.52, 29.8),
-        vector3(225.97, -1655.23, 29.8),
-    }
-    spawnAngryPed(coords)
-end)
-
-RegisterCommand('metadata', function ()
-    local carboost = PlayerData.metadata['carboostclass']
-    -- carboost = 'C'
-    local rep = PlayerData.metadata['carboostrep']
-    print(carboost, rep)
-    -- TriggerServerEvent("QBCore:Server:SetMetaData", "carboostclass", 'C')
-end)
-
-RegisterCommand("testanim", function ()
-    RequestAnimDict(laptopdict)
-    while not HasAnimDictLoaded(laptopdict) do Wait(100) end
-
-    local ped = PlayerPedId()
-    
-    TaskPlayAnim(ped, laptopdict, laptopanim, 8.0, 8.0, -1, 0, 0, false, false, false)
-end)
-
-RegisterCommand('testimage', function()
-    local storeitem = {}
-    for k, v in pairs(Config.BennysSell) do
-        local name
-        if not storeitem[k] then
-            if QBCore.Shared.Items[v.item] ~= nil then
-                if Config.BennysSell[k].name then
-                    name = Config.BennysSell[k].name
-                else
-                   if QBCore.Shared.Items[v.item] ~= nil then
-                       name = QBCore.Shared.Items[v.item].label
-                   else
-                    name = "Unknown"
-                     return TriggerServerEvent('jl-carboost:server:log', "")
-                   end
-                end
-                storeitem[k] = {
-                    name = name or v.item,
-                    image = v.image,
-                    price = v.price,
-                    stock = v.stock
-                }
-            else
-                return TriggerServerEvent('jl-carboost:server:log', "The item is not found :"..k)
-            end
-        else
-            return TriggerServerEvent("jl-carboost:server:log", "Duplicate item found: " .. k)
-        end
-    end
-end)
-
-RegisterCommand('testconfig', function()
-    print(json.encode(carSpawned))
-end)
 
 -- NUI
 RegisterNUICallback('openlaptop', function (data)
@@ -262,10 +185,10 @@ RegisterNUICallback('loadstore', function (data, cb)
                         stock = v.stock
                     }
                 else
-                    return TriggerServerEvent('jl-carboost:server:log', "The item is not found :"..k)
+                    TriggerServerEvent('jl-carboost:server:log', "The item is not found :"..k)
                 end
             else
-                return TriggerServerEvent("jl-carboost:server:log", "Duplicate item found: " .. k)
+                TriggerServerEvent("jl-carboost:server:log", "Duplicate item found: " .. k)
             end
         end
         cb({
@@ -380,9 +303,11 @@ end)
 
 RegisterNetEvent('jl-carboost:client:refreshQueue', function ()
     local citizenid = PlayerData.citizenid
-    TriggerServerEvent('jl-carboost:server:joinQueue', false, citizenid)
-    Wait(2000)
-    TriggerServerEvent('jl-carboost:server:joinQueue', true, citizenid)
+    if isJoinQueue then
+        TriggerServerEvent('jl-carboost:server:joinQueue', false, citizenid)
+        Wait(2000)
+        TriggerServerEvent('jl-carboost:server:joinQueue', true, citizenid)
+    end
 end)
 
 RegisterNetEvent('jl-carboost:client:giveContract', function ()
@@ -632,6 +557,18 @@ RegisterNetEvent('jl-carboost:client:finishBoosting', function (data)
     TriggerEvent('jl-carboost:client:refreshQueue')
 end)
 
+RegisterNetEvent('jl-carboost:client:updateProggress', function (data)
+    local data = {
+        rep = PlayerData.metadata['carboostrep'],
+        boostclass = PlayerData.metadata['carboostclass'],
+        isNextLevel = data
+    }
+    SendNUIMessage({
+        type = "updateProggress",
+        boost = data
+    })
+end)
+
 RegisterNetEvent('jl-carboost:client:deleteContract', function (data)
     local id = data.id
     SendNUIMessage({
@@ -669,15 +606,19 @@ end)
 RegisterNetEvent('jl-carboost:client:useHackingDevice', function ()
     local playerPed = PlayerPedId()
     local vehicle = GetVehiclePedIsIn(playerPed, false)
-    if IsPedInVehicle(playerPed, vehicle) then      
-        if cooldown then
-            QBCore.Functions.Notify("You can't use this device for now", "error")
-            return
-        end
-        StartHacking(vehicle)
-        cooldown = true
-        Wait(5000)
-        cooldown = false
+    if IsPedInVehicle(playerPed, vehicle) then
+
+        -- if GetPedInVehicleSeat(vehicle, 2) then   
+            if cooldown then
+                return QBCore.Functions.Notify("You can't use this device for now", "error")
+            end
+            StartHacking(vehicle)
+            cooldown = true
+            Wait(5000)
+            cooldown = false
+        -- else
+        --     return QBCore.Functions.Notify("You need to be in front seat passenger to do this", "error")
+        -- end
     else
         QBCore.Functions.Notify("You need to be in a vehicle", "error")
     end
@@ -697,6 +638,11 @@ CreateThread(function ()
 end)
 
 CreateThread(function ()
+    if LocalPlayer.state['isLoggedIn'] then
+        Wait(5000)
+        TriggerServerEvent('jl-carboost:server:getItem')
+        TriggerEvent('jl-carboost:client:setupBoostingApp')
+    end
     CreateBlip(vector3(1185.2, -3303.92, 6.92), "Post OP", 473)
 end)
 
@@ -731,3 +677,11 @@ exports['qb-target']:AddBoxZone("carboost:takeItem", vector3(1185.14, -3304.01, 
 	},
 	distance = 3.0
 })
+
+AddEventHandler('onResourceStop', function(resource)
+   if resource == GetCurrentResourceName() then
+      if DoesEntityExist(carSpawned) then
+          DeleteEntity(carSpawned)
+      end
+   end
+end)

@@ -63,7 +63,6 @@ Config.Tier = {
         },
         priceminimum = 5000,
         pricemaximum = 7000,
-        callpolice = false,
         spawnnpc = false,
     },
     ['C'] = {
@@ -99,7 +98,6 @@ Config.Tier = {
         priceminimum = 30000,
         pricemaximum = 60000,
         spawnnpc = false,
-        callpolice = false
     },
     ['B'] = {
         location = {
@@ -119,7 +117,6 @@ Config.Tier = {
         priceminimum = 30000,
         pricemaximum = 60000,
         spawnnpc = true,
-        callpolice = true
     },
     ['A'] = {
         location = {
@@ -139,7 +136,6 @@ Config.Tier = {
         priceminimum = 30000,
         pricemaximum = 60000,
         spawnnpc = true,
-        callpolice = true
     },
     ['A+'] = {
         location = {
@@ -150,7 +146,6 @@ Config.Tier = {
         },
         priceminimum = 30000,
         pricemaximum = 60000,
-        callpolice = true,
         spawnnpc = true
     },
     ['S'] = {
@@ -177,7 +172,6 @@ Config.Tier = {
         },
         priceminimum = 30000,
         pricemaximum = 60000,
-        callpolice = true,
         spawnnpc = true
     },
     ['S+'] = {
@@ -197,7 +191,6 @@ Config.Tier = {
         },
         priceminimum = 30000,
         pricemaximum = 60000,
-        callpolice = true,
         spawnnpc = true,
     }
 }
