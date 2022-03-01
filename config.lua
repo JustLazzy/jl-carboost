@@ -58,7 +58,8 @@ Config.Tier = {
             },
         },
         car = {
-            'rebla'
+            'rebla',
+            'dilettante'
         },
         priceminimum = 5000,
         pricemaximum = 7000,

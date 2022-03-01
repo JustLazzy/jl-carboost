@@ -228,8 +228,6 @@ RegisterCommand('testconfig', function()
     print(json.encode(carSpawned))
 end)
 
-
-
 -- NUI
 RegisterNUICallback('openlaptop', function (data)
     SetDisplay(false)
@@ -619,6 +617,7 @@ RegisterNetEvent('jl-carboost:client:finishBoosting', function (data)
     zone:destroy()
     zone = nil
     inZone = false
+    isContractStarted = false
     TriggerServerEvent('jl-carboost:server:finishBoosting', data)
     Wait(100)
     TriggerEvent('jl-carboost:client:deleteContract', data)
@@ -711,8 +710,8 @@ exports['qb-target']:AddBoxZone("carboost:takeItem", vector3(1185.14, -3304.01, 
     minZ=5.1,
     maxZ=9.1,
 	-- debugPoly = true,
-    scale= {1.0, 1.0,1.0},
-}, {
+    scale= {1.0, 1.0, 1.0},
+    }, {
 	options = {
 		{
             type = "client",
@@ -723,4 +722,3 @@ exports['qb-target']:AddBoxZone("carboost:takeItem", vector3(1185.14, -3304.01, 
 	},
 	distance = 3.0
 })
-
