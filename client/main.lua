@@ -378,6 +378,13 @@ RegisterNetEvent('jl-carboost:client:joinQueue', function (data)
     TriggerServerEvent('jl-carboost:server:joinQueue', isJoinQueue, citizenid)
 end)
 
+RegisterNetEvent('jl-carboost:client:refreshQueue', function ()
+    local citizenid = PlayerData.citizenid
+    TriggerServerEvent('jl-carboost:server:joinQueue', false, citizenid)
+    Wait(2000)
+    TriggerServerEvent('jl-carboost:server:joinQueue', true, citizenid)
+end)
+
 RegisterNetEvent('jl-carboost:client:giveContract', function ()
     SendNUIMessage({
         type="givecontract",
@@ -621,6 +628,8 @@ RegisterNetEvent('jl-carboost:client:finishBoosting', function (data)
     TriggerServerEvent('jl-carboost:server:finishBoosting', data)
     Wait(100)
     TriggerEvent('jl-carboost:client:deleteContract', data)
+    Wait(1000)
+    TriggerEvent('jl-carboost:client:refreshQueue')
 end)
 
 RegisterNetEvent('jl-carboost:client:deleteContract', function (data)

@@ -118,6 +118,7 @@ Config.Tier = {
         },
         priceminimum = 30000,
         pricemaximum = 60000,
+        spawnnpc = true,
         callpolice = true
     },
     ['A'] = {
@@ -137,6 +138,7 @@ Config.Tier = {
         },
         priceminimum = 30000,
         pricemaximum = 60000,
+        spawnnpc = true,
         callpolice = true
     },
     ['A+'] = {
