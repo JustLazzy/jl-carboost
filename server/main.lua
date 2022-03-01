@@ -24,7 +24,7 @@ CreateThread(function ()
             end
             player = player + 1
          end
-         if #queueNumber == inqueue then
+         if queueNumber == inqueue then
             inqueue = 0
             queueNumber = 0
          end
