@@ -124,9 +124,10 @@ function loadBoostData() {
       nextClassElement.textContent = nextClass;
       if (contract) {
         for (let i = 0; i < contract.length; i++) {
-          if (!title.classList.contains("hidden"))
-            title.classList.add("hidden");
           const contractdata = contract[i];
+
+          let interval = 1000;
+          console.log(contractdata);
           const contractParent = document.getElementById("boosting-contract");
           const contractCart = document.createElement("div");
           contractCart.id = contractdata.id;
@@ -137,7 +138,7 @@ function loadBoostData() {
         </div>
         <div class="boost-info">
           <p>Vehicle: <b>${contractdata.carname} [${contractdata.plate}]</b></p>
-          <p>Expires in: 5 hours</p>
+          <p class="expire">Expires in: </p>
         </div>
         <div class="boost-button">
           <button id="startcontract" class="start">Start Contract</button>
@@ -146,19 +147,59 @@ function loadBoostData() {
         </div>
           `;
           let startbutton = contractCart.querySelector("#startcontract");
+          let transferButton = contractCart.querySelector(".transfer");
+          let sellButton = contractCart.querySelector(".sell");
+          let expireText = contractCart.querySelector(".expire");
+          let exp = setInterval(function () {
+            let expireDate = new Date(contractdata.expire).getTime();
+            let now = new Date().getTime();
+            let diff = expireDate - now;
+            let second = 1000;
+            let minute = second * 60;
+            let hour = minute * 60;
+            let textHour = Math.floor(diff / hour);
+            let textMinute = Math.floor((diff % hour) / minute);
+            let textSecond = Math.floor((diff % minute) / second);
+            expireText.textContent =
+              "Expires in: " +
+              textHour.toString().padStart(2, "0") +
+              ":" +
+              textMinute.toString().padStart(2, "0") +
+              ":" +
+              textSecond.toString().padStart(2, "0");
+
+            if (diff < 0) {
+              clearInterval(exp);
+              contractCart.remove();
+            }
+          }, interval);
           startbutton.addEventListener("click", toggleBoosting);
+          sellButton.addEventListener("click", sellContract);
           contractParent.appendChild(contractCart);
-          // console.log(JSON.stringify(contractdata));
-        }
-      } else {
-        if (!title.classList.contains("hidden")) {
-          title.classList.add("hidden");
+          noTitleContract();
         }
       }
+
+      noTitleContract();
       let color;
       boostProgress(0, data.rep);
     })
   );
+}
+
+function noTitleContract() {
+  let title = document.querySelector("#no-contract");
+  let contractParent = document.getElementById("boosting-contract");
+  let contractList = contractParent.getElementsByClassName("boost-contract");
+  if (contractList.length == 0) {
+    if (title.classList.contains("hidden")) {
+      title.classList.remove("hidden");
+    }
+  } else {
+    if (!title.classList.contains("hidden")) {
+      title.classList.add("hidden");
+    }
+  }
 }
 
 function setupNewContract(data) {
@@ -166,6 +207,7 @@ function setupNewContract(data) {
   if (!title.classList.contains("hidden")) title.classList.add("hidden");
   const contractParent = document.getElementById("boosting-contract");
   const contractCart = document.createElement("div");
+
   contractCart.classList.add("boost-contract");
   contractCart.id = data.id;
   contractCart.innerHTML = `<div class="boost-text">
@@ -174,17 +216,107 @@ function setupNewContract(data) {
         </div>
         <div class="boost-info">
           <p>Vehicle: <b>${data.carname} [${data.plate}]</b></b></p>
-          <p>Expires in: 5 hours</p>
+          <p class="expire"></p>
         </div>
         <div class="boost-button">
           <button id="startcontract" class="start">Start Contract</button>
           <button class="transfer">Transfer Contract</button>
-          <button class="sell">Sell Contract</button>
+          <button class="sell" id="sellcontract">Sell Contract</button>
         </div>
           `;
+  let transferButton = contractCart.querySelector(".transfer");
   let startbutton = contractCart.querySelector("#startcontract");
-  startbutton.addEventListener("click", toggleBoosting);
+  let sellButton = contractCart.querySelector("#sellcontract");
+  let expireText = contractCart.querySelector(".expire");
+  let exp = setInterval(function () {
+    let expireDate = new Date(data.expire).getTime();
+    let now = new Date().getTime();
+    let diff = expireDate - now;
+    let second = 1000;
+    let minute = second * 60;
+    let hour = minute * 60;
+    let textHour = Math.floor(diff / hour);
+    let textMinute = Math.floor((diff % hour) / minute);
+    let textSecond = Math.floor((diff % minute) / second);
+    expireText.textContent =
+      "Expires in: " +
+      textHour.toString().padStart(2, "0") +
+      ":" +
+      textMinute.toString().padStart(2, "0") +
+      ":" +
+      textSecond.toString().padStart(2, "0");
+
+    if (diff < 0) {
+      clearInterval(exp);
+      contractCart.remove();
+    }
+  }, 1000);
+
   contractParent.appendChild(contractCart);
+  console.log(sellButton);
+  startbutton.addEventListener("click", toggleBoosting);
+  // transferButton.addEventListener("click", transferContract);
+  sellButton.addEventListener("click", sellContract);
+}
+
+function transferContract(data) {
+  // let contractId = event.target.parentNode.parentNode.id;
+  // fetch(`https://jl-carboost/transfercontract`, {
+  //   method: "POST",
+  //   headers: {
+  //     "Content-Type": "application/json",
+  //   },
+  //   body: JSON.stringify({
+  //     data: data,
+  //   }),
+  // }).then((resp) =>
+  //   resp.json().then((resp) => {
+  //     if (resp.success) {
+  //       event.target.parentNode.parentNode.remove();
+  //       noTitleContract();
+  //     }
+  //   })
+  // );
+}
+
+function sellContract(event) {
+  let contractElement = event.target.parentElement.parentElement;
+  Confirm.Input({
+    title: "Confirmation",
+    message: "How much did you sell this contract for?",
+    placeholder: "Enter amount",
+    type: "number",
+    okText: "Confirm",
+    cancelText: "Cancel",
+    onOk: (value) => {
+      if (value) {
+        fetch(`https://jl-carboost/sellcontract`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            data: {
+              id: contractElement.id,
+              price: value,
+            },
+          }),
+        }).then((resp) =>
+          resp.json().then((resp) => {
+            console.log(resp);
+            // if (resp.success) {
+            //   contractElement.remove();
+            //   noTitleContract();
+            // }
+          })
+        );
+      } else {
+        return Notification("Invalid value", "error");
+      }
+    },
+    onCancel: () => {},
+    parentID: "boosting-contract",
+  });
 }
 
 function toggleBoosting(event) {
@@ -197,32 +329,62 @@ function toggleBoosting(event) {
     isStart = true;
   }
   if (isStart) {
-    Notification("Contract Ended", "error");
-    buttonClicked.innerText = "Start Contract";
-    stopContract(parent.id);
-  } else {
-    fetch("https://jl-carboost/canStartContract", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    Confirm.open({
+      title: "Are you sure?",
+      message: "Are you sure you want to stop this contract?",
+      okText: "Yes",
+      cancelText: "No",
+      parentID: "boosting-contract",
+      onOk: () => {
+        Notification("Contract Ended", "error");
+        buttonClicked.innerText = "Start Contract";
+        stopContract(parent.id);
       },
-      body: JSON.stringify({}),
-    }).then((resp) => {
-      resp.json().then((resp) => {
-        if (resp.canStart) {
-          Notification("Contract Started", "success");
-          buttonClicked.innerText = "End Contract";
-          startContract(parent.id);
-        } else {
-          Notification(resp.error, "error");
-        }
-      });
+      onCancel: () => {
+        console.log("CANCELLED");
+      },
     });
+  } else {
+    let type;
+    Confirm.open({
+      title: "Options",
+      message: "If you choose VIN Scratch, you have to pay more",
+      okText: "VIN Scratch",
+      cancelText: "Normal",
+      parentID: "boosting-contract",
+      onOk: () => checkCanStart("vin"),
+      onCancel: () => checkCanStart("normal"),
+    });
+    function checkCanStart(type) {
+      console.log(type);
+      fetch("https://jl-carboost/canStartContract", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({}),
+      }).then((resp) => {
+        resp.json().then((resp) => {
+          if (resp.canStart) {
+            let data = {
+              id: parent.id,
+              type: type,
+            };
+            Notification("Contract Started", "success");
+            buttonClicked.innerText = "End Contract";
+            startContract(data);
+          } else {
+            Notification(resp.error, "error");
+          }
+        });
+      });
+    }
   }
 }
 
 function startContract(data) {
-  $.post("https://jl-carboost/startcontract", JSON.stringify({ id: data }));
+  // console.log(JSON.stringify(data));
+  $.post("https://jl-carboost/startcontract", JSON.stringify({ data: data }));
 }
 
 function stopContract(data) {
@@ -290,3 +452,5 @@ function updateClasses() {
   let nextClass = getNextClass(currentClass.textContent);
   nextClassElement.textContent = nextClass;
 }
+
+function countDown(hour, element) {}

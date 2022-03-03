@@ -119,6 +119,9 @@ $(document).ready(() => {
   window.addEventListener("click", function (event) {
     if (event.target.id != "splash") {
       if (event.target.id == "bennys") {
+        if (bennys.classList.contains("active")) {
+          return;
+        }
         toggleDisplayApp(true, "#bennys-app");
         createIcon(event.target.id);
       } else if (event.target.id == "boosting") {
@@ -338,3 +341,182 @@ function removeIcon(name) {
   child.remove();
   return;
 }
+
+var Confirm = {
+  open(options) {
+    options = Object.assign(
+      {},
+      {
+        title: "",
+        message: "",
+        okText: "vin scratch",
+        cancelText: "regular drop point",
+        onOk: function () {},
+        onCancel: function () {},
+        parentID: "",
+      },
+      options
+    );
+    const html = `
+    <div class="confirm">
+    <div class="confirm-window">
+      <div class="confirm-titlebar">
+        <span class="confirm-title">${options.title}</span>
+        <span class="confirm-exit"
+          ><i
+            class="fa-solid fa-circle-xmark"
+            style="color: rgb(245, 105, 105)"
+          ></i
+        ></span>
+      </div>
+      <div class="confirm-content">
+      ${options.message}
+      </div>
+      <div class="confirm-button">
+        <button class="confirm-button-style confirm-button--ok">
+        ${options.okText}
+        </button>
+        <button class="confirm-button-style confirm-button--cancel">
+          ${options.cancelText}
+        </button>
+      </div>
+    </div>
+  </div>
+    `;
+    // console.log(html);
+    const template = document.createElement("template");
+    const audio = new Audio("assets/audio/pop.wav");
+    template.innerHTML = html;
+    const ConfirmEl = template.content.querySelector(".confirm");
+    const closeBtn = template.content.querySelector(".confirm-exit");
+    const okBtn = template.content.querySelector(".confirm-button--ok");
+    const cancelBtn = template.content.querySelector(".confirm-button--cancel");
+    const parent = document.querySelector(`#${options.parentID}`);
+    if (parent) {
+      if (!isMuted) {
+        audio.play();
+        audio.volume = volumeValue;
+      }
+      parent.appendChild(template.content);
+      ConfirmEl.addEventListener("click", (e) => {
+        if (e.target === ConfirmEl) {
+          // options.onCancel();
+          this._close(ConfirmEl);
+        }
+      });
+      closeBtn.addEventListener("click", () => {
+        this._close(ConfirmEl);
+      });
+      okBtn.addEventListener("click", () => {
+        options.onOk();
+        this._close(ConfirmEl);
+      });
+      cancelBtn.addEventListener("click", () => {
+        options.onCancel();
+        this._close(ConfirmEl);
+      });
+    }
+    // document.body.appendChild(template.content);
+  },
+  Input(options) {
+    options = Object.assign(
+      {},
+      {
+        title: "",
+        message: "",
+        placeholder: "",
+        type: "",
+        min: "1",
+        max: "",
+        onOk: function () {},
+        onCancel: function () {},
+        parentID: "",
+      },
+      options
+    );
+    const html = `
+    <div class="confirm">
+    <div class="confirm-window">
+      <div class="confirm-titlebar">
+        <span class="confirm-title">${options.title}</span>
+        <span class="confirm-exit"
+          ><i
+            class="fa-solid fa-circle-xmark"
+            style="color: rgb(245, 105, 105)"
+          ></i
+        ></span>
+      </div>
+      <div class="confirm-content">
+      ${options.message}
+      </div>
+      <div class="confirm-content--input">
+      <input placeholder="${options.placeholder}" type="${options.type}" class="confirm--input" min="${options.min}" max="${options.max}" />
+      </div>
+      <div class="confirm-button">
+        <button class="confirm-button-style confirm-button--ok">
+        ${options.okText}
+        </button>
+        <button class="confirm-button-style confirm-button--cancel">
+          ${options.cancelText}
+        </button>
+      </div>
+    </div>
+  </div>`;
+    const template = document.createElement("template");
+    const audio = new Audio("assets/audio/pop.wav");
+    template.innerHTML = html;
+    const ConfirmEl = template.content.querySelector(".confirm");
+    const input = template.content.querySelector(".confirm--input");
+    const closeBtn = template.content.querySelector(".confirm-exit");
+    const okBtn = template.content.querySelector(".confirm-button--ok");
+    const cancelBtn = template.content.querySelector(".confirm-button--cancel");
+    const parent = document.querySelector(`#${options.parentID}`);
+    if (parent) {
+      if (!isMuted) {
+        audio.play();
+        audio.volume = volumeValue;
+      }
+      parent.appendChild(template.content);
+      ConfirmEl.addEventListener("click", (e) => {
+        if (e.target === ConfirmEl) {
+          // options.onCancel();
+          this._close(ConfirmEl);
+        }
+      });
+      okBtn.addEventListener("click", () => {
+        // console.log();
+        options.onOk(input.value);
+        this._close(ConfirmEl);
+      });
+      closeBtn.addEventListener("click", () => {
+        this._close(ConfirmEl);
+      });
+      cancelBtn.addEventListener("click", () => {
+        options.onCancel();
+        this._close(ConfirmEl);
+      });
+    }
+  },
+  _close(confirmElemnt) {
+    console.log("CLOSED");
+    confirmElemnt.classList.add("confirm--close");
+    setTimeout(() => {
+      confirmElemnt.remove();
+    }, 100);
+  },
+};
+
+var Input = {
+  open(options) {
+    options = Object.assign(
+      {},
+      {
+        title: "",
+        message: "",
+        inputText: "",
+        onOk: function () {},
+        onCancel: function () {},
+      }
+    );
+  },
+};

@@ -215,11 +215,12 @@ RegisterNUICallback('canStartContract', function (data, cb)
 end)
 
 RegisterNUICallback('startcontract', function (data)
+    local data = data
     if not isContractStarted then
         isContractStarted = true
         QBCore.Functions.TriggerCallback('jl-carboost:server:getContractData', function (result)
             if result then
-                print(json.encode(result))
+                -- print(json.encode(result))
                 TriggerEvent('jl-carboost:client:spawnCar', result)
             end
         end, data)
@@ -283,6 +284,20 @@ RegisterNUICallback('setupboostapp', function (data, cb)
             })
         end
     end, PlayerData.citizenid)
+end)
+
+RegisterNUICallback('sellcontract', function(data, cb)
+    QBCore.Functions.TriggerCallback('jl-carboost:server:sellContract', function (result)
+        if result then
+            cb({
+                success = result
+            })
+        else
+            cb({
+                error = 'No boost data'
+            })
+        end
+    end, data)
 end)
 
 RegisterNUICallback('joinqueue', function (data)
@@ -401,8 +416,8 @@ end)
 RegisterNetEvent('jl-carboost:client:spawnCar', function(data)
     QBCore.Functions.TriggerCallback('jl-carboost:server:spawnCar', function(result)
         if result then
-            local zone = GetNameOfZone(result.spawnlocation)
-            local streetlabel = GetLabelText(zone)
+            local zoneName = GetNameOfZone(result.spawnlocation)
+            local streetlabel = GetLabelText(zoneName)
             Wait(5000)
             createRadiusBlips(result.spawnlocation)
             carID = result.networkID
@@ -410,11 +425,9 @@ RegisterNetEvent('jl-carboost:client:spawnCar', function(data)
                 sender = "Unknown",
                 subject = "Car Location",
                 message = "Hey this is the car location, its in near "..streetlabel,
-                button = {
-                    enabled = true,
-                }
              })
              TriggerEvent('jl-carboost:client:startBoosting', result)
+             print(json.encode(result))
         else
             print('no result')
         end
