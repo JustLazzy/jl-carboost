@@ -41,13 +41,12 @@ RegisterNetEvent('jl-carboost:server:newContract', function (source)
    local tier = config.tier
    local car = Config.Tier[tier].car[math.random(#Config.Tier[tier].car)]
    local owner = Config.RandomName[math.random(1, #Config.RandomName)]
-   local randomHour = math.random(1,6)
+   local randomHour = math.random(Config.Expire)
    local contractData = {
       owner = owner,
       car = car,
       tier = tier,
       plate = RandomPlate(),
-      expire = GetHoursFromNow(randomHour),
    }
   local something =  os.date('%c')
   print(something)
@@ -58,6 +57,7 @@ RegisterNetEvent('jl-carboost:server:newContract', function (source)
          ['@expire'] = randomHour
       }, function (id)
          contractData.id = id
+         contractData.expire = GetHoursFromNow(randomHour)
          Config.QueueList[citizenid].contract[#Config.QueueList[citizenid].contract+1] = contractData
          TriggerClientEvent('jl-carboost:client:addContract', src, contractData)
       end)
@@ -253,15 +253,13 @@ QBCore.Commands.Add('giveContract', 'Give contract, admin only', {
       local config = Config.Tier[tostring(args[1])]
       local car = config.car[math.random(#config.car)]
       local owner = Config.RandomName[math.random(1, #Config.RandomName)]
-      local expireTime = math.random(1, 7)
-      -- local xixi = GetHoursFromNow(expireTime)
-      -- print(xixi)
+      local expireTime = math.random(Config.Expire)
       local contractData = {
          owner = owner,
          car = car,
          tier = args[1],
          plate = RandomPlate(),
-         expire = GetHoursFromNow(expireTime),
+         
       }
       MySQL.Async.insert('INSERT INTO boost_contract (owner, data, started, expire) VALUES (@owner, @data, NOW(),DATE_ADD(NOW(), INTERVAL @expire HOUR))', {
          ['@owner'] = player.PlayerData.citizenid,
@@ -269,6 +267,7 @@ QBCore.Commands.Add('giveContract', 'Give contract, admin only', {
          ['@expire'] = expireTime
       }, function (id)
          contractData.id = id
+         contractData.expire = GetHoursFromNow(expireTime)
          TriggerClientEvent('jl-carboost:client:addContract', player.PlayerData.source, contractData)
          TriggerClientEvent('QBCore:Notify', src, "Succesfully gave contract to "..player.PlayerData.name, "success")
       end)
@@ -319,6 +318,52 @@ QBCore.Functions.CreateCallback('jl-carboost:server:sellContract', function (sou
       local contractInfo = result[1]
       local contractData = json.decode(contractInfo.data)
       print(json.encode(contractData))
+   end
+end)
+
+QBCore.Functions.CreateCallback('jl-carboost:server:transfercontract', function (source, cb, data)
+   local src = source
+   local id = tonumber(data.id) 
+   local contractid = tonumber(data.contractid)
+   local toPlayer = QBCore.Functions.GetPlayer(id)
+   local Player = QBCore.Functions.GetPlayer(src)
+   if src == id then
+      return cb({
+         error = "You can't transfer contract to yourself"
+      })
+   end
+   if not toPlayer or not Player then
+      return cb({
+         error = "Invalid player"
+      })
+   end
+   local result = MySQL.Sync.fetchAll('SELECT * FROM boost_contract WHERE id = @id AND owner = @owner', {
+      ['@owner'] = Player.PlayerData.citizenid,
+      ['@id'] = contractid
+   })
+   
+
+   if result[1] then
+      MySQL.Async.execute('UPDATE boost_contract SET owner = @owner WHERE owner = @citizenid', {
+         ['@owner'] = toPlayer.PlayerData.citizenid,
+         ['@citizenid'] = Player.PlayerData.citizenid
+      }, function ()
+         local data = json.decode(result[1].data)
+         local contractData = {
+            id = contractid,
+            owner = data.owner,
+            car = data.car,
+            tier = data.tier,
+            plate = data.plate,
+            expire = result[1].expire
+         }
+         TriggerClientEvent('QBCore:Notify', src, "Succesfully transfered contract to "..toPlayer.PlayerData.name, "success")
+         TriggerClientEvent('QBCore:Notify', id, "You got new contract from "..Player.PlayerData.name, "success")
+         TriggerClientEvent('jl-carboost:client:addContract', toPlayer.PlayerData.source, contractData)
+         return cb({
+            success = true
+         })
+      end)
    end
 end)
 
@@ -445,7 +490,7 @@ end
 
 -- Delete expired contracts
 function DeleteExpiredContract()
-   MySQL.Async.execute('DELETE FROM boost_contract WHERE expire < NOW() AND started = 0',{}, function (result)
+   MySQL.Async.execute('DELETE FROM boost_contract WHERE expire < NOW()',{}, function (result)
       if result > 0 then
          print(json.encode(result))
          print('Contracts deleted')

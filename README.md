@@ -6,9 +6,10 @@
 | ------------------------------------------------------------ |
 
 ## Dependencies
-### boostinghack from Lionh34rt [here](https://github.com/Lionh34rt/boostinghack.git)
-### Polyzone
-### qb-target
+
+1. boostinghack from Lionh34rt [here](https://github.com/Lionh34rt/boostinghack.git)
+2. Polyzone
+3. qb-target
 
 <BR>
 
@@ -64,3 +65,7 @@ Config.BennysSell = {
 | ------------ | ---------------------------------- | ---------- |
 | settier      | Set Boosting Tier                  | Admin      |
 | giveContract | Give contract to a specific player | Admin      |
+
+## Special Thanks
+
+Thanks to [@kentainfr](https://github.com/Kentainfr) for the amazing icon!

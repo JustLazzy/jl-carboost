@@ -9,7 +9,6 @@ let contractPage = document.getElementById("boosting-contract");
 let shopPage = document.getElementById("boosting-shop");
 
 $(document).ready(function () {
-  // loadBoostData();
   boostingheader = boosting.querySelector("header");
   boostingheader.addEventListener("mousedown", () => {
     boostingheader.classList.add("active");
@@ -122,10 +121,11 @@ function loadBoostData() {
       let nextClassElement = document.querySelector("#nextclass");
       currentClass.textContent = data.class;
       nextClassElement.textContent = nextClass;
+      noTitleContract();
       if (contract) {
         for (let i = 0; i < contract.length; i++) {
           const contractdata = contract[i];
-
+          console.log(contractdata);
           let interval = 1000;
           console.log(contractdata);
           const contractParent = document.getElementById("boosting-contract");
@@ -142,12 +142,13 @@ function loadBoostData() {
         </div>
         <div class="boost-button">
           <button id="startcontract" class="start">Start Contract</button>
-          <button class="transfer">Transfer Contract</button>
+          <button class="transfer" id="transfercontract">Transfer Contract</button>
           <button class="sell">Sell Contract</button>
         </div>
           `;
+          console.log(contractdata.expire);
           let startbutton = contractCart.querySelector("#startcontract");
-          let transferButton = contractCart.querySelector(".transfer");
+          let transferButton = contractCart.querySelector("#transfercontract");
           let sellButton = contractCart.querySelector(".sell");
           let expireText = contractCart.querySelector(".expire");
           let exp = setInterval(function () {
@@ -168,18 +169,18 @@ function loadBoostData() {
               ":" +
               textSecond.toString().padStart(2, "0");
 
-            if (diff < 0) {
+            if (diff <= 0) {
               clearInterval(exp);
               contractCart.remove();
             }
           }, interval);
           startbutton.addEventListener("click", toggleBoosting);
+          transferButton.addEventListener("click", transferContract);
           sellButton.addEventListener("click", sellContract);
           contractParent.appendChild(contractCart);
-          noTitleContract();
+          // noTitleContract();
         }
       }
-
       noTitleContract();
       let color;
       boostProgress(0, data.rep);
@@ -220,11 +221,11 @@ function setupNewContract(data) {
         </div>
         <div class="boost-button">
           <button id="startcontract" class="start">Start Contract</button>
-          <button class="transfer">Transfer Contract</button>
+          <button class="transfer" id="transfercontract">Transfer Contract</button>
           <button class="sell" id="sellcontract">Sell Contract</button>
         </div>
           `;
-  let transferButton = contractCart.querySelector(".transfer");
+  let transferButton = contractCart.querySelector("#transfercontract");
   let startbutton = contractCart.querySelector("#startcontract");
   let sellButton = contractCart.querySelector("#sellcontract");
   let expireText = contractCart.querySelector(".expire");
@@ -249,34 +250,52 @@ function setupNewContract(data) {
     if (diff < 0) {
       clearInterval(exp);
       contractCart.remove();
+      noTitleContract();
     }
   }, 1000);
 
   contractParent.appendChild(contractCart);
-  console.log(sellButton);
   startbutton.addEventListener("click", toggleBoosting);
-  // transferButton.addEventListener("click", transferContract);
+  transferButton.addEventListener("click", transferContract);
   sellButton.addEventListener("click", sellContract);
 }
 
-function transferContract(data) {
-  // let contractId = event.target.parentNode.parentNode.id;
-  // fetch(`https://jl-carboost/transfercontract`, {
-  //   method: "POST",
-  //   headers: {
-  //     "Content-Type": "application/json",
-  //   },
-  //   body: JSON.stringify({
-  //     data: data,
-  //   }),
-  // }).then((resp) =>
-  //   resp.json().then((resp) => {
-  //     if (resp.success) {
-  //       event.target.parentNode.parentNode.remove();
-  //       noTitleContract();
-  //     }
-  //   })
-  // );
+function transferContract(event) {
+  const contractCart = event.target.parentElement.parentElement;
+  Confirm.Input({
+    title: "Transfer Contract",
+    message:
+      "Enter the player id of the player you want to transfer the contract to.",
+    placeholder: "Player ID",
+    onOk: function (value) {
+      if (!value) {
+        return Notification("Please enter a player id.", "error");
+      }
+      fetch("https://jl-carboost/transfercontract", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: value,
+          contractid: contractCart.id,
+        }),
+      }).then((res) =>
+        res.json().then((data) => {
+          if (data.error) {
+            return Notification(data.error, "error");
+          } else if (data.success) {
+            contractCart.remove();
+            return Notification("Contract transfered.", "success");
+          }
+        })
+      );
+    },
+    onCancel: function () {},
+    okText: "Transfer",
+    cancelText: "Cancel",
+    parentID: "boosting-contract",
+  });
 }
 
 function sellContract(event) {

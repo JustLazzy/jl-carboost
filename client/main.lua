@@ -12,6 +12,11 @@ RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
     TriggerServerEvent('jl-carboost:server:getItem')
     TriggerEvent('jl-carboost:client:setupBoostingApp')
 end)
+AddEventHandler('QBCore:Client:OnPlayerLoaded', function()
+    PlayerData = QBCore.Functions.GetPlayerData()
+    TriggerServerEvent('jl-carboost:server:getItem')
+    TriggerEvent('jl-carboost:client:setupBoostingApp')
+end)
 
 RegisterNetEvent('QBCore:Client:OnJobUpdate', function(JobInfo)
     PlayerData.job = JobInfo
@@ -269,6 +274,7 @@ RegisterNUICallback('checkout', function (data)
 end)
 
 RegisterNUICallback('setupboostapp', function (data, cb)
+    print('setupboostapp callback triggered')
     QBCore.Functions.TriggerCallback('jl-carboost:server:getboostdata', function (result)
         if result then
             local carboostdata = result
@@ -295,6 +301,21 @@ RegisterNUICallback('sellcontract', function(data, cb)
         else
             cb({
                 error = 'No boost data'
+            })
+        end
+    end, data)
+end)
+
+RegisterNUICallback('transfercontract', function (data, cb)
+    QBCore.Functions.TriggerCallback('jl-carboost:server:transfercontract', function (result)
+        print(json.encode(result))
+        if result and not result.error then
+            cb({
+                success = result
+            })
+        else
+            cb({
+                error = result.error or "Invalid player"
             })
         end
     end, data)

@@ -19,7 +19,6 @@ $(document).ready(() => {
   }
 
   function display(bool) {
-    // bool = true;
     if (bool) {
       laptop.classList.add("active");
       return;
@@ -498,25 +497,9 @@ var Confirm = {
     }
   },
   _close(confirmElemnt) {
-    console.log("CLOSED");
     confirmElemnt.classList.add("confirm--close");
     setTimeout(() => {
       confirmElemnt.remove();
     }, 100);
-  },
-};
-
-var Input = {
-  open(options) {
-    options = Object.assign(
-      {},
-      {
-        title: "",
-        message: "",
-        inputText: "",
-        onOk: function () {},
-        onCancel: function () {},
-      }
-    );
   },
 };
