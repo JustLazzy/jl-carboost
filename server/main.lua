@@ -292,6 +292,15 @@ RegisterNetEvent('jl-carboost:server:takeAll', function (data)
    TriggerClientEvent('QBCore:Notify', src, "Succesfully bought all items", "success")
 end)
 
+RegisterNetEvent('jl-carboost:server:getBoostSale', function()
+   local src = source
+   local result = MySQL.Sync.fetchAll('SELECT * FROM boost_contract WHERE onsale = 1')
+   if result[1] then
+      print("RESULT IS NOT NIL")
+      TriggerClientEvent('jl-carboost:client:loadBoostStore', src,result)
+   end
+end)
+
 -- Callback
 QBCore.Functions.CreateCallback('jl-carboost:server:canBuy', function(source, cb, data)
    local src = source
@@ -307,7 +316,6 @@ end)
 
 QBCore.Functions.CreateCallback('jl-carboost:server:sellContract', function (source, cb, data)
    local data = data.data
-   print(json.encode(data))
    local src = source
    local Player = QBCore.Functions.GetPlayer(src)
    local result = MySQL.Sync.fetchAll('SELECT * FROM boost_contract WHERE id = @id AND owner = @owner', {
@@ -317,7 +325,62 @@ QBCore.Functions.CreateCallback('jl-carboost:server:sellContract', function (sou
    if result[1] then
       local contractInfo = result[1]
       local contractData = json.decode(contractInfo.data)
-      print(json.encode(contractData))
+      MySQL.Async.execute('UPDATE boost_contract SET price = @price, onsale = 1 WHERE id = @id AND owner = @owner', {
+         ['@id'] = data.id,
+         ['@price'] = tonumber(data.price),
+         ['@owner'] = Player.PlayerData.citizenid
+      })
+      contractData.id = data.id
+      contractData.expire = result[1].expire
+      contractData.price = tonumber(data.price)
+      TriggerClientEvent('jl-carboost:client:newContractSale', -1, contractData)
+      return cb({
+         success = Lang:t('success.sell_contract', {
+            amount = data.price,
+            payment = Config.Payment
+         })
+      })
+   end
+end)
+
+QBCore.Functions.CreateCallback('jl-carboost:server:buycontract', function(source, cb, data)
+   local src = source
+   local Player = QBCore.Functions.GetPlayer(src)
+   local toPlayer
+   local result = MySQL.Sync.fetchAll('SELECT * FROM boost_contract WHERE id = @id AND onsale = 1', {
+      ['@id'] = data.id
+   })
+   if result[1] then
+      if Player.PlayerData.citizenid ==  result[1].owner then return cb({error = Lang:t('error.buy_yourcontract')}) end
+      toPlayer = QBCore.Functions.GetPlayerByCitizenId(result[1].owner)
+      if not toPlayer then
+         return cb({error = Lang:t('error.player_not_found')})
+      end
+      local contractInfo = result[1]
+      local moneyAmount = tonumber(contractInfo.price)
+      local money = Player.PlayerData.money[Config.Payment]
+      if money < moneyAmount then
+         return cb({
+            error = Lang:t('error.not_enough_money', {money = Config.Payment})
+         })
+      end
+      Player.Functions.RemoveMoney(Config.Payment, moneyAmount, 'bought-contract')
+      toPlayer.Functions.AddMoney(Config.Payment, moneyAmount, 'bought-contract')
+      TriggerClientEvent('QBCore:Notify', toPlayer.PlayerData.source, Lang:t('info.contract_buyed', {amount = moneyAmount}), "success")
+      MySQL.Async.execute('UPDATE boost_contract SET onsale = 0, owner = @owner WHERE id = @id', {
+         ['@id'] = data.id,
+         ['@owner'] = Player.PlayerData.citizenid
+      })
+      TriggerClientEvent('jl-carboost:client:contractBought', -1, data.id)
+      local contractData = json.decode(contractInfo.data)
+      contractData.expire = result[1].expire
+      TriggerClientEvent('jl-carboost:client:addContract', src, contractData)
+      return cb({
+         success = Lang:t('success.buy_contract', {
+            amount = moneyAmount,
+            payment = Config.Payment
+         })
+      })
    end
 end)
 
@@ -341,8 +404,6 @@ QBCore.Functions.CreateCallback('jl-carboost:server:transfercontract', function 
       ['@owner'] = Player.PlayerData.citizenid,
       ['@id'] = contractid
    })
-   
-
    if result[1] then
       MySQL.Async.execute('UPDATE boost_contract SET owner = @owner WHERE owner = @citizenid', {
          ['@owner'] = toPlayer.PlayerData.citizenid,
@@ -378,7 +439,7 @@ QBCore.Functions.CreateCallback('jl-carboost:server:getboostdata', function (sou
       rep = Player.PlayerData.metadata['carboostrep'],
       contract = {}
    }
-   local result = MySQL.Sync.fetchAll('SELECT * FROM boost_contract WHERE owner = @owner', {
+   local result = MySQL.Sync.fetchAll('SELECT * FROM boost_contract WHERE owner = @owner AND onsale = 0', {
       ['@owner'] = citizenid
    })
    if result[1] then

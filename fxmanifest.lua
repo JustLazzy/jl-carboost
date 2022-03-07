@@ -9,6 +9,8 @@ description 'Car Boost Script'
 version '0.0.1'
 
 shared_script {
+	'@qb-core/shared/locale.lua',
+	'locales/en.lua',
 	'config.lua',
 }
 

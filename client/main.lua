@@ -119,22 +119,22 @@ local function StartHacking(vehicle)
                 if trackerLeft == 0 then
                     veh.state.tracker = false
                     veh.state.hacked = true
-                    return QBCore.Functions.Notify("You have successfully disable the tracker")
+                    return QBCore.Functions.Notify(Lang:t("success.disable_tracker"))
                 else
-                    QBCore.Functions.Notify("You turn off the tracker for "..randomSeconds.." seconds, "..trackerLeft.." left ", "success")
+                    QBCore.Functions.Notify(Lang:t('success.tracker_off', {time = randomSeconds}, {tracker_left = trackerLeft}))
                 end
                 CreateThread(function ()
                     Wait(randomSeconds*1000)
                     veh.state.hacked = false
                 end)
             else
-                QBCore.Functions.Notify("You failed to disable the tracker", "error")
+                QBCore.Functions.Notify(Lang:t('error.disable_fail'), "error")
             end
         else
             print("ALREADY HACKED")
         end
     else
-        QBCore.Functions.Notify("This vehicle doesn't have a tracker", "error")
+        QBCore.Functions.Notify(Lang:t("error.no_tracker"), "error")
     end
     -- Entity(vehicle).state.hacked = true
 end
@@ -225,7 +225,6 @@ RegisterNUICallback('startcontract', function (data)
         isContractStarted = true
         QBCore.Functions.TriggerCallback('jl-carboost:server:getContractData', function (result)
             if result then
-                -- print(json.encode(result))
                 TriggerEvent('jl-carboost:client:spawnCar', result)
             end
         end, data)
@@ -274,7 +273,6 @@ RegisterNUICallback('checkout', function (data)
 end)
 
 RegisterNUICallback('setupboostapp', function (data, cb)
-    print('setupboostapp callback triggered')
     QBCore.Functions.TriggerCallback('jl-carboost:server:getboostdata', function (result)
         if result then
             local carboostdata = result
@@ -295,12 +293,10 @@ end)
 RegisterNUICallback('sellcontract', function(data, cb)
     QBCore.Functions.TriggerCallback('jl-carboost:server:sellContract', function (result)
         if result then
-            cb({
-                success = result
-            })
+            cb(result)
         else
             cb({
-                error = 'No boost data'
+                error = 'No data'
             })
         end
     end, data)
@@ -308,7 +304,6 @@ end)
 
 RegisterNUICallback('transfercontract', function (data, cb)
     QBCore.Functions.TriggerCallback('jl-carboost:server:transfercontract', function (result)
-        print(json.encode(result))
         if result and not result.error then
             cb({
                 success = result
@@ -323,6 +318,14 @@ end)
 
 RegisterNUICallback('joinqueue', function (data)
     TriggerEvent('jl-carboost:client:joinQueue', data)
+end)
+
+RegisterNUICallback('buycontract', function(data, cb)
+    QBCore.Functions.TriggerCallback('jl-carboost:server:buycontract', function(result)
+        if result then
+            cb(result)
+        end
+    end, data)
 end)
 
 -- Event
@@ -368,7 +371,6 @@ end)
 RegisterNetEvent('jl-carboost:client:addContract', function (data)
     local vehName = GetLabelText(GetDisplayNameFromVehicleModel(data.car))
     data.carname = vehName
-    print(json.encode(data))
     SendNUIMessage({
         type="addcontract",
         boost = data
@@ -404,8 +406,7 @@ RegisterNetEvent('jl-carboost:client:openMenu', function ()
         for _, v in pairs(Config.BennysItems) do
             local item = v.item
             local name = tostring(item.name)
-            -- print(#menu+1)
-            print(json.encode(QBCore.Shared.Items[name]))
+
             menu[#menu+1] = {
                 header = QBCore.Shared.Items[item.name]["label"],
                 id = item.name,
@@ -430,7 +431,7 @@ RegisterNetEvent('jl-carboost:client:openMenu', function ()
         }
         exports['qb-menu']:openMenu(menu)
     else
-        QBCore.Functions.Notify("You don't have anything in here...", "error")
+        QBCore.Functions.Notify(Lang:t("error.empty_post"), "error")
     end
 end)
 
@@ -448,9 +449,6 @@ RegisterNetEvent('jl-carboost:client:spawnCar', function(data)
                 message = "Hey this is the car location, its in near "..streetlabel,
              })
              TriggerEvent('jl-carboost:client:startBoosting', result)
-             print(json.encode(result))
-        else
-            print('no result')
         end
     end, data)
 end)
@@ -553,7 +551,7 @@ RegisterNetEvent("jl-carboost:client:bringtoPlace", function (data)
     end, function (isPointInside, point)
         inZone = isPointInside
         if inZone then
-            QBCore.Functions.Notify("Okay, leave the car there, I'll pay you later", "success")
+            QBCore.Functions.Notify(Lang:t("info.car_inzone"))
         end
     end)
     CreateThread(function ()
@@ -622,7 +620,7 @@ RegisterNetEvent('jl-carboost:client:failedBoosting', function ()
         zone = nil
         inZone = false
     end
-    QBCore.Functions.Notify("Something went wrong, contact your developer", "error")
+    QBCore.Functions.Notify(Lang:t("error.error_occured"), "error")
     TriggerEvent('jl-carboost:client:refreshContract')
 end)
 
@@ -630,10 +628,47 @@ RegisterNetEvent('jl-carboost:client:openLaptop', function ()
     SetDisplay(not display)
 end)
 
+RegisterNetEvent('jl-carboost:client:loadBoostStore', function(data)
+    local cdata = data
+    local saleData = {}
+    for k, v in pairs(cdata) do
+        local data = json.decode(v.data)
+        saleData[#saleData+1] = {
+            id = v.id,
+            owner = data.owner,
+            carname = GetLabelText(GetDisplayNameFromVehicleModel(data.car)),
+            expire = v.expire,
+            plate = data.plate,
+            tier = data.tier,
+            price = v.price
+        }
+    end
+    SendNUIMessage({
+        type = "setupboostingstore",
+        store = saleData
+    })
+end)
+
 RegisterNetEvent('jl-carboost:client:refreshContract', function ()
     QBCore.Functions.TriggerCallback('jl-carboost:server:getContractData')
     SendNUIMessage({
         type = "refreshContract",
+    })
+end)
+
+RegisterNetEvent('jl-carboost:client:newContractSale', function(data)
+    local data = data 
+    data.carname = GetLabelText(GetDisplayNameFromVehicleModel(data.car))
+    SendNUIMessage({
+        type = "newContractSale",
+        sale = data
+    })
+end)
+
+RegisterNetEvent('jl-carboost:client:contractBought', function(id)
+    SendNUIMessage({
+        type = "contractbought",
+        id = id
     })
 end)
 
@@ -644,7 +679,7 @@ RegisterNetEvent('jl-carboost:client:useHackingDevice', function ()
 
         -- if GetPedInVehicleSeat(vehicle, 2) then   
             if cooldown then
-                return QBCore.Functions.Notify("You can't use this device for now", "error")
+                return QBCore.Functions.Notify(Lang:t("error.cannot_use"), "error")
             end
             StartHacking(vehicle)
             cooldown = true
@@ -654,7 +689,7 @@ RegisterNetEvent('jl-carboost:client:useHackingDevice', function ()
         --     return QBCore.Functions.Notify("You need to be in front seat passenger to do this", "error")
         -- end
     else
-        QBCore.Functions.Notify("You need to be in a vehicle", "error")
+        QBCore.Functions.Notify(Lang:t("error.not_on_vehicle"), "error")
     end
 end)
 
@@ -675,6 +710,7 @@ CreateThread(function ()
     if LocalPlayer.state['isLoggedIn'] then
         Wait(5000)
         TriggerServerEvent('jl-carboost:server:getItem')
+        TriggerServerEvent('jl-carboost:server:getBoostSale')
         TriggerEvent('jl-carboost:client:setupBoostingApp')
     end
     CreateBlip(vector3(1185.2, -3303.92, 6.92), "Post OP", 473)

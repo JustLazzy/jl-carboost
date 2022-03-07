@@ -10,6 +10,11 @@
 1. boostinghack from Lionh34rt [here](https://github.com/Lionh34rt/boostinghack.git)
 2. Polyzone
 3. qb-target
+4. qb-phone
+
+## Preview
+
+<img src="./images/hacking_device.png"/>
 
 <BR>
 
@@ -69,3 +74,7 @@ Config.BennysSell = {
 ## Special Thanks
 
 Thanks to [@kentainfr](https://github.com/Kentainfr) for the amazing icon!
+
+<BR>
+
+If you love my work, you can [buy me a coffee](https://ko-fi.com/justlazzy)
