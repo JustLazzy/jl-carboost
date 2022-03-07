@@ -29,11 +29,6 @@ $(document).ready(() => {
   }
   display(false);
 
-  function refreshStore() {
-    const test = document.getElementsByClassName("grid");
-    console.log("this test", test);
-  }
-
   $("input").keypress(function (e) {
     typing = true;
   });
@@ -63,11 +58,20 @@ $(document).ready(() => {
       case "setupboostingapp":
         loadBoostData();
         break;
+      case "setupboostingstore":
+        loadBoostStore(event.data.store);
+        break;
       case "refreshContract":
         refreshContract();
         break;
       case "updateProggress":
         updateBoostProgress(event.data.boost);
+        break;
+      case "newContractSale":
+        newContractSale(event.data.sale);
+        break;
+      case "contractbought":
+        contractBought(event.data.id);
         break;
     }
   });
@@ -80,7 +84,6 @@ $(document).ready(() => {
     const input = e.target;
     volumeValue = (input.value / 200).toFixed(2);
 
-    console.log(input.value);
     if (input.value == 0) {
       isMuted = true;
 
@@ -348,8 +351,8 @@ var Confirm = {
       {
         title: "",
         message: "",
-        okText: "vin scratch",
-        cancelText: "regular drop point",
+        okText: "",
+        cancelText: "",
         onOk: function () {},
         onCancel: function () {},
         parentID: "",
@@ -382,7 +385,6 @@ var Confirm = {
     </div>
   </div>
     `;
-    // console.log(html);
     const template = document.createElement("template");
     const audio = new Audio("assets/audio/pop.wav");
     template.innerHTML = html;
@@ -483,7 +485,6 @@ var Confirm = {
         }
       });
       okBtn.addEventListener("click", () => {
-        // console.log();
         options.onOk(input.value);
         this._close(ConfirmEl);
       });

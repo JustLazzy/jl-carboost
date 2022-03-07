@@ -339,13 +339,13 @@ p {
 }
 
 ::-webkit-scrollbar-track {
-  background: #1b1a46;
+  background: #23222f;
   box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.25);
 }
 
 ::-webkit-scrollbar-thumb {
   border-radius: 5px;
-  background-color: #0c0c2b;
+  background-color: #3f3f3f;
 }
 
 .apps {
