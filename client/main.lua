@@ -4,8 +4,6 @@ local isJoinQueue, isContractStarted = false, false
 local carSpawned, carID = nil, nil
 local display = false
 local zone, inZone, blipDisplay, dropBlip, cooldown = nil, false, nil, nil, false
-local laptopdict = "amb@code_human_in_bus_passenger_idles@female@tablet@base"
-local laptopanim = "base"
 
 RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
     PlayerData = QBCore.Functions.GetPlayerData()
@@ -33,6 +31,7 @@ RegisterNetEvent('QBCore:Client:OnPlayerUnload', function ()
 end)
 
 -- function
+
 function SetDisplay(bool)
     display = bool
     SetNuiFocus(bool, bool)
@@ -105,6 +104,8 @@ local function spawnAngryPed(coords)
     end
 end
 
+
+
 local function StartHacking(vehicle)
     local veh = Entity(vehicle)
     local trackerLeft = veh.state.trackerLeft
@@ -121,7 +122,7 @@ local function StartHacking(vehicle)
                     veh.state.hacked = true
                     return QBCore.Functions.Notify(Lang:t("success.disable_tracker"))
                 else
-                    QBCore.Functions.Notify(Lang:t('success.tracker_off', {time = randomSeconds}, {tracker_left = trackerLeft}))
+                    QBCore.Functions.Notify(Lang:t('success.tracker_off', {time = randomSeconds, tracker_left = trackerLeft}))
                 end
                 CreateThread(function ()
                     Wait(randomSeconds*1000)
@@ -136,7 +137,6 @@ local function StartHacking(vehicle)
     else
         QBCore.Functions.Notify(Lang:t("error.no_tracker"), "error")
     end
-    -- Entity(vehicle).state.hacked = true
 end
 
 local function RegisterCar(vehicle)
@@ -150,9 +150,9 @@ local function BoostingAlert()
     if Config.Alert == 'qb-dispatch' then
         TriggerEvent('dispatch:carboost', carID)
     elseif Config.Alert == 'linden_outlawalert' then
-
+        AlertBoosting(carID, 'linden_outlawalert')
     else
-        TriggerEvent('jl-carboost:client:notifyBoosting', carID)
+        AlertBoosting(carID, 'notification')
     end
 end
 
@@ -221,11 +221,14 @@ end)
 
 RegisterNUICallback('startcontract', function (data)
     local data = data
+    print(json.encode(data))
     if not isContractStarted then
         isContractStarted = true
         QBCore.Functions.TriggerCallback('jl-carboost:server:getContractData', function (result)
             if result then
                 TriggerEvent('jl-carboost:client:spawnCar', result)
+            else
+                print("NO RESULT")
             end
         end, data)
     else
@@ -464,7 +467,7 @@ RegisterNetEvent('jl-carboost:client:startBoosting', function (data)
                 if DoesEntityExist(NetworkGetEntityFromNetworkId(carID)) then
                     carSpawned = NetworkGetEntityFromNetworkId(carID)
                     if not modified then
-                        QBCore.Functions.SetVehicleProperties(carSpawned, props)
+                        QBCore.Functions.SetVehicleProperties(carSpawned, VehProp)
                         modified = true
                     end
                     local carcoords = GetEntityCoords(carSpawned)
@@ -528,7 +531,7 @@ end)
 
 RegisterNetEvent("jl-carboost:client:bringtoPlace", function (data)
     data = data
- 
+    print(json.encode(data))
     local polyZone = Config.DropPoint[math.random(1, #Config.DropPoint)]
     TriggerServerEvent('qb-phone:server:sendNewMail', {
         sender = "Unknown",

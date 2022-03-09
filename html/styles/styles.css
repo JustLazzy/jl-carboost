@@ -14,7 +14,7 @@
 div.laptop {
   width: 95%;
   height: 95%;
-  bottom: -150%;
+  bottom: -45%;
   left: 50%;
   transform: translate(-50%, -50%);
   position: absolute;
@@ -29,40 +29,48 @@ div.laptop {
   opacity: 1;
   transition: 1s;
   z-index: -1;
+  animation: laptop_down forwards cubic-bezier(0.38, 0.09, 0.12, 0.93) 1s;
 }
 
 div.laptop.active {
   opacity: 1;
+  animation: laptop_up forwards cubic-bezier(0.4, 0, 0.01, 1.17) 1s;
   visibility: visible;
-  bottom: -45%;
+  /* bottom: -45%; */
 }
 
+/* @keyframes laptop_up {
+  from {
+    bottom: -150%;
+  }
+  to {
+    bottom: -45%;
+  }
+} */
+
 @keyframes laptop_up {
-  0% {
-    opacity: 0;
-    transform: translate(-50%, 100%);
+  from {
+    bottom: -150%;
   }
-  30% {
-    opacity: 50%;
+  to {
+    bottom: -45%;
   }
-  100% {
-    opacity: 1;
-    transform: translate(-50%, -50%);
+}
+
+@keyframes laptop_notification {
+  from {
+    bottom: -150%;
+  }
+  to {
   }
 }
 
 @keyframes laptop_down {
-  0% {
-    opacity: 1;
-    /* transform: translate(-50%, -50%); */
+  from {
+    bottom: -45%;
   }
-  40% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 0;
-    /* transform: translate(-50%, 100%); */
-    display: none;
+  to {
+    bottom: -150%;
   }
 }
 

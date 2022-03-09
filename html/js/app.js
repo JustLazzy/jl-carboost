@@ -19,6 +19,7 @@ $(document).ready(() => {
   }
 
   function display(bool) {
+    // bool = true;
     if (bool) {
       laptop.classList.add("active");
       return;
@@ -281,7 +282,6 @@ function Notification(text, style, length) {
   if (!isMuted) {
     audio.play();
   }
-
   notification.append(notificationText);
   notificationText
     .getElementsByClassName("close-btn")[0]
@@ -289,9 +289,13 @@ function Notification(text, style, length) {
       notificationText.remove();
       audio.remove();
     });
+  if (!laptop.classList.contains("active")) {
+    laptop.classList.add("notification");
+  }
   setTimeout(async () => {
     notificationText.classList.add("hide");
     notificationText.classList.remove("active");
+    laptop.classList.remove("notification");
   }, length);
   notificationText.onanimationend = (e) => {
     if (e.animationName === "sliding_back") {
@@ -308,8 +312,6 @@ function wallpaper() {
     value.endsWith(".png")
   ) {
     $(".laptop").css("background-image", `url(${value})`);
-  } else if (!value) {
-    return;
   } else {
     return;
   }

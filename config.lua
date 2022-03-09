@@ -22,9 +22,9 @@ Config.MaxQueueContract = 2 -- Max contract per session / per WaitTime
 
 Config.Expire = 6 -- Expire time it'll be random, from 1 to this config
 
-Config.MinRep = 10
+Config.MinRep = 10 -- Minimum reputation that you can get after finish contract
 
-Config.MaxRep = 40
+Config.MaxRep = 40 -- Maximum reputation that you can get after finish contract
 
 Config.Payment = 'crypto' -- crypto / bank
 

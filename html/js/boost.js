@@ -310,32 +310,7 @@ function setupNewContract(data) {
   let transferButton = contractCart.querySelector("#transfercontract");
   let startbutton = contractCart.querySelector("#startcontract");
   let sellButton = contractCart.querySelector("#sellcontract");
-  let expireText = contractCart.querySelector(".expire");
-  let exp = setInterval(function () {
-    let expireDate = new Date(data.expire).getTime();
-    let now = new Date().getTime();
-    let diff = expireDate - now;
-    let second = 1000;
-    let minute = second * 60;
-    let hour = minute * 60;
-    let textHour = Math.floor(diff / hour);
-    let textMinute = Math.floor((diff % hour) / minute);
-    let textSecond = Math.floor((diff % minute) / second);
-    expireText.textContent =
-      "Expires in: " +
-      textHour.toString().padStart(2, "0") +
-      ":" +
-      textMinute.toString().padStart(2, "0") +
-      ":" +
-      textSecond.toString().padStart(2, "0");
-
-    if (diff < 0) {
-      clearInterval(exp);
-      contractCart.remove();
-      noTitleContract();
-    }
-  }, 1000);
-
+  countDown(data.expire, contractCart);
   contractParent.appendChild(contractCart);
   startbutton.addEventListener("click", toggleBoosting);
   transferButton.addEventListener("click", transferContract);
@@ -425,6 +400,7 @@ function toggleBoosting(event) {
   let isStart;
   const buttonClicked = event.target;
   const parent = buttonClicked.parentElement.parentElement;
+  console.log(parent);
   if (buttonClicked.innerText === "Start Contract") {
     isStart = false;
   } else {
@@ -445,7 +421,6 @@ function toggleBoosting(event) {
       onCancel: () => {},
     });
   } else {
-    let type;
     Confirm.open({
       title: "Options",
       message: "If you choose VIN Scratch, you have to pay more",

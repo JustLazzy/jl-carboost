@@ -1,5 +1,5 @@
 -- This is the vehicle modification stuff
-windowtint = {  
+WindowTint = {  
 	'WINDOWTINT_PURE_BLACK',  
 	'WINDOWTINT_DARKSMOKE',  
 	'WINDOWTINT_LIGHTSMOKE',  
@@ -8,7 +8,7 @@ windowtint = {
 	'WINDOWTINT_GREEN'  
 };
 
-neonColor = {
+NeonColor = {
     -- white
     [1] = {
         222,
@@ -35,14 +35,14 @@ neonColor = {
     }
 }
 
-props = {
-    windowTint = windowtint[math.random(#windowtint)],
+VehProp = {
+    windowTint = WindowTint[math.random(#WindowTint)],
     neonEnabled = {
         [1] = true,
         [2] = true,
         [3] = true,
         [4] = true
     },
-    neonColor = neonColor[math.random(#neonColor)],
+    neonColor = NeonColor[math.random(#NeonColor)],
 }
 
