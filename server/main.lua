@@ -7,6 +7,7 @@ AddEventHandler('onResourceStart', function (resource)
    if resource == GetCurrentResourceName() then
       Queue()
       DeleteExpiredContract()
+      -- PerformHttpRequest('https://raw.githubusercontent.com/JustLazzy/jl-carboost/master/version', CheckVersion, 'GET')
    end
 end)
 
@@ -166,12 +167,16 @@ RegisterNetEvent('jl-carboost:server:finishBoosting', function (data)
       isNextLevel = true
    end
    if Config.Payment == 'crypto' then
-      TriggerClientEvent('QBCore:Notify', src, 'You just got '..amountMoney..' crypto', 'success')
+      TriggerClientEvent('QBCore:Notify', src, Lang:t('info.payment_crypto', {
+         amount = amountMoney
+      }), 'success')
    end
    pData.Functions.SetMetaData("carboostrep", total)
    pData.Functions.AddMoney(Config.Payment, amountMoney, 'finished-boosting')
    TriggerClientEvent('jl-carboost:client:updateProggress', src, isNextLevel)
-   TriggerClientEvent('QBCore:Notify', src, 'You get more reputation: '..randomRep, 'success')
+   TriggerClientEvent('QBCore:Notify', src, Lang:t('info.get_rep', {
+      rep = randomRep
+   }), "primary")
 end)
 
 RegisterNetEvent('jl-carboost:server:deleteContract', function (contractid)
@@ -209,20 +214,22 @@ QBCore.Commands.Add('settier', 'Set Boosting Tier', {
 }, false,function (source,args)
    local src = source
    if not args[1] or not type(args[1]) == "string" or Config.Tier[tostring(args[1])] == nil then
-      return TriggerClientEvent('QBCore:Notify', src, "Invalid tier", "error")
+      return TriggerClientEvent('QBCore:Notify', src, Lang:t('error.invalid_tier'), "error")
    end
    local PlayerID = tonumber(args[2])
    local player
    if PlayerID then
       player = QBCore.Functions.GetPlayer(PlayerID)
       if not player or player == nil then
-         return TriggerClientEvent('QBCore:Notify', src, "Invalid player", "error")
+         return TriggerClientEvent('QBCore:Notify', src, Lang:t('error.invalid_player'), "error")
       end
    else
       player = QBCore.Functions.GetPlayer(src)
    end
    player.Functions.SetMetaData('carboostclass', tostring(args[1]))
-   TriggerClientEvent('QBCore:Notify', src, "Successfully set the tier to "..args[1], "success")
+   TriggerClientEvent('QBCore:Notify', src, Lang:t('success.set_tier', {
+      tier = args[1]
+   }), "success")
 end, 'admin')
 
 QBCore.Commands.Add('giveContract', 'Give contract, admin only', {
@@ -239,12 +246,12 @@ QBCore.Commands.Add('giveContract', 'Give contract, admin only', {
    local PlayerID =  tonumber(args[2])
    local player
    if type(args[1]) == "number" then
-      return TriggerClientEvent('QBCore:Notify', src, "Invalid tier", "error")
+      return TriggerClientEvent('QBCore:Notify', src, Lang:t('error.invalid_tier'), "error")
    end
    if PlayerID then
       player = QBCore.Functions.GetPlayer(PlayerID)
       if not player or player == nil then
-         return TriggerClientEvent('QBCore:Notify', src, "Invalid player", "error")
+         return TriggerClientEvent('QBCore:Notify', src, Lang:t('error.invalid_player'), "error")
       end
    else
       player = QBCore.Functions.GetPlayer(src)
@@ -269,11 +276,13 @@ QBCore.Commands.Add('giveContract', 'Give contract, admin only', {
          contractData.id = id
          contractData.expire = GetHoursFromNow(expireTime)
          TriggerClientEvent('jl-carboost:client:addContract', player.PlayerData.source, contractData)
-         TriggerClientEvent('QBCore:Notify', src, "Succesfully gave contract to "..player.PlayerData.name, "success")
+         TriggerClientEvent('QBCore:Notify', src, Lang:t('success.contract_give', {
+            player = player.PlayerData.name,
+         }), "success")
       end)
 
    else
-      return TriggerClientEvent('QBCore:Notify', src, "Invalid tier", "error")
+      return TriggerClientEvent('QBCore:Notify', src, Lang:t('error.invalid_tier'), "error")
    end
 end, 'admin')
 
@@ -289,7 +298,7 @@ RegisterNetEvent('jl-carboost:server:takeAll', function (data)
       ['@citizenid'] = Player.PlayerData.citizenid,
       ['@items'] = json.encode({})
    })
-   TriggerClientEvent('QBCore:Notify', src, "Succesfully bought all items", "success")
+   TriggerClientEvent('QBCore:Notify', src, Lang:t('success.take_all'), "success")
 end)
 
 RegisterNetEvent('jl-carboost:server:getBoostSale', function()
@@ -299,6 +308,15 @@ RegisterNetEvent('jl-carboost:server:getBoostSale', function()
       print("RESULT IS NOT NIL")
       TriggerClientEvent('jl-carboost:client:loadBoostStore', src,result)
    end
+end)
+
+-- Alert
+RegisterNetEvent('jl-carboost:notifyboosting', function (pos, car)
+   TriggerClientEvent('jl-carboost:notifyboosting', -1, pos, car)
+end)
+
+RegisterNetEvent('jl-carboost:notifypolice', function (car)
+   TriggerClientEvent('jl-carboost:notifypolice', -1, car)
 end)
 
 -- Callback
@@ -373,7 +391,7 @@ QBCore.Functions.CreateCallback('jl-carboost:server:buycontract', function(sourc
       })
       TriggerClientEvent('jl-carboost:client:contractBought', -1, data.id)
       local contractData = json.decode(contractInfo.data)
-      contractData.expire = result[1].expire
+      contractData.expire, contractData.id = result[1].expire, data.id
       TriggerClientEvent('jl-carboost:client:addContract', src, contractData)
       return cb({
          success = Lang:t('success.buy_contract', {
@@ -418,8 +436,12 @@ QBCore.Functions.CreateCallback('jl-carboost:server:transfercontract', function 
             plate = data.plate,
             expire = result[1].expire
          }
-         TriggerClientEvent('QBCore:Notify', src, "Succesfully transfered contract to "..toPlayer.PlayerData.name, "success")
-         TriggerClientEvent('QBCore:Notify', id, "You got new contract from "..Player.PlayerData.name, "success")
+         TriggerClientEvent('QBCore:Notify', src, Lang:t('success.contract_transfer', {
+            player = toPlayer.PlayerData.name
+         }), "success")
+         TriggerClientEvent('QBCore:Notify', id, Lang:t('info.receive_transfer', {
+            player = Player.PlayerData.name,
+         }), "primary")
          TriggerClientEvent('jl-carboost:client:addContract', toPlayer.PlayerData.source, contractData)
          return cb({
             success = true
@@ -529,7 +551,7 @@ function Queue()
       for k, v in pairs(Config.QueueList) do
          local Player = QBCore.Functions.GetPlayerByCitizenId(k)
          if not v.getContract and v.status and Player and num <= Config.MaxQueueContract then
-            TriggerClientEvent('QBCore:Notify', Player.PlayerData.source, 'You just got a new contract', 'success')
+            TriggerClientEvent('QBCore:Notify', Player.PlayerData.source, Lang:t('info.new_contract'), "primary")
             TriggerEvent('jl-carboost:server:newContract', Player.PlayerData.source, k)
             num = (num or 0) + 1
             v.getContract = true
@@ -560,6 +582,14 @@ function DeleteExpiredContract()
    SetTimeout(sleep,function ()
       DeleteExpiredContract()
    end)
+end
+
+function CheckVersion(err, resp, headers)
+   -- https://raw.githubusercontent.com/JustLazzy/jl-carboost/master/version
+   local curVersion = LoadResourceFile(GetCurrentResourceName(), 'version')
+   if curVersion ~= resp and tonumber(curVersion) < tonumber(resp) then
+      print('[jl-carboost] New version available: ' .. resp)
+   end
 end
 
 function RandomVIN()
