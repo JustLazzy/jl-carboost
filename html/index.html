@@ -23,10 +23,17 @@
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     />
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"
+      integrity="sha512-qTXRIMyZIFb8iQcfjXWCO8+M5Tbc38Qi5WzdPOYZHIlZpzBHG3L3by84BBBOiRGiEb7KKtAOAs5qYdUiZiQNNQ=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
     <link rel="stylesheet" type="text/css" href="./styles/styles.css" />
     <link rel="stylesheet" href="./styles/bennys.css" />
     <link rel="stylesheet" href="./styles/boosting.css" />
     <link rel="stylesheet" href="./styles/setting.css" />
+    <link rel="stylesheet" href="./styles/confirmbox.css" />
   </head>
   <body oncopy="false" oncut="false" onpaste="false">
     <div class="laptop">
@@ -92,6 +99,7 @@
             <div class="container">
               <div class="navigation">
                 <div class="category">
+                  <!-- WIP -->
                   <!-- <button>Engine</button>
                   <button>Cosmetic</button>
                   <button>Etc</button>
@@ -153,22 +161,7 @@
                 <!-- Boosting goes here -->
               </div>
               <div class="boosting-list hidden" id="boosting-shop">
-                <div class="boost-contract">
-                  <div class="boost-text">
-                    <p>Boost Type: A</p>
-                    <p>Owner: I know koil</p>
-                  </div>
-                  <div class="boost-info">
-                    <p>Vehicle Type: Lombargini</p>
-                    <p>Expires in: 69 Hours</p>
-                    <p>Price: 320k</p>
-                  </div>
-                  <div class="boost-button">
-                    <button class="start" id="buy-contract">
-                      Buy Contract
-                    </button>
-                  </div>
-                </div>
+                <h1 class="title" id="no-contract-sale">No contract onsale</h1>
               </div>
             </div>
           </div>

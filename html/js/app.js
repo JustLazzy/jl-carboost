@@ -30,11 +30,6 @@ $(document).ready(() => {
   }
   display(false);
 
-  function refreshStore() {
-    const test = document.getElementsByClassName("grid");
-    console.log("this test", test);
-  }
-
   $("input").keypress(function (e) {
     typing = true;
   });
@@ -64,11 +59,20 @@ $(document).ready(() => {
       case "setupboostingapp":
         loadBoostData();
         break;
+      case "setupboostingstore":
+        loadBoostStore(event.data.store);
+        break;
       case "refreshContract":
         refreshContract();
         break;
       case "updateProggress":
         updateBoostProgress(event.data.boost);
+        break;
+      case "newContractSale":
+        newContractSale(event.data.sale);
+        break;
+      case "contractbought":
+        contractBought(event.data.id);
         break;
     }
   });
@@ -81,7 +85,6 @@ $(document).ready(() => {
     const input = e.target;
     volumeValue = (input.value / 200).toFixed(2);
 
-    console.log(input.value);
     if (input.value == 0) {
       isMuted = true;
 
@@ -119,6 +122,9 @@ $(document).ready(() => {
   window.addEventListener("click", function (event) {
     if (event.target.id != "splash") {
       if (event.target.id == "bennys") {
+        if (bennys.classList.contains("active")) {
+          return;
+        }
         toggleDisplayApp(true, "#bennys-app");
         createIcon(event.target.id);
       } else if (event.target.id == "boosting") {
@@ -276,7 +282,6 @@ function Notification(text, style, length) {
   if (!isMuted) {
     audio.play();
   }
-
   notification.append(notificationText);
   notificationText
     .getElementsByClassName("close-btn")[0]
@@ -284,9 +289,13 @@ function Notification(text, style, length) {
       notificationText.remove();
       audio.remove();
     });
+  if (!laptop.classList.contains("active")) {
+    laptop.classList.add("notification");
+  }
   setTimeout(async () => {
     notificationText.classList.add("hide");
     notificationText.classList.remove("active");
+    laptop.classList.remove("notification");
   }, length);
   notificationText.onanimationend = (e) => {
     if (e.animationName === "sliding_back") {
@@ -303,8 +312,6 @@ function wallpaper() {
     value.endsWith(".png")
   ) {
     $(".laptop").css("background-image", `url(${value})`);
-  } else if (!value) {
-    return;
   } else {
     return;
   }
@@ -338,3 +345,164 @@ function removeIcon(name) {
   child.remove();
   return;
 }
+
+var Confirm = {
+  open(options) {
+    options = Object.assign(
+      {},
+      {
+        title: "",
+        message: "",
+        okText: "",
+        cancelText: "",
+        onOk: function () {},
+        onCancel: function () {},
+        parentID: "",
+      },
+      options
+    );
+    const html = `
+    <div class="confirm">
+    <div class="confirm-window">
+      <div class="confirm-titlebar">
+        <span class="confirm-title">${options.title}</span>
+        <span class="confirm-exit"
+          ><i
+            class="fa-solid fa-circle-xmark"
+            style="color: rgb(245, 105, 105)"
+          ></i
+        ></span>
+      </div>
+      <div class="confirm-content">
+      ${options.message}
+      </div>
+      <div class="confirm-button">
+        <button class="confirm-button-style confirm-button--ok">
+        ${options.okText}
+        </button>
+        <button class="confirm-button-style confirm-button--cancel">
+          ${options.cancelText}
+        </button>
+      </div>
+    </div>
+  </div>
+    `;
+    const template = document.createElement("template");
+    const audio = new Audio("assets/audio/pop.wav");
+    template.innerHTML = html;
+    const ConfirmEl = template.content.querySelector(".confirm");
+    const closeBtn = template.content.querySelector(".confirm-exit");
+    const okBtn = template.content.querySelector(".confirm-button--ok");
+    const cancelBtn = template.content.querySelector(".confirm-button--cancel");
+    const parent = document.querySelector(`#${options.parentID}`);
+    if (parent) {
+      if (!isMuted) {
+        audio.play();
+        audio.volume = volumeValue;
+      }
+      parent.appendChild(template.content);
+      ConfirmEl.addEventListener("click", (e) => {
+        if (e.target === ConfirmEl) {
+          // options.onCancel();
+          this._close(ConfirmEl);
+        }
+      });
+      closeBtn.addEventListener("click", () => {
+        this._close(ConfirmEl);
+      });
+      okBtn.addEventListener("click", () => {
+        options.onOk();
+        this._close(ConfirmEl);
+      });
+      cancelBtn.addEventListener("click", () => {
+        options.onCancel();
+        this._close(ConfirmEl);
+      });
+    }
+    // document.body.appendChild(template.content);
+  },
+  Input(options) {
+    options = Object.assign(
+      {},
+      {
+        title: "",
+        message: "",
+        placeholder: "",
+        type: "",
+        min: "1",
+        max: "",
+        onOk: function () {},
+        onCancel: function () {},
+        parentID: "",
+      },
+      options
+    );
+    const html = `
+    <div class="confirm">
+    <div class="confirm-window">
+      <div class="confirm-titlebar">
+        <span class="confirm-title">${options.title}</span>
+        <span class="confirm-exit"
+          ><i
+            class="fa-solid fa-circle-xmark"
+            style="color: rgb(245, 105, 105)"
+          ></i
+        ></span>
+      </div>
+      <div class="confirm-content">
+      ${options.message}
+      </div>
+      <div class="confirm-content--input">
+      <input placeholder="${options.placeholder}" type="${options.type}" class="confirm--input" min="${options.min}" max="${options.max}" />
+      </div>
+      <div class="confirm-button">
+        <button class="confirm-button-style confirm-button--ok">
+        ${options.okText}
+        </button>
+        <button class="confirm-button-style confirm-button--cancel">
+          ${options.cancelText}
+        </button>
+      </div>
+    </div>
+  </div>`;
+    const template = document.createElement("template");
+    const audio = new Audio("assets/audio/pop.wav");
+    template.innerHTML = html;
+    const ConfirmEl = template.content.querySelector(".confirm");
+    const input = template.content.querySelector(".confirm--input");
+    const closeBtn = template.content.querySelector(".confirm-exit");
+    const okBtn = template.content.querySelector(".confirm-button--ok");
+    const cancelBtn = template.content.querySelector(".confirm-button--cancel");
+    const parent = document.querySelector(`#${options.parentID}`);
+    if (parent) {
+      if (!isMuted) {
+        audio.play();
+        audio.volume = volumeValue;
+      }
+      parent.appendChild(template.content);
+      ConfirmEl.addEventListener("click", (e) => {
+        if (e.target === ConfirmEl) {
+          // options.onCancel();
+          this._close(ConfirmEl);
+        }
+      });
+      okBtn.addEventListener("click", () => {
+        options.onOk(input.value);
+        this._close(ConfirmEl);
+      });
+      closeBtn.addEventListener("click", () => {
+        this._close(ConfirmEl);
+      });
+      cancelBtn.addEventListener("click", () => {
+        options.onCancel();
+        this._close(ConfirmEl);
+      });
+    }
+  },
+  _close(confirmElemnt) {
+    confirmElemnt.classList.add("confirm--close");
+    setTimeout(() => {
+      confirmElemnt.remove();
+    }, 100);
+  },
+};

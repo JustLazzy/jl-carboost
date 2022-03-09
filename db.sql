@@ -12,7 +12,8 @@ CREATE TABLE IF NOT EXISTS `boost_contract` (
   `started` datetime DEFAULT NULL,
   `expire` datetime DEFAULT NULL,
   `onsale` int(11) DEFAULT 0,
+  `price` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `id` (`id`),
   KEY `owner` (`owner`)
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=67 DEFAULT CHARSET=utf8mb3;

@@ -10,7 +10,7 @@ Config.BennysItems = {}
 
 ----------------------------------------------------------
 
-Config.Alert = 'qb-dispatch' -- qb-dispatch / linden_outlawalert / notification, only use qb-dispatch when its on stable release
+Config.Alert = 'linden_outlawalert' -- qb-dispatch / linden_outlawalert / notification, only use qb-dispatch when its on stable release
 
 Config.Minimum = 5 -- Minimum police
 
@@ -20,11 +20,15 @@ Config.MaxContract = 5 -- Max contract that you can handle
 
 Config.MaxQueueContract = 2 -- Max contract per session / per WaitTime
 
-Config.MinRep = 10
+Config.Expire = 6 -- Expire time it'll be random, from 1 to this config
 
-Config.MaxRep = 40
+Config.MinRep = 10 -- Minimum reputation that you can get after finish contract
+
+Config.MaxRep = 40 -- Maximum reputation that you can get after finish contract
 
 Config.Payment = 'crypto' -- crypto / bank
+
+Config.Attempt = 21 -- how many hacks to successfully turn off the tracker, it'll be random from 1 to this config
 
 Config.Tier = {
     --[[

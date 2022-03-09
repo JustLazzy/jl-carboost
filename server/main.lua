@@ -7,6 +7,9 @@ AddEventHandler('onResourceStart', function (resource)
    if resource == GetCurrentResourceName() then
       Queue()
       DeleteExpiredContract()
+      -- Will use this later :)
+      -- GenerateVIN()
+      -- PerformHttpRequest('https://raw.githubusercontent.com/JustLazzy/jl-carboost/master/version', CheckVersion, 'GET')
    end
 end)
 
@@ -41,21 +44,24 @@ RegisterNetEvent('jl-carboost:server:newContract', function (source)
    local tier = config.tier
    local car = Config.Tier[tier].car[math.random(#Config.Tier[tier].car)]
    local owner = Config.RandomName[math.random(1, #Config.RandomName)]
+   local randomHour = math.random(Config.Expire)
    local contractData = {
       owner = owner,
       car = car,
       tier = tier,
       plate = RandomPlate(),
    }
+  local something =  os.date('%c')
+  print(something)
    if #Config.QueueList[citizenid].contract <= Config.MaxContract then     
       MySQL.Async.insert('INSERT INTO boost_contract (owner, data, started, expire) VALUES (@owner, @data, NOW(),DATE_ADD(NOW(), INTERVAL @expire HOUR))', {
          ['@owner'] = citizenid,
          ['@data'] = json.encode(contractData),
-         ['@expire'] = math.random(1, 6)
+         ['@expire'] = randomHour
       }, function (id)
          contractData.id = id
+         contractData.expire = GetHoursFromNow(randomHour)
          Config.QueueList[citizenid].contract[#Config.QueueList[citizenid].contract+1] = contractData
-         print(json.encode(Config.QueueList[citizenid]))
          TriggerClientEvent('jl-carboost:client:addContract', src, contractData)
       end)
    end
@@ -96,7 +102,7 @@ RegisterNetEvent('jl-carboost:server:getContract', function (citizenid)
       ['@owner'] = citizenid
    })
    if result[1] then
-      for k, v in pairs(result) do
+      for _, v in pairs(result) do
          Config.QueueList[citizenid].contract[#Config.QueueList[citizenid].contract+1] = json.decode(v.data)
       end
    end
@@ -163,12 +169,16 @@ RegisterNetEvent('jl-carboost:server:finishBoosting', function (data)
       isNextLevel = true
    end
    if Config.Payment == 'crypto' then
-      TriggerClientEvent('QBCore:Notify', src, 'You just got '..amountMoney..' crypto', 'success')
+      TriggerClientEvent('QBCore:Notify', src, Lang:t('info.payment_crypto', {
+         amount = amountMoney
+      }), 'success')
    end
    pData.Functions.SetMetaData("carboostrep", total)
    pData.Functions.AddMoney(Config.Payment, amountMoney, 'finished-boosting')
    TriggerClientEvent('jl-carboost:client:updateProggress', src, isNextLevel)
-   TriggerClientEvent('QBCore:Notify', src, 'You get more reputation: '..randomRep, 'success')
+   TriggerClientEvent('QBCore:Notify', src, Lang:t('info.get_rep', {
+      rep = randomRep
+   }), "primary")
 end)
 
 RegisterNetEvent('jl-carboost:server:deleteContract', function (contractid)
@@ -206,20 +216,22 @@ QBCore.Commands.Add('settier', 'Set Boosting Tier', {
 }, false,function (source,args)
    local src = source
    if not args[1] or not type(args[1]) == "string" or Config.Tier[tostring(args[1])] == nil then
-      return TriggerClientEvent('QBCore:Notify', src, "Invalid tier", "error")
+      return TriggerClientEvent('QBCore:Notify', src, Lang:t('error.invalid_tier'), "error")
    end
    local PlayerID = tonumber(args[2])
    local player
    if PlayerID then
       player = QBCore.Functions.GetPlayer(PlayerID)
       if not player or player == nil then
-         return TriggerClientEvent('QBCore:Notify', src, "Invalid player", "error")
+         return TriggerClientEvent('QBCore:Notify', src, Lang:t('error.invalid_player'), "error")
       end
    else
       player = QBCore.Functions.GetPlayer(src)
    end
    player.Functions.SetMetaData('carboostclass', tostring(args[1]))
-   TriggerClientEvent('QBCore:Notify', src, "Successfully set the tier to "..args[1], "success")
+   TriggerClientEvent('QBCore:Notify', src, Lang:t('success.set_tier', {
+      tier = args[1]
+   }), "success")
 end, 'admin')
 
 QBCore.Commands.Add('giveContract', 'Give contract, admin only', {
@@ -236,12 +248,12 @@ QBCore.Commands.Add('giveContract', 'Give contract, admin only', {
    local PlayerID =  tonumber(args[2])
    local player
    if type(args[1]) == "number" then
-      return TriggerClientEvent('QBCore:Notify', src, "Invalid tier", "error")
+      return TriggerClientEvent('QBCore:Notify', src, Lang:t('error.invalid_tier'), "error")
    end
    if PlayerID then
       player = QBCore.Functions.GetPlayer(PlayerID)
       if not player or player == nil then
-         return TriggerClientEvent('QBCore:Notify', src, "Invalid player", "error")
+         return TriggerClientEvent('QBCore:Notify', src, Lang:t('error.invalid_player'), "error")
       end
    else
       player = QBCore.Functions.GetPlayer(src)
@@ -250,12 +262,13 @@ QBCore.Commands.Add('giveContract', 'Give contract, admin only', {
       local config = Config.Tier[tostring(args[1])]
       local car = config.car[math.random(#config.car)]
       local owner = Config.RandomName[math.random(1, #Config.RandomName)]
-      local expireTime = math.random(1, 7)
+      local expireTime = math.random(Config.Expire)
       local contractData = {
          owner = owner,
          car = car,
          tier = args[1],
-         plate = RandomPlate()
+         plate = RandomPlate(),
+         
       }
       MySQL.Async.insert('INSERT INTO boost_contract (owner, data, started, expire) VALUES (@owner, @data, NOW(),DATE_ADD(NOW(), INTERVAL @expire HOUR))', {
          ['@owner'] = player.PlayerData.citizenid,
@@ -263,19 +276,22 @@ QBCore.Commands.Add('giveContract', 'Give contract, admin only', {
          ['@expire'] = expireTime
       }, function (id)
          contractData.id = id
+         contractData.expire = GetHoursFromNow(expireTime)
          TriggerClientEvent('jl-carboost:client:addContract', player.PlayerData.source, contractData)
-         TriggerClientEvent('QBCore:Notify', src, "Succesfully gave contract to "..player.PlayerData.name, "success")
+         TriggerClientEvent('QBCore:Notify', src, Lang:t('success.contract_give', {
+            player = player.PlayerData.name,
+         }), "success")
       end)
 
    else
-      return TriggerClientEvent('QBCore:Notify', src, "Invalid tier", "error")
+      return TriggerClientEvent('QBCore:Notify', src, Lang:t('error.invalid_tier'), "error")
    end
 end, 'admin')
 
 RegisterNetEvent('jl-carboost:server:takeAll', function (data)
    local src = source
    local Player = QBCore.Functions.GetPlayer(src)
-   for k, v in pairs(data) do
+   for _, v in pairs(data) do
       local item = v.item
       Player.Functions.AddItem(item.name, item.quantity)
       TriggerClientEvent('inventory:client:itemBox', src, QBCore.Shared.Items[tostring(item.name)], 'add')
@@ -284,7 +300,29 @@ RegisterNetEvent('jl-carboost:server:takeAll', function (data)
       ['@citizenid'] = Player.PlayerData.citizenid,
       ['@items'] = json.encode({})
    })
-   TriggerClientEvent('QBCore:Notify', src, "Succesfully bought all items", "success")
+   TriggerClientEvent('QBCore:Notify', src, Lang:t('success.take_all'), "success")
+end)
+
+RegisterNetEvent('jl-carboost:server:getBoostSale', function()
+   local src = source
+   local result = MySQL.Sync.fetchAll('SELECT * FROM boost_contract WHERE onsale = 1')
+   if result[1] then
+      print("RESULT IS NOT NIL")
+      TriggerClientEvent('jl-carboost:client:loadBoostStore', src,result)
+   end
+end)
+
+-- Alert
+RegisterNetEvent('jl-carboost:notifyboosting', function (pos, car)
+   TriggerClientEvent('jl-carboost:notifyboosting', -1, pos, car)
+end)
+
+RegisterNetEvent('jl-carboost:notifypolice', function (car)
+   TriggerClientEvent('jl-carboost:notifypolice', -1, car)
+end)
+
+RegisterNetEvent('jl-carboost:test', function()
+   GenerateVIN()
 end)
 
 -- Callback
@@ -300,6 +338,124 @@ QBCore.Functions.CreateCallback('jl-carboost:server:canBuy', function(source, cb
    return cb
 end)
 
+QBCore.Functions.CreateCallback('jl-carboost:server:sellContract', function (source, cb, data)
+   local data = data.data
+   local src = source
+   local Player = QBCore.Functions.GetPlayer(src)
+   local result = MySQL.Sync.fetchAll('SELECT * FROM boost_contract WHERE id = @id AND owner = @owner', {
+      ['@owner'] = Player.PlayerData.citizenid,
+      ['@id'] = data.id
+   })
+   if result[1] then
+      local contractInfo = result[1]
+      local contractData = json.decode(contractInfo.data)
+      MySQL.Async.execute('UPDATE boost_contract SET price = @price, onsale = 1 WHERE id = @id AND owner = @owner', {
+         ['@id'] = data.id,
+         ['@price'] = tonumber(data.price),
+         ['@owner'] = Player.PlayerData.citizenid
+      })
+      contractData.id = data.id
+      contractData.expire = result[1].expire
+      contractData.price = tonumber(data.price)
+      TriggerClientEvent('jl-carboost:client:newContractSale', -1, contractData)
+      return cb({
+         success = Lang:t('success.sell_contract', {
+            amount = data.price,
+            payment = Config.Payment
+         })
+      })
+   end
+end)
+
+QBCore.Functions.CreateCallback('jl-carboost:server:buycontract', function(source, cb, data)
+   local src = source
+   local Player = QBCore.Functions.GetPlayer(src)
+   local toPlayer
+   local result = MySQL.Sync.fetchAll('SELECT * FROM boost_contract WHERE id = @id AND onsale = 1', {
+      ['@id'] = data.id
+   })
+   if result[1] then
+      if Player.PlayerData.citizenid ==  result[1].owner then return cb({error = Lang:t('error.buy_yourcontract')}) end
+      toPlayer = QBCore.Functions.GetPlayerByCitizenId(result[1].owner)
+      if not toPlayer then
+         return cb({error = Lang:t('error.player_not_found')})
+      end
+      local contractInfo = result[1]
+      local moneyAmount = tonumber(contractInfo.price)
+      local money = Player.PlayerData.money[Config.Payment]
+      if money < moneyAmount then
+         return cb({
+            error = Lang:t('error.not_enough_money', {money = Config.Payment})
+         })
+      end
+      Player.Functions.RemoveMoney(Config.Payment, moneyAmount, 'bought-contract')
+      toPlayer.Functions.AddMoney(Config.Payment, moneyAmount, 'bought-contract')
+      TriggerClientEvent('QBCore:Notify', toPlayer.PlayerData.source, Lang:t('info.contract_buyed', {amount = moneyAmount}), "success")
+      MySQL.Async.execute('UPDATE boost_contract SET onsale = 0, owner = @owner WHERE id = @id', {
+         ['@id'] = data.id,
+         ['@owner'] = Player.PlayerData.citizenid
+      })
+      TriggerClientEvent('jl-carboost:client:contractBought', -1, data.id)
+      local contractData = json.decode(contractInfo.data)
+      contractData.expire, contractData.id = result[1].expire, data.id
+      TriggerClientEvent('jl-carboost:client:addContract', src, contractData)
+      return cb({
+         success = Lang:t('success.buy_contract', {
+            amount = moneyAmount,
+            payment = Config.Payment
+         })
+      })
+   end
+end)
+
+QBCore.Functions.CreateCallback('jl-carboost:server:transfercontract', function (source, cb, data)
+   local src = source
+   local id = tonumber(data.id) 
+   local contractid = tonumber(data.contractid)
+   local toPlayer = QBCore.Functions.GetPlayer(id)
+   local Player = QBCore.Functions.GetPlayer(src)
+   if src == id then
+      return cb({
+         error = "You can't transfer contract to yourself"
+      })
+   end
+   if not toPlayer or not Player then
+      return cb({
+         error = "Invalid player"
+      })
+   end
+   local result = MySQL.Sync.fetchAll('SELECT * FROM boost_contract WHERE id = @id AND owner = @owner', {
+      ['@owner'] = Player.PlayerData.citizenid,
+      ['@id'] = contractid
+   })
+   if result[1] then
+      MySQL.Async.execute('UPDATE boost_contract SET owner = @owner WHERE owner = @citizenid', {
+         ['@owner'] = toPlayer.PlayerData.citizenid,
+         ['@citizenid'] = Player.PlayerData.citizenid
+      }, function ()
+         local data = json.decode(result[1].data)
+         local contractData = {
+            id = contractid,
+            owner = data.owner,
+            car = data.car,
+            tier = data.tier,
+            plate = data.plate,
+            expire = result[1].expire
+         }
+         TriggerClientEvent('QBCore:Notify', src, Lang:t('success.contract_transfer', {
+            player = toPlayer.PlayerData.name
+         }), "success")
+         TriggerClientEvent('QBCore:Notify', id, Lang:t('info.receive_transfer', {
+            player = Player.PlayerData.name,
+         }), "primary")
+         TriggerClientEvent('jl-carboost:client:addContract', toPlayer.PlayerData.source, contractData)
+         return cb({
+            success = true
+         })
+      end)
+   end
+end)
+
 QBCore.Functions.CreateCallback('jl-carboost:server:canTake', function (source, cb, data)
    
 end)
@@ -311,7 +467,7 @@ QBCore.Functions.CreateCallback('jl-carboost:server:getboostdata', function (sou
       rep = Player.PlayerData.metadata['carboostrep'],
       contract = {}
    }
-   local result = MySQL.Sync.fetchAll('SELECT * FROM boost_contract WHERE owner = @owner', {
+   local result = MySQL.Sync.fetchAll('SELECT * FROM boost_contract WHERE owner = @owner AND onsale = 0', {
       ['@owner'] = citizenid
    })
    if result[1] then
@@ -319,6 +475,7 @@ QBCore.Functions.CreateCallback('jl-carboost:server:getboostdata', function (sou
          if v.onsale == 1 then
             return
          end
+         print(json.encode(v))
          local data = json.decode(v.data)
          contractData.contract[#contractData.contract+1] = {
             id = v.id,
@@ -326,6 +483,7 @@ QBCore.Functions.CreateCallback('jl-carboost:server:getboostdata', function (sou
             car = data.car,
             tier = data.tier or 'D',
             plate = data.plate,
+            expire = v.expire
          }
       end
    end
@@ -333,6 +491,8 @@ QBCore.Functions.CreateCallback('jl-carboost:server:getboostdata', function (sou
 end)
 
 QBCore.Functions.CreateCallback('jl-carboost:server:getContractData', function (source, cb, data)
+   local data = data.data
+   -- print(json.encode(data))
    local Player = QBCore.Functions.GetPlayer(source)
    local result = MySQL.Sync.fetchAll('SELECT * FROM boost_contract WHERE id = @id AND owner = @owner', {
       ['@id'] = data.id,
@@ -342,6 +502,7 @@ QBCore.Functions.CreateCallback('jl-carboost:server:getContractData', function (
       local res = result[1]
       local contractdata = {
          id = res.id,
+         type = data.type,
          data = json.decode(res.data),
       }
       return cb(contractdata)
@@ -349,6 +510,7 @@ QBCore.Functions.CreateCallback('jl-carboost:server:getContractData', function (
 end)
 
 QBCore.Functions.CreateCallback('jl-carboost:server:spawnCar', function (source, cb, data)
+   local src = source
    local cardata = data
    local boosttier = Config.Tier[cardata.data.tier]
    local coords = boosttier.location[math.random(1, #boosttier.location)]
@@ -363,10 +525,10 @@ QBCore.Functions.CreateCallback('jl-carboost:server:spawnCar', function (source,
    while not DoesEntityExist(car) do
       Wait(25)
    end
-   
    if DoesEntityExist(car) then
       SetVehicleDoorsLocked(car, 2) -- Lock the vehicle
       SetVehicleNumberPlateText(car, cardata.data.plate)
+      SetVehicleColours(car, math.random(159))
       local netId = NetworkGetNetworkIdFromEntity(car)
       data = {
          id = cardata.id,
@@ -374,6 +536,7 @@ QBCore.Functions.CreateCallback('jl-carboost:server:spawnCar', function (source,
          spawnlocation = coords.car,
          npc = npcCoords,
          carmodel = car,
+         type = cardata.type
       }
       cb(data)
    else
@@ -395,7 +558,7 @@ function Queue()
       for k, v in pairs(Config.QueueList) do
          local Player = QBCore.Functions.GetPlayerByCitizenId(k)
          if not v.getContract and v.status and Player and num <= Config.MaxQueueContract then
-            TriggerClientEvent('QBCore:Notify', Player.PlayerData.source, 'You just got a new contract', 'success')
+            TriggerClientEvent('QBCore:Notify', Player.PlayerData.source, Lang:t('info.new_contract'), "primary")
             TriggerEvent('jl-carboost:server:newContract', Player.PlayerData.source, k)
             num = (num or 0) + 1
             v.getContract = true
@@ -428,10 +591,42 @@ function DeleteExpiredContract()
    end)
 end
 
+function CheckVersion(err, resp, headers)
+   -- https://raw.githubusercontent.com/JustLazzy/jl-carboost/master/version
+   local curVersion = LoadResourceFile(GetCurrentResourceName(), 'version')
+   if curVersion ~= resp and tonumber(curVersion) < tonumber(resp) then
+      print('[jl-carboost] New version available: ' .. resp)
+   end
+end
+
+function RandomVIN()
+   local random = tostring(QBCore.Shared.RandomInt(3) .. QBCore.Shared.RandomStr(3) .. QBCore.Shared.RandomInt(2)):upper()
+   return random
+end
+
+function GenerateVIN()
+   local result = MySQL.Sync.fetchAll('SELECT * FROM player_vehicles WHERE vinnumber IS NULL')
+   if result[1] then
+      for _, v in pairs(result) do
+         local vin = RandomVIN()
+         MySQL.Sync.execute('UPDATE player_vehicles SET vinnumber = @vin WHERE id = @id', {
+            ['@vin'] = vin,
+            ['@id'] = v.id
+         })
+      end
+   end
+end
+
 -- Random Plate
 function RandomPlate()
 	local random = tostring(QBCore.Shared.RandomStr(2) .. QBCore.Shared.RandomInt(4)):upper()
    return random
+end
+
+function GetHoursFromNow(hours)
+   local hours = tonumber(hours)
+   local time = os.date("%c", os.time() + hours * 60 * 60)
+   return time
 end
 
 -- make the laptop usable

@@ -4,12 +4,15 @@ game 'gta5'
 
 author 'JustLazzy'
 
-description 'Car Boost Script'
+description 'QBCore Car Boosting Script With Laptop UI'
 
-version '0.0.1'
+version '1.0.0'
 
 shared_script {
+	'@qb-core/shared/locale.lua',
+	'locales/en.lua',
 	'config.lua',
+	'utils.lua'
 }
 
 server_script {
