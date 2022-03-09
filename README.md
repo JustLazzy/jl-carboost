@@ -54,7 +54,7 @@ And you're done
 ```lua
 Config.BennysSell = {
     ["brake1"] = {
-        item = 'brake1', --Item name
+        item = 'brake1', --Item name on your shared/items.lua
         image = 'brake_parts_b.png', --Item image
         price = 1000, --Item price
         stock = 50 -- Item stock
