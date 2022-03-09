@@ -111,8 +111,7 @@ local function StartHacking(vehicle)
     local trackerLeft = veh.state.trackerLeft
     if veh.state.tracker then
         if not veh.state.hacked then
-            local success = true
-            -- exports['boostinghack']:StartHack()
+            local success =  exports['boostinghack']:StartHack()
             if success then
                 local randomSeconds = math.random(30)
                 trackerLeft = trackerLeft - 1
