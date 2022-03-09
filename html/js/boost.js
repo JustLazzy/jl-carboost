@@ -436,7 +436,9 @@ function toggleBoosting(event) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({}),
+        body: JSON.stringify({
+          type: type,
+        }),
       }).then((resp) => {
         resp.json().then((resp) => {
           if (resp.canStart) {

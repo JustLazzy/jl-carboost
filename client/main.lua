@@ -111,7 +111,8 @@ local function StartHacking(vehicle)
     local trackerLeft = veh.state.trackerLeft
     if veh.state.tracker then
         if not veh.state.hacked then
-            local success = exports['boostinghack']:StartHack()
+            local success = true
+            -- exports['boostinghack']:StartHack()
             if success then
                 local randomSeconds = math.random(30)
                 trackerLeft = trackerLeft - 1
@@ -142,7 +143,7 @@ end
 local function RegisterCar(vehicle)
     local veh = Entity(vehicle)
     veh.state.tracker = true
-    veh.state.trackerLeft = 2
+    veh.state.trackerLeft = math.random(Config.Attempt)
     veh.state.hacked = false
 end
 
@@ -208,6 +209,11 @@ RegisterNUICallback('loadstore', function (data, cb)
 end)
 
 RegisterNUICallback('canStartContract', function (data, cb)
+    if data.type == 'vin' then
+        return cb({
+            error = "VIN is not supported yet"
+        })
+    end
     if isContractStarted then
         cb({
             error = "You already start the contract"
@@ -530,51 +536,53 @@ RegisterNetEvent('jl-carboost:client:startTracker', function(data)
 end)
 
 RegisterNetEvent("jl-carboost:client:bringtoPlace", function (data)
-    data = data
-    print(json.encode(data))
-    local polyZone = Config.DropPoint[math.random(1, #Config.DropPoint)]
-    TriggerServerEvent('qb-phone:server:sendNewMail', {
-        sender = "Unknown",
-        subject = "Drop point",
-        message = "Hey this is the drop point, you can drop your car here, I'm sending you the coord on gps",
-    })
-
-    dropBlip = CreateBlip(polyZone.coords, "Drop Point", 225, 66)
-    SetNewWaypoint(polyZone.coords)
-    Wait(100)
-    zone = BoxZone:Create(polyZone.coords, polyZone.length, polyZone.width, {
-        name=polyZone.name,
-        heading=polyZone.heading,
-        -- debugPoly=true,
-        minZ=polyZone.minZ,
-        maxZ=polyZone.maxZ
-    })
-    zone:onPointInOut(function ()
-        return GetEntityCoords(carSpawned)
-    end, function (isPointInside, point)
-        inZone = isPointInside
-        if inZone then
-            QBCore.Functions.Notify(Lang:t("info.car_inzone"))
-        end
-    end)
-    CreateThread(function ()
-        while true do
-            Wait(100)
+    if data.type == 'vin' then
+        -- [todo] write vinscratch logic here
+    else
+        local polyZone = Config.DropPoint[math.random(1, #Config.DropPoint)]
+        TriggerServerEvent('qb-phone:server:sendNewMail', {
+            sender = "Unknown",
+            subject = "Drop point",
+            message = "Hey this is the drop point, you can drop your car here, I'm sending you the coord on gps",
+        })
+    
+        dropBlip = CreateBlip(polyZone.coords, "Drop Point", 225, 66)
+        SetNewWaypoint(polyZone.coords)
+        Wait(100)
+        zone = BoxZone:Create(polyZone.coords, polyZone.length, polyZone.width, {
+            name=polyZone.name,
+            heading=polyZone.heading,
+            -- debugPoly=true,
+            minZ=polyZone.minZ,
+            maxZ=polyZone.maxZ
+        })
+        zone:onPointInOut(function ()
+            return GetEntityCoords(carSpawned)
+        end, function (isPointInside, point)
+            inZone = isPointInside
             if inZone then
-                if DoesEntityExist(carSpawned) then
-                    if not IsPedInVehicle(PlayerPedId(), carSpawned, false) then
-                        local playerCoords = GetEntityCoords(PlayerPedId())
-                        local carcoords = GetEntityCoords(carSpawned)
-                        local dist = #(playerCoords - carcoords)
-                        if dist >= 30.0 then
-                            TriggerEvent('jl-carboost:client:finishBoosting', data)
-                            break
+                QBCore.Functions.Notify(Lang:t("info.car_inzone"))
+            end
+        end)
+        CreateThread(function ()
+            while true do
+                Wait(100)
+                if inZone then
+                    if DoesEntityExist(carSpawned) then
+                        if not IsPedInVehicle(PlayerPedId(), carSpawned, false) then
+                            local playerCoords = GetEntityCoords(PlayerPedId())
+                            local carcoords = GetEntityCoords(carSpawned)
+                            local dist = #(playerCoords - carcoords)
+                            if dist >= 30.0 then
+                                TriggerEvent('jl-carboost:client:finishBoosting', data)
+                                break
+                            end
                         end
                     end
                 end
             end
-        end
-    end)
+        end)
+    end
 end)
 
 RegisterNetEvent('jl-carboost:client:finishBoosting', function (data)

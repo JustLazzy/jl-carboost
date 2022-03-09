@@ -7,6 +7,8 @@ AddEventHandler('onResourceStart', function (resource)
    if resource == GetCurrentResourceName() then
       Queue()
       DeleteExpiredContract()
+      -- Will use this later :)
+      -- GenerateVIN()
       -- PerformHttpRequest('https://raw.githubusercontent.com/JustLazzy/jl-carboost/master/version', CheckVersion, 'GET')
    end
 end)
@@ -100,7 +102,7 @@ RegisterNetEvent('jl-carboost:server:getContract', function (citizenid)
       ['@owner'] = citizenid
    })
    if result[1] then
-      for k, v in pairs(result) do
+      for _, v in pairs(result) do
          Config.QueueList[citizenid].contract[#Config.QueueList[citizenid].contract+1] = json.decode(v.data)
       end
    end
@@ -289,7 +291,7 @@ end, 'admin')
 RegisterNetEvent('jl-carboost:server:takeAll', function (data)
    local src = source
    local Player = QBCore.Functions.GetPlayer(src)
-   for k, v in pairs(data) do
+   for _, v in pairs(data) do
       local item = v.item
       Player.Functions.AddItem(item.name, item.quantity)
       TriggerClientEvent('inventory:client:itemBox', src, QBCore.Shared.Items[tostring(item.name)], 'add')
@@ -317,6 +319,10 @@ end)
 
 RegisterNetEvent('jl-carboost:notifypolice', function (car)
    TriggerClientEvent('jl-carboost:notifypolice', -1, car)
+end)
+
+RegisterNetEvent('jl-carboost:test', function()
+   GenerateVIN()
 end)
 
 -- Callback
@@ -504,6 +510,7 @@ QBCore.Functions.CreateCallback('jl-carboost:server:getContractData', function (
 end)
 
 QBCore.Functions.CreateCallback('jl-carboost:server:spawnCar', function (source, cb, data)
+   local src = source
    local cardata = data
    local boosttier = Config.Tier[cardata.data.tier]
    local coords = boosttier.location[math.random(1, #boosttier.location)]
@@ -518,10 +525,10 @@ QBCore.Functions.CreateCallback('jl-carboost:server:spawnCar', function (source,
    while not DoesEntityExist(car) do
       Wait(25)
    end
-   
    if DoesEntityExist(car) then
       SetVehicleDoorsLocked(car, 2) -- Lock the vehicle
       SetVehicleNumberPlateText(car, cardata.data.plate)
+      SetVehicleColours(car, math.random(159))
       local netId = NetworkGetNetworkIdFromEntity(car)
       data = {
          id = cardata.id,
@@ -593,14 +600,21 @@ function CheckVersion(err, resp, headers)
 end
 
 function RandomVIN()
-
+   local random = tostring(QBCore.Shared.RandomInt(3) .. QBCore.Shared.RandomStr(3) .. QBCore.Shared.RandomInt(2)):upper()
+   return random
 end
 
 function GenerateVIN()
-   MySQL.Async.execute('UPDATE')
-   SetTimeout(sleep, function ()
-      GenerateVIN()
-   end)
+   local result = MySQL.Sync.fetchAll('SELECT * FROM player_vehicles WHERE vinnumber IS NULL')
+   if result[1] then
+      for _, v in pairs(result) do
+         local vin = RandomVIN()
+         MySQL.Sync.execute('UPDATE player_vehicles SET vinnumber = @vin WHERE id = @id', {
+            ['@vin'] = vin,
+            ['@id'] = v.id
+         })
+      end
+   end
 end
 
 -- Random Plate
