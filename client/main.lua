@@ -1,19 +1,25 @@
 local QBCore = exports['qb-core']:GetCoreObject()
 local PlayerData = QBCore.Functions.GetPlayerData()
+local PlayerJob = {}
 local isJoinQueue, isContractStarted = false, false
-local carSpawned, carID = nil, nil
+local carSpawned, carID, carmodel = nil, nil, nil
 local display = false
-local zone, inZone, blipDisplay, dropBlip, cooldown = nil, false, nil, nil, false
+local zone, inZone, blipDisplay, dropBlip, cooldown, inscratchPoint = nil, false, nil, nil, false, false
+local scratchpoint 
+
+OnlineCops = 0
+
 
 RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
     PlayerData = QBCore.Functions.GetPlayerData()
+    PlayerJob = QBCore.Functions.GetPlayerData().job
+    onDuty = true
     TriggerServerEvent('jl-carboost:server:getItem')
     TriggerEvent('jl-carboost:client:setupBoostingApp')
 end)
-AddEventHandler('QBCore:Client:OnPlayerLoaded', function()
-    PlayerData = QBCore.Functions.GetPlayerData()
-    TriggerServerEvent('jl-carboost:server:getItem')
-    TriggerEvent('jl-carboost:client:setupBoostingApp')
+
+RegisterNetEvent('police:SetCopCount', function (amount)
+    OnlineCops = amount
 end)
 
 RegisterNetEvent('QBCore:Client:OnJobUpdate', function(JobInfo)
@@ -25,9 +31,14 @@ RegisterNetEvent('QBCore:Player:SetPlayerData', function(val)
 end)
 
 RegisterNetEvent('QBCore:Client:OnPlayerUnload', function ()
+    PlayerJob = {}
     TriggerServerEvent('jl-carboost:server:removeData', PlayerData.citizenid)  
     PlayerData = {}
     Config.BennysItems = {}
+end)
+
+RegisterNetEvent('QBCore:Client:SetDuty', function(duty)
+    onDuty = duty
 end)
 
 -- function
@@ -41,12 +52,12 @@ function SetDisplay(bool)
     })
 end
 
-local function createRadiusBlips(x, y, z)
-    local blip = AddBlipForRadius(x,y, z, 100.0)
+local function createRadiusBlips(v)
+    local blip = Citizen.InvokeNative(0x46818D79B1F7499A,v.x + math.random(0.0,150.0), v.y + math.random(0.0,80.0), v.z + math.random(0.0,5.0) , 300.0)
     SetBlipHighDetail(blip, true)
-    SetBlipColour(blip, 44)
+    SetBlipColour(blip, 68)
     SetBlipAsShortRange(blip, true)
-    SetBlipAlpha(blip, 50)
+    SetBlipAlpha(blip, 128)
     blipDisplay = blip
 end
 
@@ -146,6 +157,37 @@ local function RegisterCar(vehicle)
     veh.state.hacked = false
 end
 
+local function finishBoosting(data)
+    TriggerServerEvent('jl-carboost:server:finishBoosting')
+    TriggerEvent('jl-carboost:client:deleteContract')
+    DeleteEntity(carSpawned)
+    RemoveBlip(dropBlip)
+    carSpawned = nil
+    zone:destroy()
+    zone = nil
+    inZone = false
+    isContractStarted = false
+    carmodel = nil
+    ContractID = nil
+    Wait(1000)
+    TriggerEvent('jl-carboost:client:refreshQueue')
+end
+
+local function Scratching()
+    TriggerServerEvent('jl-carboost:server:finishBoosting')
+    TriggerEvent('jl-carboost:client:deleteContract')
+    scratchpoint:destroy()
+    scratchpoint = nil
+    RemoveBlip(dropBlip)
+    carSpawned = nil
+    inscratchPoint = false
+    isContractStarted = false
+    carmodel = nil
+    ContractID = nil
+    Wait(1000)
+    TriggerEvent('jl-carboost:client:refreshQueue')
+end
+
 local function BoostingAlert()
     if Config.Alert == 'qb-dispatch' then
         TriggerEvent('dispatch:carboost', carID)
@@ -208,25 +250,40 @@ RegisterNUICallback('loadstore', function (data, cb)
 end)
 
 RegisterNUICallback('canStartContract', function (data, cb)
-    if data.type == 'vin' then
+    if OnlineCops < Config.MinimumPolice then
         return cb({
-            error = "VIN is not supported yet"
+            error = "To start the contract you need at least "..Config.MinimumPolice.." cops online"
         })
     end
     if isContractStarted then
-        cb({
+        return cb({
             error = "You already start the contract"
         })
     else
-        cb({
-            canStart = true
-        })
+        if data.type == 'vin' then
+            QBCore.Functions.TriggerCallback('jl-carboost:server:vinmoney', function(result)
+                if result and not result.error then
+                    return cb({
+                        canStart = true
+                    })
+                else
+                    return cb({
+                        error = result.error or Lang:t('error.not_enough_money', {
+                            money = Config.Payment
+                        })
+                    })
+                end
+            end, PlayerData.citizenid)
+        else
+            return cb({
+                canStart = true
+            })
+        end
     end
 end)
 
 RegisterNUICallback('startcontract', function (data)
     local data = data
-    print(json.encode(data))
     if not isContractStarted then
         isContractStarted = true
         QBCore.Functions.TriggerCallback('jl-carboost:server:getContractData', function (result)
@@ -288,6 +345,10 @@ RegisterNUICallback('setupboostapp', function (data, cb)
                 carboostdata.contract[k].carname = GetLabelText(GetDisplayNameFromVehicleModel(v.car))
             end
             cb({
+                setting = {
+                    payment = Config.Payment,
+                    amount = Config.VINPayment,
+                },
                 boostdata = carboostdata
             })
         else
@@ -451,6 +512,7 @@ RegisterNetEvent('jl-carboost:client:spawnCar', function(data)
             Wait(5000)
             createRadiusBlips(result.spawnlocation)
             carID = result.networkID
+            carmodel = result.car
             TriggerServerEvent('qb-phone:server:sendNewMail', {
                 sender = "Unknown",
                 subject = "Car Location",
@@ -471,6 +533,7 @@ RegisterNetEvent('jl-carboost:client:startBoosting', function (data)
                 -- carSpawned = NetworkGetEntityFromNetworkId(carID)
                 if DoesEntityExist(NetworkGetEntityFromNetworkId(carID)) then
                     carSpawned = NetworkGetEntityFromNetworkId(carID)
+                    
                     if not modified then
                         QBCore.Functions.SetVehicleProperties(carSpawned, VehProp)
                         modified = true
@@ -491,6 +554,76 @@ RegisterNetEvent('jl-carboost:client:startBoosting', function (data)
     end)
 end)
 
+RegisterNetEvent('jl-carboost:client:checkvin', function ()
+    local vehicle = QBCore.Functions.GetClosestVehicle()
+    if vehicle ~= 0 then
+        local networkID = NetworkGetNetworkIdFromEntity(vehicle)
+        if GetVehicleDoorLockStatus(vehicle) == 1 then
+                QBCore.Functions.Progressbar('check_vin', 'Checking VIN Number', 6000, false, true, { -- Name | Label | Time | useWhileDead | canCancel
+                    disableMovement = true,
+                    disableCarMovement = true,
+                    disableMouse = false,
+                    disableCombat = true,
+                }, {
+                    animDict = '"anim@amb@clubhouse@tutorial@bkr_tut_ig3@"@',
+                    anim = 'machinic_loop_mechandplayer',
+                    flags = 16,
+                }, {}, {}, function() 
+                    QBCore.Functions.TriggerCallback('jl-carboost:server:checkvin', function(result)
+                        if result and result.success then
+
+                            QBCore.Functions.Notify(result.message, "primary")
+                           
+                        else
+                            QBCore.Functions.Notify("Hmm you can't found the VIN", "error")
+                        end
+                    end, networkID)
+                    ClearPedTasks(PlayerPedId())
+                end, function() -- Play When Cancel
+                    QBCore.Functions.Notify("Cancelled", "error")
+                    ClearPedTasks(PlayerPedId())
+                end)
+            else
+                QBCore.Functions.Notify("The vehicle is locked", "error")
+            end
+        else
+            QBCore.Functions.Notify("No vehicle nearby", "error")
+        end
+end)
+
+RegisterNetEvent('jl-carboost:client:vinscratch', function(veh)
+    local ID = NetworkGetNetworkIdFromEntity(veh)
+    QBCore.Functions.Progressbar('vin_scratching', 'Scratching VIN', 7000, false, true, { -- Name | Label | Time | useWhileDead | canCancel
+        disableMovement = true,
+        disableCarMovement = true,
+        disableMouse = false,
+        disableCombat = true,
+    }, {
+        animDict = '"anim@amb@clubhouse@tutorial@bkr_tut_ig3@"@',
+        anim = 'machinic_loop_mechandplayer',
+        flags = 1,
+    }, {}, {}, function() -- Play When Done
+        QBCore.Functions.TriggerCallback('jl-carboost:server:checkvin', function(result)
+            if result and result.owner == PlayerData.citizenid then
+                if result.vinscratch == 1 then
+                    return QBCore.Functions.Notify('You already scratch this vehicle VIN', 'error')
+                end
+            else
+                QBCore.Functions.Notify('VIN Scratched, you can change your plate number', 'primary')
+                local vehProp = QBCore.Functions.GetVehicleProperties(veh)
+                TriggerServerEvent('jl-carboost:server:vinscratch', ID, vehProp, carmodel)
+                TriggerEvent('jl-carboost:client:deleteContract')
+                Scratching()
+            end
+        end, ID)
+       
+        ClearPedTasks(PlayerPedId())
+    end, function() -- Play When Cancel
+        --Stuff goes here
+        ClearPedTasks(PlayerPedId())
+    end)
+end)
+        
 RegisterNetEvent('jl-carboost:client:playerInVehicle', function (data)
     local data = data
     CreateThread(function ()
@@ -535,8 +668,33 @@ RegisterNetEvent('jl-carboost:client:startTracker', function(data)
 end)
 
 RegisterNetEvent("jl-carboost:client:bringtoPlace", function (data)
+    ContractID = data.id
     if data.type == 'vin' then
         -- [todo] write vinscratch logic here
+        local pz = Config.DropPoint[math.random(1, #Config.DropPoint)]
+        TriggerServerEvent('qb-phone:server:sendNewMail', {
+            sender = "Unknown",
+            subject = "VIN Scratching",
+            message = "You can scratch your VIN here",
+        })
+        dropBlip = CreateBlip(pz.coords, 'VIN Scratch', 255, 1)
+        scratchpoint = BoxZone:Create(pz.coords, pz.length, pz.width, {
+            name=pz.name,
+            heading=pz.heading,
+            -- debugPoly=true,
+            minZ=pz.minZ,
+            maxZ=pz.maxZ
+        })
+        scratchpoint:onPointInOut(function ()
+            return GetEntityCoords(carSpawned)
+        end, function (isPointInside, point)
+            inscratchPoint = isPointInside
+            if inscratchPoint then
+                QBCore.Functions.Notify(Lang:t("info.in_scratch"))
+            else
+                QBCore.Functions.Notify(Lang:t("info.not_in_scratch"))
+            end
+        end)
     else
         local polyZone = Config.DropPoint[math.random(1, #Config.DropPoint)]
         TriggerServerEvent('qb-phone:server:sendNewMail', {
@@ -544,8 +702,7 @@ RegisterNetEvent("jl-carboost:client:bringtoPlace", function (data)
             subject = "Drop point",
             message = "Hey this is the drop point, you can drop your car here, I'm sending you the coord on gps",
         })
-    
-        dropBlip = CreateBlip(polyZone.coords, "Drop Point", 225, 66)
+        dropBlip = CreateBlip(polyZone.coords, "Drop Point", 225, 1)
         SetNewWaypoint(polyZone.coords)
         Wait(100)
         zone = BoxZone:Create(polyZone.coords, polyZone.length, polyZone.width, {
@@ -573,7 +730,7 @@ RegisterNetEvent("jl-carboost:client:bringtoPlace", function (data)
                             local carcoords = GetEntityCoords(carSpawned)
                             local dist = #(playerCoords - carcoords)
                             if dist >= 30.0 then
-                                TriggerEvent('jl-carboost:client:finishBoosting', data)
+                                finishBoosting(data)
                                 break
                             end
                         end
@@ -585,18 +742,7 @@ RegisterNetEvent("jl-carboost:client:bringtoPlace", function (data)
 end)
 
 RegisterNetEvent('jl-carboost:client:finishBoosting', function (data)
-    DeleteEntity(carSpawned)
-    RemoveBlip(dropBlip)
-    carSpawned = nil
-    zone:destroy()
-    zone = nil
-    inZone = false
-    isContractStarted = false
-    TriggerServerEvent('jl-carboost:server:finishBoosting', data)
-    Wait(100)
-    TriggerEvent('jl-carboost:client:deleteContract', data)
-    Wait(1000)
-    TriggerEvent('jl-carboost:client:refreshQueue')
+
 end)
 
 RegisterNetEvent('jl-carboost:client:updateProggress', function (data)
@@ -611,13 +757,12 @@ RegisterNetEvent('jl-carboost:client:updateProggress', function (data)
     })
 end)
 
-RegisterNetEvent('jl-carboost:client:deleteContract', function (data)
-    local id = data.id
+RegisterNetEvent('jl-carboost:client:deleteContract', function ()
     SendNUIMessage({
         type = "removeContract",
-        id = id
+        id = ContractID
     })
-    TriggerServerEvent('jl-carboost:server:deleteContract', id)
+    TriggerServerEvent('jl-carboost:server:deleteContract', ContractID)
 end)
 
 
@@ -629,6 +774,10 @@ RegisterNetEvent('jl-carboost:client:failedBoosting', function ()
         zone:destroy()
         zone = nil
         inZone = false
+    elseif scratchpoint then
+        scratchpoint:destroy()
+        scratchpoint = nil
+        inscratchPoint = false
     end
     QBCore.Functions.Notify(Lang:t("error.error_occured"), "error")
     TriggerEvent('jl-carboost:client:refreshContract')
@@ -686,8 +835,7 @@ RegisterNetEvent('jl-carboost:client:useHackingDevice', function ()
     local playerPed = PlayerPedId()
     local vehicle = GetVehiclePedIsIn(playerPed, false)
     if IsPedInVehicle(playerPed, vehicle) then
-
-        -- if GetPedInVehicleSeat(vehicle, 2) then   
+        if GetPedInVehicleSeat(GetVehiclePedIsIn(PlayerPedId(), false), 0) ~= 0 then
             if cooldown then
                 return QBCore.Functions.Notify(Lang:t("error.cannot_use"), "error")
             end
@@ -695,9 +843,9 @@ RegisterNetEvent('jl-carboost:client:useHackingDevice', function ()
             cooldown = true
             Wait(5000)
             cooldown = false
-        -- else
-        --     return QBCore.Functions.Notify("You need to be in front seat passenger to do this", "error")
-        -- end
+        else
+            return QBCore.Functions.Notify(Lang:t('error.not_seat'), "error")
+        end
     else
         QBCore.Functions.Notify(Lang:t("error.not_on_vehicle"), "error")
     end
@@ -725,6 +873,8 @@ CreateThread(function ()
     end
     CreateBlip(vector3(1185.2, -3303.92, 6.92), "Post OP", 473)
 end)
+
+
 
 -- Prevent the boosting still running when the car is destroyed / disappeared for no reason
 CreateThread(function ()
@@ -757,6 +907,32 @@ exports['qb-target']:AddBoxZone("carboost:takeItem", vector3(1185.14, -3304.01, 
 	},
 	distance = 3.0
 })
+
+local bones = {
+    'bodyshell',
+    'bonnet',
+    'boot',
+    'wheel_lf',
+    'wheel_rf',
+    'wheel_lm',
+    'wheel_rm',
+}
+exports['qb-target']:AddTargetBone(bones, {
+    options = {
+        {
+            icon = "fas fa-solid fa-car",
+            label = "Scratch VIN",
+            canInteract = function ()
+                return inscratchPoint
+            end,
+            action = function (entity)
+                TriggerEvent('jl-carboost:client:vinscratch', entity)
+            end
+        },
+    },
+    distance = 1.2
+})
+
 
 AddEventHandler('onResourceStop', function(resource)
    if resource == GetCurrentResourceName() then

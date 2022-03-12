@@ -11,7 +11,8 @@ local Translations = {
         ['empty_post'] = "You don't have anything in here",
         ['not_enough_money'] = "You have not enough %{money} in your account",
         ['invalid_tier'] = 'Invalid tier',
-        ['invalid_player'] = 'Invalid player'
+        ['invalid_player'] = 'Invalid player',
+        ['not_seat'] = 'You need to be in front seat passenger to do this'
     },
     success = {
         ['disable_tracker'] = 'You have successfully disable the tracker',
@@ -30,7 +31,9 @@ local Translations = {
         ['new_contract'] = "You just got a new contract",
         ['payment_crypto'] = 'You just got %{amount} crypto',
         ['get_rep'] = 'You get more reputation: %{rep}',
-        ['boosting'] = '10-81 car boosting reported!'
+        ['boosting'] = '10-81 car boosting reported!',
+        ['in_scratch'] = 'You can scratch your VIN here',
+        ['not_in_scratch'] = 'You leave the zone'
     },
     menu = {
         
