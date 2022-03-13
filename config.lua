@@ -282,7 +282,25 @@ Config.DropPoint = {
 }
 
 Config.ScratchingPoint = {
-    
+    -- pz 
+    [1] = {
+        coords = vector3(1430.56, 6332.89, 23.99),
+        length = 10.6,
+        width = 11.8,
+        name = "scratchingpoint",
+        heading = 0,
+        minZ= 21.29,
+        maxZ = 24.99
+    },
+    [2] = {
+        coords = vector3(1637.43, 4850.97, 42.02),
+        length = 9.95,
+        width = 7.8,
+        name = "scratchingpoint2",
+        heading = 10,
+        minZ= 39.42,
+        maxZ = 43.42
+    }
 }
 
 Config.BennysSell = {

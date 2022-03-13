@@ -671,7 +671,7 @@ RegisterNetEvent("jl-carboost:client:bringtoPlace", function (data)
     ContractID = data.id
     if data.type == 'vin' then
         -- [todo] write vinscratch logic here
-        local pz = Config.DropPoint[math.random(1, #Config.DropPoint)]
+        local pz = Config.ScratchingPoint[math.random(1, #Config.ScratchingPoint)]
         TriggerServerEvent('qb-phone:server:sendNewMail', {
             sender = "Unknown",
             subject = "VIN Scratching",

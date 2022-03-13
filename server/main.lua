@@ -51,8 +51,6 @@ RegisterNetEvent('jl-carboost:server:newContract', function (source)
       tier = tier,
       plate = RandomPlate(),
    }
-  local something =  os.date('%c')
-  print(something)
    if #Config.QueueList[citizenid].contract <= Config.MaxContract then     
       MySQL.Async.insert('INSERT INTO boost_contract (owner, data, started, expire) VALUES (@owner, @data, NOW(),DATE_ADD(NOW(), INTERVAL @expire HOUR))', {
          ['@owner'] = citizenid,
@@ -505,7 +503,6 @@ QBCore.Functions.CreateCallback('jl-carboost:server:getboostdata', function (sou
          if v.onsale == 1 then
             return
          end
-         print(json.encode(v))
          local data = json.decode(v.data)
          contractData.contract[#contractData.contract+1] = {
             id = v.id,
@@ -522,7 +519,6 @@ end)
 
 QBCore.Functions.CreateCallback('jl-carboost:server:getContractData', function (source, cb, data)
    local data = data.data
-   -- print(json.encode(data))
    local Player = QBCore.Functions.GetPlayer(source)
    local result = MySQL.Sync.fetchAll('SELECT * FROM boost_contract WHERE id = @id AND owner = @owner', {
       ['@id'] = data.id,
