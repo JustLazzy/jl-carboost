@@ -20,4 +20,4 @@ CREATE TABLE IF NOT EXISTS `boost_contract` (
 
 ALTER TABLE player_vehicles ADD COLUMN `vinnumber` VARCHAR(50) NULL;
 
-ALTER TABLE player_vehicles ADD COLUMN `vinscratch` INT(2) 0;
+ALTER TABLE player_vehicles ADD COLUMN `vinscratch` INT(2) DEFAULT 0;
