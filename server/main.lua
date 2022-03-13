@@ -8,7 +8,7 @@ AddEventHandler('onResourceStart', function (resource)
       Queue()
       DeleteExpiredContract()
       -- Will use this later :)
-      -- GenerateVIN()
+      GenerateVIN()
       -- PerformHttpRequest('https://raw.githubusercontent.com/JustLazzy/jl-carboost/master/version', CheckVersion, 'GET')
    end
 end)
@@ -51,8 +51,6 @@ RegisterNetEvent('jl-carboost:server:newContract', function (source)
       tier = tier,
       plate = RandomPlate(),
    }
-  local something =  os.date('%c')
-  print(something)
    if #Config.QueueList[citizenid].contract <= Config.MaxContract then     
       MySQL.Async.insert('INSERT INTO boost_contract (owner, data, started, expire) VALUES (@owner, @data, NOW(),DATE_ADD(NOW(), INTERVAL @expire HOUR))', {
          ['@owner'] = citizenid,
@@ -153,10 +151,9 @@ RegisterNetEvent('jl-carboost:server:log', function (string, type)
    end
 end)
 
-RegisterNetEvent('jl-carboost:server:finishBoosting', function (data)
+RegisterNetEvent('jl-carboost:server:finishBoosting', function ()
    local isNextLevel = false
    local src = source
-   local data = data
    local pData = QBCore.Functions.GetPlayer(src)
    local amountMoney = math.random(20, 70)
    local currentRep = pData.PlayerData.metadata['carboostrep']
@@ -202,6 +199,25 @@ RegisterNetEvent('jl-carboost:server:updateBennysConfig', function (data)
       ['@citizenid'] = pData.PlayerData.citizenid,
       ['@items'] = json.encode(data)
    })
+end)
+
+RegisterNetEvent('jl-carboost:server:vinscratch', function(NetworkID, mods, model)
+   local src = source 
+   local pData = QBCore.Functions.GetPlayer(src)
+   local entity = NetworkGetEntityFromNetworkId(NetworkID)
+   local plate = GetVehicleNumberPlateText(entity)
+   MySQL.Async.insert('INSERT INTO player_vehicles (license, citizenid, vehicle, hash, mods, plate, state, vinscratch, vinnumber) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', {
+      pData.PlayerData.license,
+      pData.PlayerData.citizenid,
+      model,
+      entity,
+      json.encode(mods),
+      plate,
+      0,
+      1,
+      RandomVIN()
+   })
+   TriggerClientEvent('vehiclekeys:client:SetOwner', src, plate)
 end)
 
 QBCore.Commands.Add('settier', 'Set Boosting Tier', {
@@ -456,8 +472,20 @@ QBCore.Functions.CreateCallback('jl-carboost:server:transfercontract', function 
    end
 end)
 
-QBCore.Functions.CreateCallback('jl-carboost:server:canTake', function (source, cb, data)
-   
+QBCore.Functions.CreateCallback('jl-carboost:server:vinmoney', function (source, cb, data)
+   local src = source
+   local Player = QBCore.Functions.GetPlayer(src)
+   local money = Player.PlayerData.money[Config.Payment]
+   if money > Config.VINPayment then
+      Player.Functions.RemoveMoney(Config.Payment, Config.VINPayment, 'vin-money')
+      return cb({
+         success = true
+      })
+   else
+      return cb({
+         error = Lang:t('error.not_enough_money', {money = Config.Payment})
+      })
+   end
 end)
 
 QBCore.Functions.CreateCallback('jl-carboost:server:getboostdata', function (source, cb, citizenid)
@@ -475,7 +503,6 @@ QBCore.Functions.CreateCallback('jl-carboost:server:getboostdata', function (sou
          if v.onsale == 1 then
             return
          end
-         print(json.encode(v))
          local data = json.decode(v.data)
          contractData.contract[#contractData.contract+1] = {
             id = v.id,
@@ -492,7 +519,6 @@ end)
 
 QBCore.Functions.CreateCallback('jl-carboost:server:getContractData', function (source, cb, data)
    local data = data.data
-   -- print(json.encode(data))
    local Player = QBCore.Functions.GetPlayer(source)
    local result = MySQL.Sync.fetchAll('SELECT * FROM boost_contract WHERE id = @id AND owner = @owner', {
       ['@id'] = data.id,
@@ -536,6 +562,7 @@ QBCore.Functions.CreateCallback('jl-carboost:server:spawnCar', function (source,
          spawnlocation = coords.car,
          npc = npcCoords,
          carmodel = car,
+         car = cardata.data.car,
          type = cardata.type
       }
       cb(data)
@@ -544,6 +571,30 @@ QBCore.Functions.CreateCallback('jl-carboost:server:spawnCar', function (source,
          networkID = 0,
       }
       cb(data)
+   end
+end)
+
+QBCore.Functions.CreateCallback('jl-carboost:server:checkvin', function (source, cb, data)
+   local src = source
+   local veh = NetworkGetEntityFromNetworkId(data)
+   local plate = GetVehicleNumberPlateText(veh)
+   local result = MySQL.Sync.fetchAll('SELECT vinnumber, vinscratch,citizenid  FROM player_vehicles WHERE plate = @plate', {
+      ['@plate'] = plate
+   })
+   if result[1] then
+      local vin
+      if result[1].vinscratch == 1 then
+         if math.random() <= Config.VINChance then
+            vin = "Seems like the VIN got scratched!"
+         else
+            vin = "The VIN number is: " .. result[1].vinnumber
+         end
+      else
+         vin = "The VIN number is: " .. result[1].vinnumber
+      end
+      return cb({success = true, message = vin, vin = result[1].vinnumber, owner = result[1].citizenid, vinscratch = result[1].vinscratch})
+   else
+      return cb({success = false, message = "Test"})
    end
 end)
 
@@ -582,13 +633,17 @@ end
 function DeleteExpiredContract()
    MySQL.Async.execute('DELETE FROM boost_contract WHERE expire < NOW()',{}, function (result)
       if result > 0 then
-         print(json.encode(result))
-         print('Contracts deleted')
+         print('Deleted ' .. result .. ' expired contracts')
       end
    end)
    SetTimeout(sleep,function ()
       DeleteExpiredContract()
    end)
+end
+
+function RandomVIN()
+   local random = tostring(QBCore.Shared.RandomInt(3) .. QBCore.Shared.RandomStr(3) .. QBCore.Shared.RandomInt(2)):upper()
+   return random
 end
 
 function CheckVersion(err, resp, headers)
@@ -597,11 +652,6 @@ function CheckVersion(err, resp, headers)
    if curVersion ~= resp and tonumber(curVersion) < tonumber(resp) then
       print('[jl-carboost] New version available: ' .. resp)
    end
-end
-
-function RandomVIN()
-   local random = tostring(QBCore.Shared.RandomInt(3) .. QBCore.Shared.RandomStr(3) .. QBCore.Shared.RandomInt(2)):upper()
-   return random
 end
 
 function GenerateVIN()
@@ -619,7 +669,7 @@ end
 
 -- Random Plate
 function RandomPlate()
-	local random = tostring(QBCore.Shared.RandomStr(2) .. QBCore.Shared.RandomInt(4)):upper()
+	local random = tostring(QBCore.Shared.RandomInt(1) .. QBCore.Shared.RandomStr(2) .. QBCore.Shared.RandomInt(3) .. QBCore.Shared.RandomStr(2)):upper()
    return random
 end
 
@@ -629,6 +679,16 @@ function GetHoursFromNow(hours)
    return time
 end
 
+function AddVIN(plate)
+   local vin = RandomVIN()
+   MySQL.Sync.execute('UPDATE player_vehicles SET vinnumber = @vin WHERE plate = @plate', {
+      ['@vin'] = vin,
+      ['@plate'] = plate
+   })
+end
+
+exports('AddVIN', AddVIN)
+
 -- make the laptop usable
 QBCore.Functions.CreateUseableItem('laptop' , function(source, item)
    TriggerClientEvent('jl-carboost:client:openLaptop', source)
@@ -636,4 +696,8 @@ end)
 
 QBCore.Functions.CreateUseableItem('hacking_device',  function (source, item)
    TriggerClientEvent('jl-carboost:client:useHackingDevice', source)
+end)
+
+QBCore.Functions.CreateUseableItem('fake_plate', function(source, item)
+   TriggerClientEvent('jl-carboost:client:fakeplate', source)
 end)

@@ -17,3 +17,7 @@ CREATE TABLE IF NOT EXISTS `boost_contract` (
   UNIQUE KEY `id` (`id`),
   KEY `owner` (`owner`)
 ) ENGINE=InnoDB AUTO_INCREMENT=67 DEFAULT CHARSET=utf8mb3;
+
+ALTER TABLE player_vehicles ADD COLUMN `vinnumber` VARCHAR(50) NULL;
+
+ALTER TABLE player_vehicles ADD COLUMN `vinscratch` INT(2) 0;

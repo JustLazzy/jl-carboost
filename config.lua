@@ -12,7 +12,7 @@ Config.BennysItems = {}
 
 Config.Alert = 'linden_outlawalert' -- qb-dispatch / linden_outlawalert / notification, only use qb-dispatch when its on stable release
 
-Config.Minimum = 5 -- Minimum police
+Config.MinimumPolice = 0 -- Minimum police
 
 Config.WaitTime = 1 -- Time to wait to get first contract, (in minutes)
 
@@ -28,7 +28,11 @@ Config.MaxRep = 40 -- Maximum reputation that you can get after finish contract
 
 Config.Payment = 'crypto' -- crypto / bank
 
-Config.Attempt = 21 -- how many hacks to successfully turn off the tracker, it'll be random from 1 to this config
+Config.VINPayment = 100 -- Amount of money that you have to pay for VIN
+
+Config.Attempt = 2 -- how many hacks to successfully turn off the tracker, it'll be random from 1 to this config
+
+Config.VINChance = 0.1 -- chance police to find out the VIN is scratched or no
 
 Config.Tier = {
     --[[
@@ -40,24 +44,48 @@ Config.Tier = {
                 car = vector4(-935.1176, -1080.552,1.683342, 120.1060),
                 npc = {
                     vector3(-924.21, -1088.11, 2.17),
-                    vector3(-936.39, -1067.84, 2.17),
-                    vector3(-932.79, -1064.2, 2.15)
                 }
             },
             [2] = {
                 car = vector4(-1077.27, -1143.9, 2.16, 203.94),
                 npc = {
                     vector3(-1077.77, -1128.86, 2.16),
-                    vector3(-1088.7, -1127.05, 2.16),
-                    vector3(-1055.04, -1144.29, 2.16)
                 }
             },
             [3] = {
-                car = vector4(-1023.625, -890.4014, 5.202, 216.0399),
+                car = vector4(-1517.9, -884.14, 10.11, 47.89),
                 npc = {
-                    vector3(-1014.88, -898.47, 2.22),
-                    vector3(-1037.91, -907.53, 3.55),
-                    vector3(-1013.67, -884.11, 7.82)
+                    vector3(-1529.57, -885.42, 10.17),
+                }
+            },
+            [4] = {
+                car = vector4(-1144.5, -737.39, 20.21, 290.27),
+                npc = {
+                    vector3(-1159.14, -740.26, 19.89),
+                }
+            },
+            [5] = {
+                car = vector4(-727.06, -1061.14, 12.35, 31.44),
+                npc = {
+                    vector3(-738.16, -1068.43, 12.42),
+                }
+            },
+            [6] = {
+                car = vector4(-524.4, -883.63, 25.16, 156.43),
+                npc = {
+                    vector3(-535.84, -886.55, 25.21),
+                }
+            },
+            [7] = {
+                car = vector4(-446.69, -767.76, 30.56, 265.37),
+                npc = {
+                    vector3(-447.65, -789.61, 32.94),
+                }
+            },
+            [8] = {
+                car = vector4(-174.92, -156.66, 43.62, 67.47),
+                npc = {
+                    vector3(-194.97, -134.63, 43.98),
                 }
             },
         },
@@ -76,7 +104,6 @@ Config.Tier = {
                 npc = {
                     vector3(0.86, -1502.77, 30.0),
                     vector3(12.44, -1532.56, 29.28),
-                    vector3(19.94, -1511.37, 31.85)
                 }
             },
             [2] = {
@@ -84,7 +111,6 @@ Config.Tier = {
                 npc = {
                     vector3(-1679.17, -201.26, 57.54),
                     vector3(-1666.61, -185.91, 57.6),
-                    vector3(-1649.03, -179.92, 56.39)
                 }
             },
             [3] = {
@@ -92,7 +118,41 @@ Config.Tier = {
                 npc = {
                     vector3(-37.36, -1835.39, 26.02),
                     vector3(-53.74, -1822.3, 26.78),
-                    vector3(-62.12, -1814.4, 27.19)
+                }
+            },
+            [4] = {
+                car = vector4(-1977.01, 259.98, 87.22, 287.74),
+                npc = {
+                    vector3(-1969.96, 247.87, 87.61),
+                    vector3(-1981.06, 248.86, 87.61),
+                }
+            },
+            [5] = {
+                car = vector4(-1197.86, 349.32, 71.14, 101.93),
+                npc = {
+                    vector3(-1208.21, 354.13, 71.23),
+                    vector3(-1211.41, 322.84, 71.03),
+                }
+            },
+            [6] = {
+                car = vector4(232.96, 385.49, 106.41, 75.35),
+                npc = {
+                    vector3(223.97, 381.21, 106.52),
+                    vector3(255.24, 375.49, 105.53),
+                }
+            },
+            [7] = {
+                car = vector4(138.55, 317.62, 112.13, 111.85),
+                npc = {
+                    vector3(152.35, 304.96, 112.13),
+                    vector3(134.62, 322.93, 116.63),
+                }
+            },
+            [8] = {
+                car = vector4(152.46, 163.21, 104.85, 73.96),
+                npc = {
+                    vector3(156.63, 153.34, 105.08),
+                    vector3(141.94, 178.25, 105.43),
                 }
             },
         },
@@ -218,6 +278,28 @@ Config.DropPoint = {
         heading = 0,
         minZ=4.87,
         maxZ=8.47
+    }
+}
+
+Config.ScratchingPoint = {
+    -- pz 
+    [1] = {
+        coords = vector3(1430.56, 6332.89, 23.99),
+        length = 10.6,
+        width = 11.8,
+        name = "scratchingpoint",
+        heading = 0,
+        minZ= 21.29,
+        maxZ = 24.99
+    },
+    [2] = {
+        coords = vector3(1637.43, 4850.97, 42.02),
+        length = 9.95,
+        width = 7.8,
+        name = "scratchingpoint2",
+        heading = 10,
+        minZ= 39.42,
+        maxZ = 43.42
     }
 }
 
