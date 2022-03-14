@@ -12,12 +12,6 @@
 3. qb-target
 4. qb-phone
 
-## Preview
-
-<img src="./images/hacking_device.png"/>
-
-<BR>
-
 # How to install
 
 <tr>
@@ -129,6 +123,22 @@ Config.BennysSell = {
 | ------------ | ---------------------------------- | ---------- |
 | settier      | Set Boosting Tier                  | Admin      |
 | giveContract | Give contract to a specific player | Admin      |
+
+# Preview
+
+## Bennys App
+
+<img src="https://media.discordapp.net/attachments/943001162196611103/952890360764432394/unknown.png?width=1036&height=583" />
+<img src="https://media.discordapp.net/attachments/943001162196611103/952890442217828352/unknown.png?width=1036&height=583">
+
+## Boosting App
+
+<img src= "https://media.discordapp.net/attachments/943001162196611103/952890617401323550/unknown.png?width=1036&height=583"/>
+<img src= "https://media.discordapp.net/attachments/943001162196611103/952890668873838622/unknown.png?width=1036&height=583"/>
+
+## Setting
+
+<img src="https://media.discordapp.net/attachments/943001162196611103/952891497747996672/unknown.png?width=1036&height=583"/>
 
 ## Special Thanks
 

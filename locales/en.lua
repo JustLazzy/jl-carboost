@@ -12,7 +12,9 @@ local Translations = {
         ['not_enough_money'] = "You have not enough %{money} in your account",
         ['invalid_tier'] = 'Invalid tier',
         ['invalid_player'] = 'Invalid player',
-        ['not_seat'] = 'You need to be in front seat passenger to do this'
+        ['not_seat'] = 'You need to be in front seat passenger to do this',
+        ['not_owner'] = 'You need to be the owner of the vehicle to do this',
+        ['not_plate'] = 'You need to be in the front or back of the vehicle to do this',
     },
     success = {
         ['disable_tracker'] = 'You have successfully disable the tracker',
@@ -22,7 +24,8 @@ local Translations = {
         ['contract_transfer'] = 'Successfully transfered contract to %{player}',
         ['contract_give'] = 'Successfully gave contract to %{player}',
         ['set_tier'] = "Successfully set the tier to %{tier}",
-        ['take_all'] = 'Successfully received all items'
+        ['take_all'] = 'Successfully received all items',
+        ['plate_changed'] = "Successfully change the plate to %{plate}"
     },
     info = {
         ['car_inzone'] = "Okay, leave the car there, I'll pay you later",
@@ -33,7 +36,7 @@ local Translations = {
         ['get_rep'] = 'You get more reputation: %{rep}',
         ['boosting'] = '10-81 car boosting reported!',
         ['in_scratch'] = 'You can scratch your VIN here',
-        ['not_in_scratch'] = 'You leave the zone'
+        ['not_in_scratch'] = 'You leave the zone',
     },
     menu = {
         

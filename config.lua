@@ -352,6 +352,12 @@ Config.BennysSell = {
         price = 100000,
         stock = 50,
     },
+    ["fake_plate"] = {
+        item = "fake_plate",
+        image = "fake_plate.png",
+        price = 230,
+        stock = 50,
+    }
 
 }
 

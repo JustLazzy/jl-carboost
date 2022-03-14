@@ -323,9 +323,15 @@ RegisterNetEvent('jl-carboost:server:getBoostSale', function()
    local src = source
    local result = MySQL.Sync.fetchAll('SELECT * FROM boost_contract WHERE onsale = 1')
    if result[1] then
-      print("RESULT IS NOT NIL")
       TriggerClientEvent('jl-carboost:client:loadBoostStore', src,result)
    end
+end)
+
+RegisterNetEvent('jl-carboost:server:setPlate', function (oldPlate, newPlate)
+   MySQL.Async.execute('UPDATE player_vehicles SET plate = @newPlate WHERE plate = @oldPlate', {
+      ['@oldPlate'] = oldPlate,
+      ['@newPlate'] = newPlate
+   })
 end)
 
 -- Alert
@@ -335,10 +341,6 @@ end)
 
 RegisterNetEvent('jl-carboost:notifypolice', function (car)
    TriggerClientEvent('jl-carboost:notifypolice', -1, car)
-end)
-
-RegisterNetEvent('jl-carboost:test', function()
-   GenerateVIN()
 end)
 
 -- Callback
