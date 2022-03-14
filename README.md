@@ -1,6 +1,6 @@
 # JustLazzy Carboost
 
-## THIS SCRIPT IS NOT YET STABLE! AND NOT YET READY, PLEASE REPORT IF YOU FIND BUG
+## a carboosting script with laptop ui and bennys app
 
 | Join my discord server [here](https://discord.gg/fqUjRyhW2z) |
 | ------------------------------------------------------------ |
