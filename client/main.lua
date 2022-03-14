@@ -967,16 +967,8 @@ exports['qb-target']:AddBoxZone("carboost:takeItem", vector3(1185.14, -3304.01, 
 	distance = 3.0
 })
 
-local bones = {
-    'bodyshell',
-    'bonnet',
-    'boot',
-    'wheel_lf',
-    'wheel_rf',
-    'wheel_lm',
-    'wheel_rm',
-}
-exports['qb-target']:AddTargetBone(bones, {
+
+exports['qb-target']:AddTargetBone('bonnet', {
     options = {
         {
             icon = "fas fa-solid fa-car",
