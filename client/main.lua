@@ -557,37 +557,41 @@ end)
 RegisterNetEvent('jl-carboost:client:checkvin', function ()
     local vehicle = QBCore.Functions.GetClosestVehicle()
     if vehicle ~= 0 then
-        local networkID = NetworkGetNetworkIdFromEntity(vehicle)
-        if GetVehicleDoorLockStatus(vehicle) == 1 then
-                QBCore.Functions.Progressbar('check_vin', 'Checking VIN Number', 6000, false, true, { -- Name | Label | Time | useWhileDead | canCancel
-                    disableMovement = true,
-                    disableCarMovement = true,
-                    disableMouse = false,
-                    disableCombat = true,
-                }, {
-                    animDict = '"anim@amb@clubhouse@tutorial@bkr_tut_ig3@"@',
-                    anim = 'machinic_loop_mechandplayer',
-                    flags = 16,
-                }, {}, {}, function() 
-                    QBCore.Functions.TriggerCallback('jl-carboost:server:checkvin', function(result)
-                        if result and result.success then
-
-                            QBCore.Functions.Notify(result.message, "primary")
-                           
-                        else
-                            QBCore.Functions.Notify("Hmm you can't found the VIN", "error")
-                        end
-                    end, networkID)
-                    ClearPedTasks(PlayerPedId())
-                end, function() -- Play When Cancel
-                    QBCore.Functions.Notify("Cancelled", "error")
-                    ClearPedTasks(PlayerPedId())
-                end)
+        local vehPos = GetEntityCoords(vehicle)
+        local PlayerPos = GetEntityCoords(PlayerPedId())
+        if #(PlayerPos - vehPos) <= 5.0 then
+            local networkID = NetworkGetNetworkIdFromEntity(vehicle)
+            if GetVehicleDoorLockStatus(vehicle) == 1 then
+                    QBCore.Functions.Progressbar('check_vin', 'Checking VIN Number', 6000, false, true, { -- Name | Label | Time | useWhileDead | canCancel
+                        disableMovement = true,
+                        disableCarMovement = true,
+                        disableMouse = false,
+                        disableCombat = true,
+                    }, {
+                        animDict = '"anim@amb@clubhouse@tutorial@bkr_tut_ig3@"@',
+                        anim = 'machinic_loop_mechandplayer',
+                        flags = 16,
+                    }, {}, {}, function() 
+                        QBCore.Functions.TriggerCallback('jl-carboost:server:checkvin', function(result)
+                            if result and result.success then
+    
+                                QBCore.Functions.Notify(result.message, "primary")
+                               
+                            else
+                                QBCore.Functions.Notify("Hmm you can't found the VIN", "error")
+                            end
+                        end, networkID)
+                        ClearPedTasks(PlayerPedId())
+                    end, function() -- Play When Cancel
+                        QBCore.Functions.Notify("Cancelled", "error")
+                        ClearPedTasks(PlayerPedId())
+                    end)
+                else
+                    QBCore.Functions.Notify("The vehicle is locked", "error")
+                end
             else
-                QBCore.Functions.Notify("The vehicle is locked", "error")
+                QBCore.Functions.Notify("No vehicle nearby", "error")
             end
-        else
-            QBCore.Functions.Notify("No vehicle nearby", "error")
         end
 end)
 
@@ -851,6 +855,61 @@ RegisterNetEvent('jl-carboost:client:useHackingDevice', function ()
     end
 end)
 
+RegisterNetEvent('jl-carboost:client:fakeplate', function()
+    local veh = QBCore.Functions.GetClosestVehicle()
+    local vehID = NetworkGetNetworkIdFromEntity(veh)
+    local playerpos = GetEntityCoords(PlayerPedId())
+    local front = GetOffsetFromEntityInWorldCoords(veh, 0, -2.5, 0)
+    local back = GetOffsetFromEntityInWorldCoords(veh, 0, 2.5, 0)
+    local distFront = #(playerpos - front)
+    local distBack = #(playerpos - back)
+    if veh ~= 0 and not IsPedInAnyVehicle(PlayerPedId()) then
+        if distFront < 2.0 or distBack < 2.0 then 
+            QBCore.Functions.TriggerCallback('jl-carboost:server:checkvin', function (result)
+                if result then
+                    if result.owner == PlayerData.citizenid then
+                        QBCore.Functions.Progressbar('change_plate', 'Changing the plate', 8000, false, true, { -- Name | Label | Time | useWhileDead | canCancel
+                            disableMovement = true,
+                            disableCarMovement = true,
+                            disableMouse = false,
+                            disableCombat = true,
+                        }, {
+                            animDict = '"anim@amb@clubhouse@tutorial@bkr_tut_ig3@"@',
+                            anim = 'machinic_loop_mechandplayer',
+                            flags = 1,
+                        }, {}, {}, function() -- Play When Done
+                            TriggerEvent('jl-carboost:client:setPlate', vehID)
+                            ClearPedTasks(PlayerPedId())
+                        end, function() -- Play When Cancel
+                            ClearPedTasks(PlayerPedId())
+                            --Stuff goes here
+                        end)
+                    else
+                        QBCore.Functions.Notify(Lang:t("error.not_owner"), "error")
+                    end
+                end
+            end, vehID)
+        else
+            QBCore.Functions.Notify(Lang:t("error.not_plate"), "error")
+        end
+    end
+end)
+
+RegisterNetEvent('jl-carboost:client:setPlate', function (vehID)
+    local veh = NetworkGetEntityFromNetworkId(vehID)
+    if veh and veh ~= 0 then
+        local plate = QBCore.Functions.GetPlate(veh)
+        local newPlate = RandomPlate()
+        SetVehicleNumberPlateText(veh, newPlate)
+        TriggerServerEvent('jl-carboost:server:setPlate', plate, newPlate)
+        QBCore.Functions.Notify(Lang:t("success.plate_changed", {
+            plate = newPlate
+        }), "success")
+        TriggerEvent('inventory:client:ItemBox', QBCore.Shared.Items["fake_plate"], "remove")
+        TriggerServerEvent("QBCore:Server:RemoveItem", "fake_plate", 1)
+    end
+end)
+
 -- Threads
 CreateThread(function ()
     while display do
@@ -908,16 +967,8 @@ exports['qb-target']:AddBoxZone("carboost:takeItem", vector3(1185.14, -3304.01, 
 	distance = 3.0
 })
 
-local bones = {
-    'bodyshell',
-    'bonnet',
-    'boot',
-    'wheel_lf',
-    'wheel_rf',
-    'wheel_lm',
-    'wheel_rm',
-}
-exports['qb-target']:AddTargetBone(bones, {
+
+exports['qb-target']:AddTargetBone('bonnet', {
     options = {
         {
             icon = "fas fa-solid fa-car",
@@ -933,6 +984,11 @@ exports['qb-target']:AddTargetBone(bones, {
     distance = 1.2
 })
 
+function RandomPlate()
+	local random = tostring(QBCore.Shared.RandomInt(1) .. QBCore.Shared.RandomStr(2) .. QBCore.Shared.RandomInt(3) .. QBCore.Shared.RandomStr(2)):upper()
+   return random
+end
+
 
 AddEventHandler('onResourceStop', function(resource)
    if resource == GetCurrentResourceName() then
@@ -941,3 +997,4 @@ AddEventHandler('onResourceStop', function(resource)
       end
    end
 end)
+

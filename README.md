@@ -12,12 +12,6 @@
 3. qb-target
 4. qb-phone
 
-## Preview
-
-<img src="./images/hacking_device.png"/>
-
-<BR>
-
 # How to install
 
 <tr>
@@ -37,6 +31,9 @@
 ```lua
 -- Hacking
 ['hacking_device']			  = {['name'] = "hacking_device",					['label'] = "Hacking device",			['weight'] = 500,		['type'] = 'item', 		['image'] = 'hacking_device.png',			['unique'] = true,		['useable']	= true,		['shouldClose'] = true,	   ['combinable'] = nil,   ['description'] = "A multi purpose hacking device"},
+
+-- Fake Plate
+['fake_plate']					 = {['name'] = 'fake_plate',					['label'] = "Plate Number",				['weight'] = 500,		['type'] = 'item',		['image'] = 'fake_plate.png',			['unique'] = true,		['useable'] = true,		['shouldClose'] = true,	   ['combinable'] = nil,   ['description'] = "A fake plate?"}
 ```
 
 Find laptop and change unique and usage to true,
@@ -129,6 +126,22 @@ Config.BennysSell = {
 | ------------ | ---------------------------------- | ---------- |
 | settier      | Set Boosting Tier                  | Admin      |
 | giveContract | Give contract to a specific player | Admin      |
+
+# Preview
+
+## Bennys App
+
+<img src="https://media.discordapp.net/attachments/943001162196611103/952890360764432394/unknown.png?width=1036&height=583" />
+<img src="https://media.discordapp.net/attachments/943001162196611103/952890442217828352/unknown.png?width=1036&height=583">
+
+## Boosting App
+
+<img src= "https://media.discordapp.net/attachments/943001162196611103/952890617401323550/unknown.png?width=1036&height=583"/>
+<img src= "https://media.discordapp.net/attachments/943001162196611103/952890668873838622/unknown.png?width=1036&height=583"/>
+
+## Setting
+
+<img src="https://media.discordapp.net/attachments/943001162196611103/952891497747996672/unknown.png?width=1036&height=583"/>
 
 ## Special Thanks
 
