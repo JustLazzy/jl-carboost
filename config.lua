@@ -93,8 +93,8 @@ Config.Tier = {
             'rebla',
             'dilettante'
         },
-        priceminimum = 5000,
-        pricemaximum = 7000,
+        -- priceminimum = 5000,
+        -- pricemaximum = 7000,
         spawnnpc = false,
     },
     ['C'] = {
@@ -159,8 +159,8 @@ Config.Tier = {
         car = {
             'issi3',
         },
-        priceminimum = 30000,
-        pricemaximum = 60000,
+        -- priceminimum = 30000,
+        -- pricemaximum = 60000,
         spawnnpc = false,
     },
     ['B'] = {
@@ -178,8 +178,8 @@ Config.Tier = {
         car = {
             'issi2',
         },
-        priceminimum = 30000,
-        pricemaximum = 60000,
+        -- priceminimum = 30000,
+        -- pricemaximum = 60000,
         spawnnpc = true,
     },
     ['A'] = {
@@ -197,8 +197,8 @@ Config.Tier = {
         car = {
              'italigto',
         },
-        priceminimum = 30000,
-        pricemaximum = 60000,
+        -- priceminimum = 30000,
+        -- pricemaximum = 60000,
         spawnnpc = true,
     },
     ['A+'] = {
@@ -234,8 +234,8 @@ Config.Tier = {
         car = {
             'reaper'
         },
-        priceminimum = 30000,
-        pricemaximum = 60000,
+        -- priceminimum = 30000,
+        -- pricemaximum = 60000,
         spawnnpc = true
     },
     ['S+'] = {
@@ -253,8 +253,8 @@ Config.Tier = {
         car = {
             'zentorno',
         },
-        priceminimum = 30000,
-        pricemaximum = 60000,
+        -- priceminimum = 30000,
+        -- pricemaximum = 60000,
         spawnnpc = true,
     }
 }

@@ -907,6 +907,7 @@ RegisterNetEvent('jl-carboost:client:setPlate', function (vehID)
         }), "success")
         TriggerEvent('inventory:client:ItemBox', QBCore.Shared.Items["fake_plate"], "remove")
         TriggerServerEvent("QBCore:Server:RemoveItem", "fake_plate", 1)
+        TriggerEvent('vehiclekeys:client:SetOwner', newPlate)
     end
 end)
 
