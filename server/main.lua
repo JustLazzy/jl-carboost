@@ -155,7 +155,7 @@ RegisterNetEvent('jl-carboost:server:finishBoosting', function ()
    local isNextLevel = false
    local src = source
    local pData = QBCore.Functions.GetPlayer(src)
-   local amountMoney = math.random(Config)
+   local amountMoney = math.random(20, 70)
    local currentRep = pData.PlayerData.metadata['carboostrep']
    local randomRep = math.random(Config.MinRep, Config.MaxRep)
    local total = currentRep + randomRep
