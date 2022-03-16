@@ -110,7 +110,7 @@ RegisterNetEvent('jl-carboost:server:takeItem', function (name, quantity)
    local src = source
    local Player = QBCore.Functions.GetPlayer(src)
    Player.Functions.AddItem(name, quantity)
-   TriggerClientEvent('inventory:client:itemBox', src, QBCore.Shared.Items[tostring(name)], 'add')
+   TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items[name], "add")
 end)
 
 RegisterNetEvent('jl-carboost:server:getItem', function ()
@@ -310,7 +310,8 @@ RegisterNetEvent('jl-carboost:server:takeAll', function (data)
    for _, v in pairs(data) do
       local item = v.item
       Player.Functions.AddItem(item.name, item.quantity)
-      TriggerClientEvent('inventory:client:itemBox', src, QBCore.Shared.Items[tostring(item.name)], 'add')
+      print(item.name)
+      TriggerClientEvent('inventory:client:itemBox', src, QBCore.Shared.Items[item.name], 'add')
    end
    MySQL.Async.execute('UPDATE bennys_shop SET items = @items WHERE citizenid = @citizenid', {
       ['@citizenid'] = Player.PlayerData.citizenid,
