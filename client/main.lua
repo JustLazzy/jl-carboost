@@ -273,7 +273,7 @@ RegisterNUICallback('canStartContract', function (data, cb)
                         })
                     })
                 end
-            end, PlayerData.citizenid)
+            end, data)
         else
             return cb({
                 canStart = true
@@ -343,6 +343,7 @@ RegisterNUICallback('setupboostapp', function (data, cb)
             local carboostdata = result
             for k, v in pairs(carboostdata.contract) do
                 carboostdata.contract[k].carname = GetLabelText(GetDisplayNameFromVehicleModel(v.car))
+                carboostdata.contract[k].vinprice = Config.Tier[v.tier].vinprice
             end
             cb({
                 setting = {
@@ -440,6 +441,7 @@ end)
 RegisterNetEvent('jl-carboost:client:addContract', function (data)
     local vehName = GetLabelText(GetDisplayNameFromVehicleModel(data.car))
     data.carname = vehName
+    data.vinprice = Config.Tier[data.tier].vinprice
     SendNUIMessage({
         type="addcontract",
         boost = data

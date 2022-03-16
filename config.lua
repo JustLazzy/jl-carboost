@@ -99,6 +99,7 @@ Config.Tier = {
         -- pricemaximum = 7000,
         spawnnpc = false,
         attempt = 2,
+        vinprice = 2000
     },
     ['C'] = {
         location = {
@@ -166,6 +167,7 @@ Config.Tier = {
         -- pricemaximum = 60000,
         spawnnpc = false,
         attempt = 2,
+        vinprice = 3000
     },
     ['B'] = {
         location = {
@@ -186,6 +188,7 @@ Config.Tier = {
         -- pricemaximum = 60000,
         spawnnpc = true,
         attempt = 2,
+        vinprice = 4000
     },
     ['A'] = {
         location = {
@@ -206,6 +209,7 @@ Config.Tier = {
         -- pricemaximum = 60000,
         spawnnpc = true,
         attempt = 2,
+        vinprice = 5000
     },
     ['A+'] = {
         location = {
@@ -218,6 +222,7 @@ Config.Tier = {
         -- pricemaximum = 60000,
         spawnnpc = true,
         attempt = 2,
+        vinprice = 6000
     },
     ['S'] = {
         location = {
@@ -245,6 +250,7 @@ Config.Tier = {
         -- pricemaximum = 60000,
         spawnnpc = true,
         attempt = 2,
+        vinprice = 8000
     },
     ['S+'] = {
         location = {
@@ -265,6 +271,7 @@ Config.Tier = {
         -- pricemaximum = 60000,
         spawnnpc = true,
         attempt = 2,
+        vinprice = 12000,
     }
 }
 
