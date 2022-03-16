@@ -12,6 +12,8 @@ Config.BennysItems = {}
 
 Config.Alert = 'linden_outlawalert' -- qb-dispatch / linden_outlawalert / notification, only use qb-dispatch when its on stable release
 
+Config.Inventory = 'qb-inventory/html/images/' -- qb-inventory/html/images/
+
 Config.MinimumPolice = 0 -- Minimum police
 
 Config.WaitTime = 1 -- Time to wait to get first contract, (in minutes)
@@ -96,6 +98,7 @@ Config.Tier = {
         -- priceminimum = 5000,
         -- pricemaximum = 7000,
         spawnnpc = false,
+        attempt = 2,
     },
     ['C'] = {
         location = {
@@ -162,6 +165,7 @@ Config.Tier = {
         -- priceminimum = 30000,
         -- pricemaximum = 60000,
         spawnnpc = false,
+        attempt = 2,
     },
     ['B'] = {
         location = {
@@ -181,6 +185,7 @@ Config.Tier = {
         -- priceminimum = 30000,
         -- pricemaximum = 60000,
         spawnnpc = true,
+        attempt = 2,
     },
     ['A'] = {
         location = {
@@ -200,6 +205,7 @@ Config.Tier = {
         -- priceminimum = 30000,
         -- pricemaximum = 60000,
         spawnnpc = true,
+        attempt = 2,
     },
     ['A+'] = {
         location = {
@@ -208,9 +214,10 @@ Config.Tier = {
         car = {
             'jester2',
         },
-        priceminimum = 30000,
-        pricemaximum = 60000,
-        spawnnpc = true
+        -- priceminimum = 30000,
+        -- pricemaximum = 60000,
+        spawnnpc = true,
+        attempt = 2,
     },
     ['S'] = {
         location = {
@@ -236,7 +243,8 @@ Config.Tier = {
         },
         -- priceminimum = 30000,
         -- pricemaximum = 60000,
-        spawnnpc = true
+        spawnnpc = true,
+        attempt = 2,
     },
     ['S+'] = {
         location = {
@@ -256,6 +264,7 @@ Config.Tier = {
         -- priceminimum = 30000,
         -- pricemaximum = 60000,
         spawnnpc = true,
+        attempt = 2,
     }
 }
 
@@ -306,55 +315,46 @@ Config.ScratchingPoint = {
 Config.BennysSell = {
     ["brake1"] = {
         item = 'brake1',
-        image = 'brake_parts_b.png',
         price = 1000,
         stock = 50
     },
     ["brake2"] = {
         item = 'brake2',
-        image = 'brake_parts_c.png',
         price = 1000,
         stock = 50,
     },
     ["brake3"] = {
         item = 'brake3',
-        image = 'brake_parts_d.png',
         price = 1000,
         stock = 50,
     },
     ["engine4"] = {
         item = 'engine4',
-        image = 'engine_parts_s.png',
         price = 502000,
         stock = 50,
     },
     ["engine0"] = {
         item = 'engine0',
-        image = 'engine_parts_a.png',
         price = 130000,
         stock = 50,
     },
     ["engine1"] = {
         item = 'engine1',
-        image = 'engine_parts_b.png',
         price = 120000,
         stock = 50,
     },
     ["engine2"] = {
         item = 'engine2',
-        image = 'engine_parts_c.png',
         price = 100000,
         stock = 50,
     },
     ["engine3"] = {
         item = 'engine3',
-        image = 'engine_parts_d.png',
         price = 100000,
         stock = 50,
     },
     ["fake_plate"] = {
         item = "fake_plate",
-        image = "fake_plate.png",
         price = 230,
         stock = 50,
     }

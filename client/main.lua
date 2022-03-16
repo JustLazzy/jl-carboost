@@ -227,7 +227,7 @@ RegisterNUICallback('loadstore', function (data, cb)
                     storeitem[#storeitem+1] = {
                         name = name,
                         item = v.item,
-                        image = v.image,
+                        image = Config.Inventory ..QBCore.Shared.Items[v.item].image,
                         price = v.price,
                         stock = v.stock
                     }
