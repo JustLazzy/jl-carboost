@@ -95,11 +95,11 @@ Config.Tier = {
             'rebla',
             'dilettante'
         },
-        -- priceminimum = 5000,
-        -- pricemaximum = 7000,
+        priceminimum = 5,
+        pricemaximum = 10,
         spawnnpc = false,
         attempt = 2,
-        vinprice = 2000
+        vinprice = 12
     },
     ['C'] = {
         location = {
@@ -163,11 +163,11 @@ Config.Tier = {
         car = {
             'issi3',
         },
-        -- priceminimum = 30000,
-        -- pricemaximum = 60000,
+        priceminimum = 8,
+        pricemaximum = 21,
         spawnnpc = false,
         attempt = 2,
-        vinprice = 3000
+        vinprice = 15
     },
     ['B'] = {
         location = {
@@ -184,11 +184,11 @@ Config.Tier = {
         car = {
             'issi2',
         },
-        -- priceminimum = 30000,
-        -- pricemaximum = 60000,
+        priceminimum = 23,
+        pricemaximum = 28,
         spawnnpc = true,
         attempt = 2,
-        vinprice = 4000
+        vinprice = 20
     },
     ['A'] = {
         location = {
@@ -205,11 +205,11 @@ Config.Tier = {
         car = {
              'italigto',
         },
-        -- priceminimum = 30000,
-        -- pricemaximum = 60000,
+        priceminimum = 28,
+        pricemaximum = 35,
         spawnnpc = true,
         attempt = 2,
-        vinprice = 5000
+        vinprice = 25
     },
     ['A+'] = {
         location = {
@@ -218,11 +218,11 @@ Config.Tier = {
         car = {
             'jester2',
         },
-        -- priceminimum = 30000,
-        -- pricemaximum = 60000,
+        priceminimum = 30,
+        pricemaximum = 41,
         spawnnpc = true,
         attempt = 2,
-        vinprice = 6000
+        vinprice = 32
     },
     ['S'] = {
         location = {
@@ -246,11 +246,11 @@ Config.Tier = {
         car = {
             'reaper'
         },
-        -- priceminimum = 30000,
-        -- pricemaximum = 60000,
+        priceminimum = 45,
+        pricemaximum = 61,
         spawnnpc = true,
         attempt = 2,
-        vinprice = 8000
+        vinprice = 35
     },
     ['S+'] = {
         location = {
@@ -267,11 +267,11 @@ Config.Tier = {
         car = {
             'zentorno',
         },
-        -- priceminimum = 30000,
-        -- pricemaximum = 60000,
+        priceminimum = 61,
+        pricemaximum = 24,
         spawnnpc = true,
         attempt = 2,
-        vinprice = 12000,
+        vinprice = 43,
     }
 }
 

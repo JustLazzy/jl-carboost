@@ -41,7 +41,7 @@ RegisterNetEvent('jl-carboost:server:newContract', function (source)
    local Player = QBCore.Functions.GetPlayer(src)
    local citizenid = Player.PlayerData.citizenid
    local config = Config.QueueList[citizenid]
-   local tier = config.tier
+   local tier = RandomTier(config.tier)
    local car = Config.Tier[tier].car[math.random(#Config.Tier[tier].car)]
    local owner = Config.RandomName[math.random(1, #Config.RandomName)]
    local randomHour = math.random(Config.Expire)
@@ -151,13 +151,22 @@ RegisterNetEvent('jl-carboost:server:log', function (string, type)
    end
 end)
 
-RegisterNetEvent('jl-carboost:server:finishBoosting', function ()
+RegisterNetEvent('jl-carboost:server:finishBoosting', function (type, tier)
    local isNextLevel = false
    local src = source
    local pData = QBCore.Functions.GetPlayer(src)
-   local amountMoney = math.random(20, 70)
+   local configTier = Config.Tier[tier]
+   local amountMoney = math.random(configTier.priceminimum, configTier.pricemaximum)
    local currentRep = pData.PlayerData.metadata['carboostrep']
    local randomRep = math.random(Config.MinRep, Config.MaxRep)
+   if type ~= 'vin' then
+      pData.Functions.AddMoney(Config.Payment, amountMoney, 'finished-boosting')
+      if Config.Payment == 'crypto' then
+         TriggerClientEvent('QBCore:Notify', src, Lang:t('info.payment_crypto', {
+            amount = amountMoney
+         }), 'success')
+      end
+   end
    local total = currentRep + randomRep
    if total >= 100 then
       total = total - 100
@@ -165,17 +174,11 @@ RegisterNetEvent('jl-carboost:server:finishBoosting', function ()
       pData.Functions.SetMetaData('carboostclass', class)
       isNextLevel = true
    end
-   if Config.Payment == 'crypto' then
-      TriggerClientEvent('QBCore:Notify', src, Lang:t('info.payment_crypto', {
-         amount = amountMoney
-      }), 'success')
-   end
    pData.Functions.SetMetaData("carboostrep", total)
-   pData.Functions.AddMoney(Config.Payment, amountMoney, 'finished-boosting')
    TriggerClientEvent('jl-carboost:client:updateProggress', src, isNextLevel)
    TriggerClientEvent('QBCore:Notify', src, Lang:t('info.get_rep', {
       rep = randomRep
-   }), "primary")
+   }), "primary")   
 end)
 
 RegisterNetEvent('jl-carboost:server:deleteContract', function (contractid)
@@ -688,6 +691,63 @@ function AddVIN(plate)
       ['@vin'] = vin,
       ['@plate'] = plate
    })
+end
+
+RegisterNetEvent('jl-testing', function ()
+   local tier = RandomTier('A')
+   print(tier)
+end)
+
+function RandomTier(tier)
+   local chance = math.random(1, 100)
+   local tierName = {
+      'D',
+      'C',
+      'B',
+      'A',
+      'A+',
+      'S',
+      'S+'
+   }
+   if tier == 'S+' then
+      if chance >= 70 then
+         return 'S+'
+      else
+         return tierName[math.random(1, 6)]
+      end
+   elseif tier == 'S' then
+      if chance >= 70 then
+         return 'S'
+      else
+         return tierName[math.random(1, 5)]
+      end
+   elseif tier == 'A+' then
+      if chance >= 70 then
+         return 'A+'
+      else
+         return tierName[math.random(1, 4)]
+      end
+   elseif tier == 'A' then
+      if chance >= 70 then
+         return 'A'
+      else
+         return tierName[math.random(1, 3)]
+      end
+   elseif tier == 'B' then
+      if chance >= 70 then
+         return 'B'
+      else
+         return tierName[math.random(1, 2)]
+      end
+   elseif tier == 'C' then
+      if chance >= 70 then
+         return 'C'
+      else
+         return tierName[math.random(1, 1)]
+      end
+   elseif tier == 'D' then
+      return 'D'
+   end
 end
 
 exports('AddVIN', AddVIN)

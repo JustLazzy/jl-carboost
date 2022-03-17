@@ -1,7 +1,7 @@
 local QBCore = exports['qb-core']:GetCoreObject()
 local PlayerData = QBCore.Functions.GetPlayerData()
 local PlayerJob = {}
-local isJoinQueue, isContractStarted = false, false
+local isJoinQueue, isContractStarted, Tier = false, false, nil
 local carSpawned, carID, carmodel = nil, nil, nil
 local display = false
 local zone, inZone, blipDisplay, dropBlip, cooldown, inscratchPoint = nil, false, nil, nil, false, false
@@ -153,12 +153,13 @@ end
 local function RegisterCar(vehicle)
     local veh = Entity(vehicle)
     veh.state.tracker = true
-    veh.state.trackerLeft = math.random(Config.Attempt)
+    print(Tier)
+    veh.state.trackerLeft = math.random(Config.Tier[Tier].attempt) or math.random(3)
     veh.state.hacked = false
 end
 
 local function finishBoosting(data)
-    TriggerServerEvent('jl-carboost:server:finishBoosting')
+    TriggerServerEvent('jl-carboost:server:finishBoosting', 'normal', Tier)
     TriggerEvent('jl-carboost:client:deleteContract')
     DeleteEntity(carSpawned)
     RemoveBlip(dropBlip)
@@ -174,7 +175,7 @@ local function finishBoosting(data)
 end
 
 local function Scratching()
-    TriggerServerEvent('jl-carboost:server:finishBoosting')
+    TriggerServerEvent('jl-carboost:server:finishBoosting', 'vin', Tier)
     TriggerEvent('jl-carboost:client:deleteContract')
     scratchpoint:destroy()
     scratchpoint = nil
@@ -249,6 +250,10 @@ RegisterNUICallback('loadstore', function (data, cb)
     end
 end)
 
+RegisterCommand('testconfig', function()
+    TriggerServerEvent('jl-testing')
+end)
+
 RegisterNUICallback('canStartContract', function (data, cb)
     if OnlineCops < Config.MinimumPolice then
         return cb({
@@ -286,6 +291,7 @@ RegisterNUICallback('startcontract', function (data)
     local data = data
     if not isContractStarted then
         isContractStarted = true
+        Tier = data.data.tier
         QBCore.Functions.TriggerCallback('jl-carboost:server:getContractData', function (result)
             if result then
                 TriggerEvent('jl-carboost:client:spawnCar', result)
@@ -532,10 +538,8 @@ RegisterNetEvent('jl-carboost:client:startBoosting', function (data)
         while true do
             Wait(5000)
             if carID ~= nil then
-                -- carSpawned = NetworkGetEntityFromNetworkId(carID)
                 if DoesEntityExist(NetworkGetEntityFromNetworkId(carID)) then
                     carSpawned = NetworkGetEntityFromNetworkId(carID)
-                    
                     if not modified then
                         QBCore.Functions.SetVehicleProperties(carSpawned, VehProp)
                         modified = true
@@ -971,7 +975,7 @@ exports['qb-target']:AddBoxZone("carboost:takeItem", vector3(1185.14, -3304.01, 
 })
 
 
-exports['qb-target']:AddTargetBone('bonnet', {
+exports['qb-target']:AddTargetBone('door_pside_f', {
     options = {
         {
             icon = "fas fa-solid fa-car",

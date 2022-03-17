@@ -443,6 +443,7 @@ function toggleBoosting(event) {
             let data = {
               id: parent.id,
               type: type,
+              tier: tier,
             };
             Notification("Contract Started", "success");
             buttonClicked.innerText = "End Contract";
