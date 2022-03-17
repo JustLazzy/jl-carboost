@@ -47,7 +47,7 @@ function loadBennysApp() {
         storedata.forEach((data) => {
           const article = document.createElement("article");
           article.id = data.item;
-          article.innerHTML = `<img class="product-image" src="./assets/shop/${data.image}" alt="${data.name}" />
+          article.innerHTML = `<img class="product-image" src=nui://lj-inventory/html/images/${data.item}.png width=80px>
               <div class="text">
                 <h3 class="title">${data.name}</h3>
                 <p>Stock: <b>${data.stock}</b></p>
