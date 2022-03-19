@@ -7,9 +7,8 @@ AddEventHandler('onResourceStart', function (resource)
    if resource == GetCurrentResourceName() then
       Queue()
       DeleteExpiredContract()
-      -- Will use this later :)
       GenerateVIN()
-      -- PerformHttpRequest('https://raw.githubusercontent.com/JustLazzy/jl-carboost/master/version', CheckVersion, 'GET')
+      PerformHttpRequest('https://raw.githubusercontent.com/JustLazzy/jl-carboost/master/version', CheckVersion, 'GET')
    end
 end)
 
@@ -524,17 +523,18 @@ QBCore.Functions.CreateCallback('jl-carboost:server:getboostdata', function (sou
 end)
 
 QBCore.Functions.CreateCallback('jl-carboost:server:getContractData', function (source, cb, data)
-   local data = data.data
+   if not data then return end
+   local boostdata = data.data
    local Player = QBCore.Functions.GetPlayer(source)
    local result = MySQL.Sync.fetchAll('SELECT * FROM boost_contract WHERE id = @id AND owner = @owner', {
-      ['@id'] = data.id,
+      ['@id'] = boostdata.id,
       ['@owner'] = Player.PlayerData.citizenid
    })
    if result[1] then
       local res = result[1]
       local contractdata = {
          id = res.id,
-         type = data.type,
+         type = boostdata.type,
          data = json.decode(res.data),
       }
       return cb(contractdata)
@@ -657,6 +657,8 @@ function CheckVersion(err, resp, headers)
    local curVersion = LoadResourceFile(GetCurrentResourceName(), 'version')
    if curVersion ~= resp and tonumber(curVersion) < tonumber(resp) then
       print('[jl-carboost] New version available: ' .. resp)
+   else
+      print('[jl-carboost] No new version available')
    end
 end
 

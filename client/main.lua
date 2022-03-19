@@ -6,9 +6,15 @@ local carSpawned, carID, carmodel = nil, nil, nil
 local display = false
 local zone, inZone, blipDisplay, dropBlip, cooldown, inscratchPoint = nil, false, nil, nil, false, false
 local scratchpoint 
-
 OnlineCops = 0
 
+
+local tabletDict = "amb@code_human_in_bus_passenger_idles@female@tablet@base"
+local tabletAnim = "base"
+local tabletProp = 'prop_cs_tablet'
+local tabletBone = 60309
+local tabletOffset = vector3(0.03, 0.002, -0.0)
+local tabletRot = vector3(10.0, 160.0, 0.0)
 
 RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
     PlayerData = QBCore.Functions.GetPlayerData()
@@ -50,6 +56,7 @@ function SetDisplay(bool)
         type="openlaptop",
         status = bool
     })
+    doAnimation()
 end
 
 local function createRadiusBlips(v)
@@ -115,6 +122,41 @@ local function spawnAngryPed(coords)
     end
 end
 
+-- Zamn thanks qb-mdt 😎
+function doAnimation()
+    if not display then return end
+    -- Animation
+    RequestAnimDict(tabletDict)
+    while not HasAnimDictLoaded(tabletDict) do Citizen.Wait(100) end
+    -- Model
+    RequestModel(tabletProp)
+    while not HasModelLoaded(tabletProp) do Citizen.Wait(100) end
+
+    local plyPed = PlayerPedId()
+
+    local tabletObj = CreateObject(tabletProp, 0.0, 0.0, 0.0, true, true, false)
+
+    local tabletBoneIndex = GetPedBoneIndex(plyPed, tabletBone)
+
+    -- Set statebag inventory is in use
+    TriggerEvent('actionbar:setEmptyHanded')
+
+    AttachEntityToEntity(tabletObj, plyPed, tabletBoneIndex, tabletOffset.x, tabletOffset.y, tabletOffset.z, tabletRot.x, tabletRot.y, tabletRot.z, true, false, false, false, 2, true)
+    SetModelAsNoLongerNeeded(tabletProp)
+
+    CreateThread(function()
+        while display do
+            Wait(0)
+            if not IsEntityPlayingAnim(plyPed, tabletDict, tabletAnim, 3) then
+                TaskPlayAnim(plyPed, tabletDict, tabletAnim, 3.0, 3.0, -1, 49, 0, 0, 0, 0)
+            end
+        end
+        ClearPedSecondaryTask(plyPed)
+        Wait(250)
+        DetachEntity(tabletObj, true, false)
+        DeleteEntity(tabletObj)
+    end)
+end
 
 
 local function StartHacking(vehicle)
@@ -533,6 +575,7 @@ end)
 
 RegisterNetEvent('jl-carboost:client:startBoosting', function (data)
     local data = data
+    ContractID = data.id
     local modified = false
     CreateThread(function ()
         while true do
@@ -678,7 +721,7 @@ RegisterNetEvent('jl-carboost:client:startTracker', function(data)
 end)
 
 RegisterNetEvent("jl-carboost:client:bringtoPlace", function (data)
-    ContractID = data.id
+   
     if data.type == 'vin' then
         -- [todo] write vinscratch logic here
         local pz = Config.ScratchingPoint[math.random(1, #Config.ScratchingPoint)]
@@ -777,8 +820,6 @@ end)
 
 
 RegisterNetEvent('jl-carboost:client:failedBoosting', function ()
-    carSpawned = nil
-    carID = nil
     RemoveBlip(dropBlip)
     if zone then
         zone:destroy()
@@ -789,8 +830,11 @@ RegisterNetEvent('jl-carboost:client:failedBoosting', function ()
         scratchpoint = nil
         inscratchPoint = false
     end
-    QBCore.Functions.Notify(Lang:t("error.error_occured"), "error")
-    TriggerEvent('jl-carboost:client:refreshContract')
+    carSpawned, carID, carmodel = nil, nil, nil
+    isContractStarted = false
+    QBCore.Functions.Notify(Lang:t("error.no_car"), "error")
+    TriggerEvent('jl-carboost:client:refreshQueue')
+    TriggerEvent('jl-carboost:client:deleteContract')
 end)
 
 RegisterNetEvent('jl-carboost:client:openLaptop', function ()

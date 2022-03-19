@@ -254,7 +254,7 @@ function buyContract(event) {
 }
 
 function noTitleContract() {
-  let title = document.querySelector("#no-contract");
+  let title = document.getElementById("no-contract");
   let contractParent = document.getElementById("boosting-contract");
   let contractList = contractParent.getElementsByClassName("boost-contract");
   if (contractList.length == 0) {
@@ -471,32 +471,15 @@ function stopContract(data) {
 }
 
 function removeContract(id) {
-  let contractParent = document.getElementById("boosting-contract");
   let contractCart = document.getElementById(id);
   if (contractCart) {
     contractCart.remove();
     Notification("You have done your contract", "success");
-    let contractList = contractParent.getElementsByClassName("boost-contract");
-    if (contractList.length === 0) {
-      let title = document.querySelector("#no-contract");
-      title.classList.remove("hidden");
-    }
   }
+  noTitleContract();
 }
 
-function refreshContract() {
-  let boostingList = document.querySelector("#boosting-contract");
-  boostingList.innerHTML = "";
-  fetch("https://jl-carboost/getcontract", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({}),
-  }).then((resp) => {
-    resp.json().then(() => {});
-  });
-}
+function refreshContract() {}
 
 function getNextClass(data) {
   let nextClass;

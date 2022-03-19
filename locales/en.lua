@@ -15,6 +15,7 @@ local Translations = {
         ['not_seat'] = 'You need to be in front seat passenger to do this',
         ['not_owner'] = 'You need to be the owner of the vehicle to do this',
         ['not_plate'] = 'You need to be in the front or back of the vehicle to do this',
+        ['no_car'] = 'Your car is gone...'
     },
     success = {
         ['disable_tracker'] = 'You have successfully disable the tracker',
