@@ -8,7 +8,6 @@ let buycontractbutton = document.querySelector(".buy-contract");
 let contractPage = document.getElementById("boosting-contract");
 let shopPage = document.getElementById("boosting-shop");
 let Payment;
-let Amount;
 
 $(document).ready(function () {
   boostingheader = boosting.querySelector("header");
@@ -113,7 +112,6 @@ function loadBoostData() {
     resp.json().then((resp) => {
       let settings = resp.setting;
       Payment = settings.payment;
-      Amount = settings.amount;
       const data = resp.boostdata;
       const contract = data.contract;
       let currentClass = document.querySelector("#currentclass");
@@ -130,7 +128,7 @@ function loadBoostData() {
           contractCart.id = contractdata.id;
           contractCart.classList.add("boost-contract");
           contractCart.innerHTML = `<div class="boost-text">
-          <p id="boost-type">Boost Type: <b>${contractdata.tier}</b></p>
+          <p id="boost-type" data-tier="${contractdata.tier}"> Boost Type: <b">${contractdata.tier}</b></p>
           <p>Owner: ${contractdata.owner}</p>
         </div>
         <div class="boost-info">
@@ -138,7 +136,7 @@ function loadBoostData() {
           <p class="expire">Expires in: </p>
         </div>
         <div class="boost-button">
-          <button id="startcontract" class="start">Start Contract</button>
+          <button id="startcontract" data-vinprice="${contractdata.vinprice}" class="start">Start Contract</button>
           <button class="transfer" id="transfercontract">Transfer Contract</button>
           <button class="sell">Sell Contract</button>
         </div>
@@ -256,7 +254,7 @@ function buyContract(event) {
 }
 
 function noTitleContract() {
-  let title = document.querySelector("#no-contract");
+  let title = document.getElementById("no-contract");
   let contractParent = document.getElementById("boosting-contract");
   let contractList = contractParent.getElementsByClassName("boost-contract");
   if (contractList.length == 0) {
@@ -291,7 +289,7 @@ function setupNewContract(data) {
   contractCart.classList.add("boost-contract");
   contractCart.id = data.id;
   contractCart.innerHTML = `<div class="boost-text">
-  <p id="boost-type">Boost Type: <b>${data.tier}</b></p>
+  <p id="boost-type" data-tier="${data.tier}">Boost Type: <b>${data.tier}</b></p>
   <p>Owner: ${data.owner}</p>
   </div>
   <div class="boost-info">
@@ -299,7 +297,7 @@ function setupNewContract(data) {
   <p class="expire"></p>
         </div>
         <div class="boost-button">
-          <button id="startcontract" class="start">Start Contract</button>
+          <button id="startcontract" data-vinprice="${data.vinprice}" class="start">Start Contract</button>
           <button class="transfer" id="transfercontract">Transfer Contract</button>
           <button class="sell" id="sellcontract">Sell Contract</button>
           </div>
@@ -398,6 +396,8 @@ function toggleBoosting(event) {
   let isStart;
   const buttonClicked = event.target;
   const parent = buttonClicked.parentElement.parentElement;
+  const tier = parent.querySelector("#boost-type").dataset.tier;
+  const amount = parent.querySelector("#startcontract").dataset.vinprice;
   if (buttonClicked.innerText === "Start Contract") {
     isStart = false;
   } else {
@@ -420,7 +420,7 @@ function toggleBoosting(event) {
   } else {
     Confirm.open({
       title: "Options",
-      message: `If you choose VIN Scratch, you have to pay ${Amount} (${Payment})`,
+      message: `If you choose VIN Scratch, you have to pay ${amount} (${Payment})`,
       okText: "VIN Scratch",
       cancelText: "Normal",
       parentID: "boosting-contract",
@@ -435,6 +435,7 @@ function toggleBoosting(event) {
         },
         body: JSON.stringify({
           type: type,
+          tier: tier,
         }),
       }).then((resp) => {
         resp.json().then((resp) => {
@@ -442,6 +443,7 @@ function toggleBoosting(event) {
             let data = {
               id: parent.id,
               type: type,
+              tier: tier,
             };
             Notification("Contract Started", "success");
             buttonClicked.innerText = "End Contract";
@@ -469,32 +471,15 @@ function stopContract(data) {
 }
 
 function removeContract(id) {
-  let contractParent = document.getElementById("boosting-contract");
   let contractCart = document.getElementById(id);
   if (contractCart) {
     contractCart.remove();
     Notification("You have done your contract", "success");
-    let contractList = contractParent.getElementsByClassName("boost-contract");
-    if (contractList.length === 0) {
-      let title = document.querySelector("#no-contract");
-      title.classList.remove("hidden");
-    }
   }
+  noTitleContract();
 }
 
-function refreshContract() {
-  let boostingList = document.querySelector("#boosting-contract");
-  boostingList.innerHTML = "";
-  fetch("https://jl-carboost/getcontract", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({}),
-  }).then((resp) => {
-    resp.json().then(() => {});
-  });
-}
+function refreshContract() {}
 
 function getNextClass(data) {
   let nextClass;

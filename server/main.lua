@@ -7,9 +7,8 @@ AddEventHandler('onResourceStart', function (resource)
    if resource == GetCurrentResourceName() then
       Queue()
       DeleteExpiredContract()
-      -- Will use this later :)
       GenerateVIN()
-      -- PerformHttpRequest('https://raw.githubusercontent.com/JustLazzy/jl-carboost/master/version', CheckVersion, 'GET')
+      PerformHttpRequest('https://raw.githubusercontent.com/JustLazzy/jl-carboost/master/version', CheckVersion, 'GET')
    end
 end)
 
@@ -41,7 +40,7 @@ RegisterNetEvent('jl-carboost:server:newContract', function (source)
    local Player = QBCore.Functions.GetPlayer(src)
    local citizenid = Player.PlayerData.citizenid
    local config = Config.QueueList[citizenid]
-   local tier = config.tier
+   local tier = RandomTier(config.tier)
    local car = Config.Tier[tier].car[math.random(#Config.Tier[tier].car)]
    local owner = Config.RandomName[math.random(1, #Config.RandomName)]
    local randomHour = math.random(Config.Expire)
@@ -110,7 +109,7 @@ RegisterNetEvent('jl-carboost:server:takeItem', function (name, quantity)
    local src = source
    local Player = QBCore.Functions.GetPlayer(src)
    Player.Functions.AddItem(name, quantity)
-   TriggerClientEvent('inventory:client:itemBox', src, QBCore.Shared.Items[tostring(name)], 'add')
+   TriggerClientEvent('inventory:client:ItemBox', src, QBCore.Shared.Items[name], "add")
 end)
 
 RegisterNetEvent('jl-carboost:server:getItem', function ()
@@ -151,13 +150,22 @@ RegisterNetEvent('jl-carboost:server:log', function (string, type)
    end
 end)
 
-RegisterNetEvent('jl-carboost:server:finishBoosting', function ()
+RegisterNetEvent('jl-carboost:server:finishBoosting', function (type, tier)
    local isNextLevel = false
    local src = source
    local pData = QBCore.Functions.GetPlayer(src)
-   local amountMoney = math.random(20, 70)
+   local configTier = Config.Tier[tier]
+   local amountMoney = math.random(configTier.priceminimum, configTier.pricemaximum)
    local currentRep = pData.PlayerData.metadata['carboostrep']
    local randomRep = math.random(Config.MinRep, Config.MaxRep)
+   if type ~= 'vin' then
+      pData.Functions.AddMoney(Config.Payment, amountMoney, 'finished-boosting')
+      if Config.Payment == 'crypto' then
+         TriggerClientEvent('QBCore:Notify', src, Lang:t('info.payment_crypto', {
+            amount = amountMoney
+         }), 'success')
+      end
+   end
    local total = currentRep + randomRep
    if total >= 100 then
       total = total - 100
@@ -165,17 +173,11 @@ RegisterNetEvent('jl-carboost:server:finishBoosting', function ()
       pData.Functions.SetMetaData('carboostclass', class)
       isNextLevel = true
    end
-   if Config.Payment == 'crypto' then
-      TriggerClientEvent('QBCore:Notify', src, Lang:t('info.payment_crypto', {
-         amount = amountMoney
-      }), 'success')
-   end
    pData.Functions.SetMetaData("carboostrep", total)
-   pData.Functions.AddMoney(Config.Payment, amountMoney, 'finished-boosting')
    TriggerClientEvent('jl-carboost:client:updateProggress', src, isNextLevel)
    TriggerClientEvent('QBCore:Notify', src, Lang:t('info.get_rep', {
       rep = randomRep
-   }), "primary")
+   }), "primary")   
 end)
 
 RegisterNetEvent('jl-carboost:server:deleteContract', function (contractid)
@@ -310,7 +312,8 @@ RegisterNetEvent('jl-carboost:server:takeAll', function (data)
    for _, v in pairs(data) do
       local item = v.item
       Player.Functions.AddItem(item.name, item.quantity)
-      TriggerClientEvent('inventory:client:itemBox', src, QBCore.Shared.Items[tostring(item.name)], 'add')
+      print(item.name)
+      TriggerClientEvent('inventory:client:itemBox', src, QBCore.Shared.Items[item.name], 'add')
    end
    MySQL.Async.execute('UPDATE bennys_shop SET items = @items WHERE citizenid = @citizenid', {
       ['@citizenid'] = Player.PlayerData.citizenid,
@@ -478,7 +481,7 @@ QBCore.Functions.CreateCallback('jl-carboost:server:vinmoney', function (source,
    local src = source
    local Player = QBCore.Functions.GetPlayer(src)
    local money = Player.PlayerData.money[Config.Payment]
-   if money > Config.VINPayment then
+   if money > Config.Tier[data.tier].vinprice then
       Player.Functions.RemoveMoney(Config.Payment, Config.VINPayment, 'vin-money')
       return cb({
          success = true
@@ -510,7 +513,7 @@ QBCore.Functions.CreateCallback('jl-carboost:server:getboostdata', function (sou
             id = v.id,
             owner = data.owner,
             car = data.car,
-            tier = data.tier or 'D',
+            tier = data.tier,
             plate = data.plate,
             expire = v.expire
          }
@@ -520,17 +523,18 @@ QBCore.Functions.CreateCallback('jl-carboost:server:getboostdata', function (sou
 end)
 
 QBCore.Functions.CreateCallback('jl-carboost:server:getContractData', function (source, cb, data)
-   local data = data.data
+   if not data then return end
+   local boostdata = data.data
    local Player = QBCore.Functions.GetPlayer(source)
    local result = MySQL.Sync.fetchAll('SELECT * FROM boost_contract WHERE id = @id AND owner = @owner', {
-      ['@id'] = data.id,
+      ['@id'] = boostdata.id,
       ['@owner'] = Player.PlayerData.citizenid
    })
    if result[1] then
       local res = result[1]
       local contractdata = {
          id = res.id,
-         type = data.type,
+         type = boostdata.type,
          data = json.decode(res.data),
       }
       return cb(contractdata)
@@ -653,6 +657,8 @@ function CheckVersion(err, resp, headers)
    local curVersion = LoadResourceFile(GetCurrentResourceName(), 'version')
    if curVersion ~= resp and tonumber(curVersion) < tonumber(resp) then
       print('[jl-carboost] New version available: ' .. resp)
+   else
+      print('[jl-carboost] No new version available')
    end
 end
 
@@ -687,6 +693,63 @@ function AddVIN(plate)
       ['@vin'] = vin,
       ['@plate'] = plate
    })
+end
+
+RegisterNetEvent('jl-testing', function ()
+   local tier = RandomTier('A')
+   print(tier)
+end)
+
+function RandomTier(tier)
+   local chance = math.random(1, 100)
+   local tierName = {
+      'D',
+      'C',
+      'B',
+      'A',
+      'A+',
+      'S',
+      'S+'
+   }
+   if tier == 'S+' then
+      if chance >= 70 then
+         return 'S+'
+      else
+         return tierName[math.random(1, 6)]
+      end
+   elseif tier == 'S' then
+      if chance >= 70 then
+         return 'S'
+      else
+         return tierName[math.random(1, 5)]
+      end
+   elseif tier == 'A+' then
+      if chance >= 70 then
+         return 'A+'
+      else
+         return tierName[math.random(1, 4)]
+      end
+   elseif tier == 'A' then
+      if chance >= 70 then
+         return 'A'
+      else
+         return tierName[math.random(1, 3)]
+      end
+   elseif tier == 'B' then
+      if chance >= 70 then
+         return 'B'
+      else
+         return tierName[math.random(1, 2)]
+      end
+   elseif tier == 'C' then
+      if chance >= 70 then
+         return 'C'
+      else
+         return tierName[math.random(1, 1)]
+      end
+   elseif tier == 'D' then
+      return 'D'
+   end
 end
 
 exports('AddVIN', AddVIN)
