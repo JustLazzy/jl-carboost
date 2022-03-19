@@ -945,6 +945,11 @@ RegisterNetEvent('jl-carboost:client:fakeplate', function()
     end
 end)
 
+function RandomPlate()
+	local random = tostring(QBCore.Shared.RandomInt(1) .. QBCore.Shared.RandomStr(2) .. QBCore.Shared.RandomInt(3) .. QBCore.Shared.RandomStr(2)):upper()
+   return random
+end
+
 RegisterNetEvent('jl-carboost:client:setPlate', function (vehID)
     local veh = NetworkGetEntityFromNetworkId(vehID)
     if veh and veh ~= 0 then
@@ -1019,10 +1024,10 @@ exports['qb-target']:AddBoxZone("carboost:takeItem", vector3(1185.14, -3304.01, 
 })
 
 
-exports['qb-target']:AddTargetBone('door_pside_f', {
+exports['qb-target']:AddTargetBone('windscreen', {
     options = {
         {
-            icon = "fas fa-solid fa-car",
+            icon = "fas fa-tally",
             label = "Scratch VIN",
             canInteract = function ()
                 return inscratchPoint
@@ -1035,11 +1040,18 @@ exports['qb-target']:AddTargetBone('door_pside_f', {
     distance = 1.2
 })
 
-function RandomPlate()
-	local random = tostring(QBCore.Shared.RandomInt(1) .. QBCore.Shared.RandomStr(2) .. QBCore.Shared.RandomInt(3) .. QBCore.Shared.RandomStr(2)):upper()
-   return random
-end
-
+exports['qb-target']:AddTargetBone('windscreen', {
+    options = {
+        {
+            type = "client",
+            icon = "fas fa-solid fa-car",
+            label = "Check VIN",
+            event = "jl-carboost:client:checkvin",
+            job = "police",
+        },
+    },
+    distance = 2
+})
 
 AddEventHandler('onResourceStop', function(resource)
    if resource == GetCurrentResourceName() then
