@@ -1009,7 +1009,7 @@ exports['qb-target']:AddBoxZone("carboost:takeItem", vector3(1185.14, -3304.01, 
     heading=0,
     minZ=5.1,
     maxZ=9.1,
-	debugPoly = true,
+	-- debugPoly = true,
     scale= {1.0, 1.0, 1.0},
     }, {
 	options = {
