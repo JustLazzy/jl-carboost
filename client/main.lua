@@ -820,7 +820,6 @@ end)
 
 
 RegisterNetEvent('jl-carboost:client:failedBoosting', function ()
-    RemoveBlip(dropBlip)
     if zone then
         zone:destroy()
         zone = nil
@@ -830,6 +829,9 @@ RegisterNetEvent('jl-carboost:client:failedBoosting', function ()
         scratchpoint = nil
         inscratchPoint = false
     end
+    RemoveBlip(blipDisplay)
+    RemoveBlip(dropBlip)
+    DeleteEntity(carSpawned)
     carSpawned, carID, carmodel = nil, nil, nil
     isContractStarted = false
     QBCore.Functions.Notify(Lang:t("error.no_car"), "error")
