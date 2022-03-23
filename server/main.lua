@@ -712,13 +712,13 @@ function RandomTier(tier)
       'S+'
    }
    if tier == 'S+' then
-      if chance >= 70 then
+      if chance >= 98 then
          return 'S+'
       else
          return tierName[math.random(1, 6)]
       end
    elseif tier == 'S' then
-      if chance >= 70 then
+      if chance >= 80 then
          return 'S'
       else
          return tierName[math.random(1, 5)]
