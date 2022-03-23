@@ -60,6 +60,13 @@ local Translations = {
         ['service'] = 'Service',
         ['military'] = 'Military',
         ['truck'] = 'Truck'
+    },
+
+    vehicle_info = {
+        -- door count
+        ['two_door'] = "Two doors",
+        ['three_door'] = "Three doors",
+        ['four_door'] = "Four doors",
     }
 }
 Lang = Locale:new({
