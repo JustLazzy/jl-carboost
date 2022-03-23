@@ -6,7 +6,7 @@ author 'JustLazzy'
 
 description 'QBCore Car Boosting Script With Laptop UI'
 
-version '1.0.0'
+version '1.0.1'
 
 shared_script {
 	'@qb-core/shared/locale.lua',

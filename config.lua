@@ -10,7 +10,7 @@ Config.BennysItems = {}
 
 ----------------------------------------------------------
 
-Config.Alert = 'linden_outlawalert' -- qb-dispatch / linden_outlawalert / notification, only use qb-dispatch when its on stable release
+Config.Alert = 'qb-dispatch' -- qb-dispatch / linden_outlawalert / notification, only use qb-dispatch when its on stable release
 
 Config.Inventory = 'qb-inventory/html/images/' -- qb-inventory/html/images/
 

@@ -113,6 +113,7 @@ local function spawnAngryPed(coords)
             SetPedFleeAttributes(ped, 0, 0)
             SetPedConfigFlag(ped, 58, true)
             SetPedConfigFlag(ped, 75, true)
+            SetBlockingOfNonTemporaryEvents(ped, true)
             TaskGotoEntityAiming(ped, PlayerPedId(), 4.0, 50.0)
         end
         Wait(2000)
@@ -157,7 +158,6 @@ function doAnimation()
         DeleteEntity(tabletObj)
     end)
 end
-
 
 local function StartHacking(vehicle)
     local veh = Entity(vehicle)
@@ -233,7 +233,7 @@ end
 
 local function BoostingAlert()
     if Config.Alert == 'qb-dispatch' then
-        TriggerEvent('dispatch:carboost', carID)
+        AlertBoosting(carID, 'qb-dispatch')
     elseif Config.Alert == 'linden_outlawalert' then
         AlertBoosting(carID, 'linden_outlawalert')
     else
@@ -818,6 +818,12 @@ RegisterNetEvent('jl-carboost:client:deleteContract', function ()
     TriggerServerEvent('jl-carboost:server:deleteContract', ContractID)
 end)
 
+RegisterNetEvent('jl-carboost:client:playerUnload', function()
+    if carSpawned then
+        DeleteVehicle(carSpawned)
+    end
+    TriggerServerEvent('jl-carboost:server:joinQueue', false, PlayerData.citizenid)
+end)
 
 RegisterNetEvent('jl-carboost:client:failedBoosting', function ()
     if zone then
@@ -833,6 +839,7 @@ RegisterNetEvent('jl-carboost:client:failedBoosting', function ()
     RemoveBlip(dropBlip)
     DeleteEntity(carSpawned)
     carSpawned, carID, carmodel = nil, nil, nil
+    blipDisplay, dropBlip = nil, nil
     isContractStarted = false
     QBCore.Functions.Notify(Lang:t("error.no_car"), "error")
     TriggerEvent('jl-carboost:client:refreshQueue')
