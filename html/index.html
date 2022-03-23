@@ -34,6 +34,8 @@
     <link rel="stylesheet" href="./styles/boosting.css" />
     <link rel="stylesheet" href="./styles/setting.css" />
     <link rel="stylesheet" href="./styles/confirmbox.css" />
+
+    <!-- FROALA -->
   </head>
   <body oncopy="false" oncut="false" onpaste="false">
     <div class="laptop">
@@ -146,6 +148,14 @@
                 <button class="my-contract">My Contract</button>
                 <button class="buy-contract">Buy Contract</button>
                 <button class="join-queue">Join Queue</button>
+                <div class="ref">
+                  <button
+                    class="refresh-contract"
+                    onclick="refreshContract(this)"
+                  >
+                    Refresh
+                  </button>
+                </div>
               </div>
               <div class="boosting-list" id="boosting-contract">
                 <div class="boost-proggress">

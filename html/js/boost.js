@@ -236,7 +236,6 @@ function buyContract(event) {
           if (resp.success) {
             Notification(resp.success, "success");
             noTitleSale();
-            // loadBoostData();
           } else {
             Notification(
               resp.error
@@ -538,4 +537,26 @@ function countDown(expire, element) {
       noTitleContract();
     }
   }, 1000);
+}
+
+function refreshContract(event) {
+  const loadingicon = document.createElement("i");
+  loadingicon.className = "fas fa-rotate fa-spin";
+  loadingicon.style.fontSize = "15px";
+  event.innerText = "";
+  event.appendChild(loadingicon);
+  const contractParent = document.getElementById("boosting-contract");
+  // let Parent = document.querySelector();
+  let toDelete = contractParent.getElementsByClassName("boost-contract");
+  if (toDelete.length > 0) {
+    for (let i = 0; i < toDelete.length; i++) {
+      toDelete[i].remove();
+    }
+  }
+  setTimeout(() => {
+    event.removeChild(loadingicon);
+    event.innerText = "Refresh";
+    Notification("Contracts updated", "success");
+    loadBoostData();
+  }, 3000);
 }

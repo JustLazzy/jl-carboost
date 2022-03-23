@@ -17,7 +17,6 @@ $(document).ready(() => {
   if (index >= 2) {
     index = 0;
   }
-
   function display(bool) {
     // bool = true;
     if (bool) {

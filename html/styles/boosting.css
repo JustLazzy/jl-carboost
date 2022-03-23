@@ -78,6 +78,8 @@
   top: 10%;
   position: relative;
   display: flex;
+  margin-right: 30px;
+  margin-left: 30px;
 }
 
 #boosting-app .navigation button {
@@ -110,6 +112,23 @@
 
 #boosting-app .navigation button.buy-contract {
   background-color: #e95f58;
+}
+
+#boosting-app .navigation button.refresh-contract {
+  /* make it on right */
+  /* position: relative; */
+
+  display: flex;
+  align-items: center;
+  background-color: #daae51;
+  width: 100px;
+  margin: 10px;
+}
+.ref {
+  /* make it right */
+  position: absolute;
+  right: 100px;
+  top: 0;
 }
 
 #boosting-app .boosting-list {
@@ -177,6 +196,13 @@
   flex-direction: row;
   width: 80%;
   height: auto;
+}
+
+/* make boost-proggress responsive to 3000+px monitor */
+@media screen and (min-width: 3000px) {
+  #boosting-app .boosting-list {
+    margin-top: 100px;
+  }
 }
 
 #boosting-app .progress-bar {
