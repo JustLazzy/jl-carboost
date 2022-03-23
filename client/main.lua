@@ -818,9 +818,14 @@ RegisterNetEvent('jl-carboost:client:deleteContract', function ()
     TriggerServerEvent('jl-carboost:server:deleteContract', ContractID)
 end)
 
+RegisterNetEvent('jl-carboost:client:playerUnload', function()
+    if carSpawned then
+        DeleteVehicle(carSpawned)
+    end
+    TriggerServerEvent('jl-carboost:server:joinQueue', false, PlayerData.citizenid)
+end)
 
 RegisterNetEvent('jl-carboost:client:failedBoosting', function ()
-    RemoveBlip(dropBlip)
     if zone then
         zone:destroy()
         zone = nil
@@ -830,7 +835,11 @@ RegisterNetEvent('jl-carboost:client:failedBoosting', function ()
         scratchpoint = nil
         inscratchPoint = false
     end
+    RemoveBlip(blipDisplay)
+    RemoveBlip(dropBlip)
+    DeleteEntity(carSpawned)
     carSpawned, carID, carmodel = nil, nil, nil
+    blipDisplay, dropBlip = nil, nil
     isContractStarted = false
     QBCore.Functions.Notify(Lang:t("error.no_car"), "error")
     TriggerEvent('jl-carboost:client:refreshQueue')
