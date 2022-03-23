@@ -30,10 +30,6 @@ Config.MaxRep = 40 -- Maximum reputation that you can get after finish contract
 
 Config.Payment = 'crypto' -- crypto / bank
 
-Config.VINPayment = 100 -- Amount of money that you have to pay for VIN
-
-Config.Attempt = 2 -- how many hacks to successfully turn off the tracker, it'll be random from 1 to this config
-
 Config.VINChance = 0.1 -- chance police to find out the VIN is scratched or no
 
 Config.Tier = {

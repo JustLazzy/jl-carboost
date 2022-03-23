@@ -482,7 +482,7 @@ QBCore.Functions.CreateCallback('jl-carboost:server:vinmoney', function (source,
    local Player = QBCore.Functions.GetPlayer(src)
    local money = Player.PlayerData.money[Config.Payment]
    if money > Config.Tier[data.tier].vinprice then
-      Player.Functions.RemoveMoney(Config.Payment, Config.VINPayment, 'vin-money')
+      Player.Functions.RemoveMoney(Config.Payment, Config.Tier[data.tier].vinprice, 'vin-money')
       return cb({
          success = true
       })
