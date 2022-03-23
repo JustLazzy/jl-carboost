@@ -546,12 +546,9 @@ function refreshContract(event) {
   event.innerText = "";
   event.appendChild(loadingicon);
   const contractParent = document.getElementById("boosting-contract");
-  // let Parent = document.querySelector();
   let toDelete = contractParent.getElementsByClassName("boost-contract");
-  if (toDelete.length > 0) {
-    for (let i = 0; i < toDelete.length; i++) {
-      toDelete[i].remove();
-    }
+  while (toDelete[0]) {
+    toDelete[0].parentNode.removeChild(toDelete[0]);
   }
   setTimeout(() => {
     event.removeChild(loadingicon);
