@@ -11,7 +11,7 @@ function AlertBoosting(netid, type)
         local dispatchData = {dispatchData = data, caller = 'Alarm', coords = carPos}
         TriggerServerEvent('wf-alerts:svNotify', dispatchData)
     elseif type == "qb-dispatch" then
-        exports['qb-dispatch']:CarBoosting(vehInfo)
+        exports['qb-dispatch']:CarBoosting(car)
     else
         TriggerServerEvent('jl-carboost:notifypolice', netid)
     end
