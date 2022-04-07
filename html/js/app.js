@@ -49,6 +49,10 @@ $(document).ready(() => {
           Notification("You don't have enough money", "error");
         }
         break;
+      case "config":
+        console.log();
+        setConfig(event.data.config);
+        break;
       case "addcontract":
         setupNewContract(event.data.boost);
         break;
@@ -311,6 +315,12 @@ function wallpaper() {
     value.endsWith(".png")
   ) {
     $(".laptop").css("background-image", `url(${value})`);
+    $.post(
+      "https://jl-carboost/wallpaper",
+      JSON.stringify({
+        wallpaper: value,
+      })
+    );
   } else {
     return;
   }
@@ -505,3 +515,12 @@ var Confirm = {
     }, 100);
   },
 };
+
+function setConfig(data) {
+  if (data.wallpaper === "default" || data.wallpaper === "") {
+    // $(".laptop").css("background-image", "url(assets/img/wallpaper.jpg)");
+    return;
+  } else {
+    $(".laptop").css("background-image", `url(${data.wallpaper})`);
+  }
+}

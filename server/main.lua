@@ -180,6 +180,14 @@ RegisterNetEvent('jl-carboost:server:finishBoosting', function (type, tier)
    }), "primary")   
 end)
 
+RegisterNetEvent('jl-carboost:server:saveConfig', function (data)
+   local wallpaper = data.wallpaper
+   local pData = QBCore.Functions.GetPlayer(source)
+   pData.Functions.SetMetaData('laptopdata', {
+      wallpaper = wallpaper
+   })
+end)
+
 RegisterNetEvent('jl-carboost:server:deleteContract', function (contractid)
    local src = source
    local Player = QBCore.Functions.GetPlayer(src)

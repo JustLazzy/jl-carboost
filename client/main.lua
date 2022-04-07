@@ -21,7 +21,7 @@ RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
     PlayerJob = QBCore.Functions.GetPlayerData().job
     onDuty = true
     TriggerServerEvent('jl-carboost:server:getItem')
-    TriggerEvent('jl-carboost:client:setupBoostingApp')
+    TriggerEvent('jl-carboost:client:setupLaptop')
 end)
 
 RegisterNetEvent('police:SetCopCount', function (amount)
@@ -139,9 +139,6 @@ function doAnimation()
 
     local tabletBoneIndex = GetPedBoneIndex(plyPed, tabletBone)
 
-    -- Set statebag inventory is in use
-    TriggerEvent('actionbar:setEmptyHanded')
-
     AttachEntityToEntity(tabletObj, plyPed, tabletBoneIndex, tabletOffset.x, tabletOffset.y, tabletOffset.z, tabletRot.x, tabletRot.y, tabletRot.z, true, false, false, false, 2, true)
     SetModelAsNoLongerNeeded(tabletProp)
 
@@ -248,6 +245,12 @@ end)
 
 RegisterNUICallback('exit', function (data)
     SetDisplay(false)
+end)
+
+RegisterNUICallback('wallpaper', function (data)
+    local wallpaper = data.wallpaper
+    TriggerServerEvent('jl-carboost:server:saveConfig', data)
+    -- print(json.encode(PlayerData.metadata['laptopdata']))
 end)
 
 RegisterNUICallback('loadstore', function (data, cb)
@@ -476,9 +479,23 @@ RegisterNetEvent('jl-carboost:client:giveContract', function ()
     })
 end)
 
+RegisterNetEvent('jl-carboost:client:setupLaptop', function ()
+    TriggerEvent('jl-carboost:client:sendLaptopConfig')
+    TriggerEvent('jl-carboost:client:setupBoostingApp')
+    TriggerServerEvent('jl-carboost:server:getBoostSale')
+end)
+
 RegisterNetEvent('jl-carboost:client:setupBoostingApp', function ()
     SendNUIMessage({
         type="setupboostingapp",
+    })
+end)
+
+RegisterNetEvent('jl-carboost:client:sendLaptopConfig', function ()
+    local config = PlayerData.metadata['laptopdata']
+    SendNUIMessage({
+        type = "config",
+        config = config
     })
 end)
 
@@ -992,8 +1009,7 @@ CreateThread(function ()
     if LocalPlayer.state['isLoggedIn'] then
         Wait(5000)
         TriggerServerEvent('jl-carboost:server:getItem')
-        TriggerServerEvent('jl-carboost:server:getBoostSale')
-        TriggerEvent('jl-carboost:client:setupBoostingApp')
+        TriggerEvent('jl-carboost:client:setupLaptop')
     end
     CreateBlip(vector3(1185.2, -3303.92, 6.92), "Post OP", 473)
 end)

@@ -104,7 +104,7 @@ div.laptop .notification {
 }
 
 .notification .alert.success {
-  border-left: 7px solid#32eb42;
+  border-left: 7px solid #32eb42;
 }
 
 .notification .alert.info {
@@ -112,11 +112,11 @@ div.laptop .notification {
 }
 
 .notification .alert.warning {
-  border-left: 7px solid#ffc353;
+  border-left: 7px solid #ffc353;
 }
 
 .notification .alert.error {
-  border-left: 7px solid#ff5252;
+  border-left: 7px solid #ff5252;
 }
 
 .notification .alert.active {
