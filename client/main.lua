@@ -82,9 +82,10 @@ local function CreateBlip(coords, name, sprite, colour)
 	return blip
 end
 
+
+
 local function spawnAngryPed(coords)
     if coords and coords[1] then
-        local peds = {}
         for k, v in pairs(coords) do
             local npc = {
                 'a_m_m_beach_01',
@@ -99,11 +100,12 @@ local function spawnAngryPed(coords)
                 Wait(50)
             end
             local ped = CreatePed(1, hash, x, y, z, 0.0, true, true)
-            peds[#peds+1] = ped
             SetNetworkIdExistsOnAllMachines(NetworkGetNetworkIdFromEntity(ped), true)
             SetPedAccuracy(ped, 30)
-            SetPedRelationshipGroupHash(ped, GetHashKey("AMBIENT_GANG_WEICHENG"))
-            SetPedRelationshipGroupDefaultHash(ped, GetHashKey("AMBIENT_GANG_WEICHENG"))
+            SetPedRelationshipGroupHash(ped, `HATES_PLAYER`)
+            SetPedKeepTask(ped, true)
+            SetCanAttackFriendly(ped, false, true)
+            TaskCombatPed(ped, PlayerPedId(), 0, 16)
             SetPedCombatAttributes(ped, 46, true)
             SetPedCombatAbility(ped, 1)
             SetPedCombatAttributes(ped, 0, true)
@@ -114,11 +116,7 @@ local function spawnAngryPed(coords)
             SetPedConfigFlag(ped, 58, true)
             SetPedConfigFlag(ped, 75, true)
             SetBlockingOfNonTemporaryEvents(ped, true)
-            TaskGotoEntityAiming(ped, PlayerPedId(), 4.0, 50.0)
-        end
-        Wait(2000)
-        for k, v in pairs(peds) do
-            TaskShootAtEntity(v, PlayerPedId(), -1)
+            SetEntityAsNoLongerNeeded(ped)
         end
     end
 end
