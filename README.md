@@ -1,3 +1,5 @@
+# THIS REPO IS NOW ARCHIVED, WILL MOVE TO NEW RESOURCE
+
 # JustLazzy Carboost
 
 ## a carboosting script with laptop ui and bennys app
